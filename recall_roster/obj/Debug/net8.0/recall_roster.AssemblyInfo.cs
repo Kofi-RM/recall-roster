@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("recall_roster")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dfda0d9cf28afdca1194b337b40a7b751e810a06")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c4abc5b0e784ffa382ceac88bd74443ac45b1d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("recall_roster")]
 [assembly: System.Reflection.AssemblyTitleAttribute("recall_roster")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

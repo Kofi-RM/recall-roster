@@ -265,3 +265,6 @@ D:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster
 D:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\obj\Debug\net8.0\recall_roster.csproj.CopyComplete
 D:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\obj\Debug\net8.0\recall_roster.genruntimeconfig.cache
 D:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\obj\Debug\net8.0\ref\recall_roster.dll
+d:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\bin\Debug\net8.0\DotNetEnv.dll
+d:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\bin\Debug\net8.0\Sprache.dll
+d:\downloads\Capstone-Gov_Recall-main (2)\Capstone-Gov_Recall-main\recall_roster\obj\recall_roster\bin\Debug\net8.0\Twilio.dll

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {}
+    "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {}
   },
   "projects": {
-    "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {
+    "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
+        "projectUniqueName": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
         "projectName": "recall_roster",
-        "projectPath": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
+        "projectPath": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
         "packagesPath": "C:\\Users\\kofir\\.nuget\\packages\\",
-        "outputPath": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\obj\\",
+        "outputPath": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kofir\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -38,6 +38,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "DotNetEnv": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "Microsoft.AspNetCore.Mvc": {
               "target": "Package",
               "version": "[2.2.0, )"
@@ -59,6 +63,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "Twilio": {
+              "target": "Package",
+              "version": "[6.16.1, )"
             }
           },
           "imports": [
