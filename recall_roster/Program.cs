@@ -12,6 +12,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using DotNetEnv;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +22,14 @@ var builder = WebApplication.CreateBuilder(args);
             
 
 // );
-DotNetEnv.Env.Load();
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).LogTo(Console.WriteLine, LogLevel.Debug);
 
+
+var bid = builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+  //bid.FirstOrDefault()
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
@@ -46,13 +48,13 @@ string accountSid = "ACcff994a1cf3f18f1a2ef2140a797c9d6";
 Console.WriteLine(accountSid);
         TwilioClient.Init(accountSid, authToken);
 
-        var message = MessageResource.Create(
+        /*var message = MessageResource.Create(
             body: "Join Earth's mightiest heroes. Like Kevin Bacon.",
             from: new Twilio.Types.PhoneNumber("+18336223946"),
             to: new Twilio.Types.PhoneNumber("+14707862142")
-        );
+        );*/
 
-        Console.WriteLine(message.Sid);
+       // Console.WriteLine(message.Sid);
 
 var app = builder.Build();
 

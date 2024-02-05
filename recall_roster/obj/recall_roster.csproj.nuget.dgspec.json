@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {}
+    "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {}
   },
   "projects": {
-    "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {
+    "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
+        "projectUniqueName": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
         "projectName": "recall_roster",
-        "projectPath": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
+        "projectPath": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\recall_roster.csproj",
         "packagesPath": "C:\\Users\\kofir\\.nuget\\packages\\",
-        "outputPath": "d:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\obj\\",
+        "outputPath": "D:\\downloads\\Capstone-Gov_Recall-main (2)\\Capstone-Gov_Recall-main\\recall_roster\\obj\\recall_roster\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kofir\\AppData\\Roaming\\NuGet\\NuGet.Config"
