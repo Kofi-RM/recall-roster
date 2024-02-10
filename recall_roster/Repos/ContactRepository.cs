@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using recall_roster.Data;
 using recall_roster.Models;
 using System.Collections.Generic;
@@ -18,6 +20,24 @@ public class ContactRepository
     {
         return _dbContext.Contacts.ToList();
     }
+
+     public Contact GetContact(string name)
+    {
+        var output = this._dbContext.Contacts.FirstOrDefault(o => o.FirstName == name);
+        return output;
+    }
+
+       public void RemoveContact(Contact name)
+    {
+        this._dbContext.Contacts.Remove(name);
+       this._dbContext.SaveChanges();
+    }
+
+  public void AddContact(Contact contact)
+{
+    _dbContext.Contacts.Add(contact);
+    _dbContext.SaveChanges();
+}
 
     // Add other methods for CRUD operations as needed...
 }

@@ -17,22 +17,17 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register AppDbContext
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+ builder.Services.AddDbContext<AppDbContext>(options =>
+     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             
 
-// );
+ );
 
-
-var bid = builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
 
   //bid.FirstOrDefault()
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Recall Roster", Version = "v1" });
 });
 
 
@@ -52,7 +47,7 @@ Console.WriteLine(accountSid);
             body: "Join Earth's mightiest heroes. Like Kevin Bacon.",
             from: new Twilio.Types.PhoneNumber("+18336223946"),
             to: new Twilio.Types.PhoneNumber("+14707862142")
-        );*/
+        ); */
 
        // Console.WriteLine(message.Sid);
 
@@ -65,7 +60,7 @@ var app = builder.Build();
     app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API Name V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recall Roster V1");
 });
 
 
