@@ -14,6 +14,9 @@ using Microsoft.OpenApi.Models;
 using DotNetEnv;
 using Microsoft.Extensions.Options;
 
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Register AppDbContext
@@ -23,6 +26,15 @@ var builder = WebApplication.CreateBuilder(args);
 
  );
 
+  var react = builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowOrigin",
+            builder => builder
+                .WithOrigins("http://localhost:3000") // Replace with your frontend URL
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+    });
 
   //bid.FirstOrDefault()
 builder.Services.AddSwaggerGen(c =>
@@ -63,6 +75,11 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recall Roster V1");
 });
 
+app.UseCors("AllowOrigin");
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
 
 
 // Add additional middleware or configure endpoints here...

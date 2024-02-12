@@ -9,6 +9,7 @@
       "recall_roster/1.0.0": {
         "dependencies": {
           "DotNetEnv": "3.0.0",
+          "Microsoft.AspNetCore.Cors": "2.2.0",
           "Microsoft.AspNetCore.Mvc": "2.2.0",
           "Microsoft.EntityFrameworkCore": "8.0.0",
           "Microsoft.EntityFrameworkCore.Design": "8.0.0",
