@@ -27,4 +27,35 @@ public class ContactController : ControllerBase
         var contacts = _contactRepository.GetAllContacts();
         return Ok(contacts);
     }
+
+
+    [HttpGet("{name}")]
+    public ActionResult<Contact> GetContact(string name)
+    {
+        _logger.LogInformation("Executing GetContacts action...");
+        var contact = _contactRepository.GetContact(name);
+        if (contact == null)
+        {
+            return NotFound();
+        }
+        return Ok(contact);
+    }
+
+
+[HttpGet("remove/{name}")]
+public ActionResult<Contact> RemoveContact(string name)
+{
+    _logger.LogInformation("Executing GetContacts action...");
+    var contact = _contactRepository.GetContact(name);
+    if (contact != null)
+    {
+        this._contactRepository.RemoveContact(contact);
+        Console.WriteLine("Contact removed");
+    } else {
+        return NotFound();
+    }
+    return Ok(contact);
+}
+
+
 }
