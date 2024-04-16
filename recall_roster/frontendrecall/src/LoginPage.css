@@ -1,0 +1,22 @@
+.ToolBar {
+    margin-bottom: 20px;
+}
+
+.MuiTypography-root.logoName {
+    
+     font-family: "Orbitron", sans-serif; 
+      font-optical-sizing: auto;
+     font-weight: bold;
+      font-style:italic;
+    }
+.MuiTypography-root.login {
+  font-family: "Roboto", sans-serif; 
+  font-optical-sizing: auto;
+ 
+  font-style:italic;
+
+}
+    
+.background {
+  background-color: white;
+  }

@@ -1,0 +1,57 @@
+.landing {
+
+    background-color: rgb(241, 242, 242);
+}
+
+body {
+  
+
+  background-color: rgb(241, 242, 242);
+}
+
+/* .colorBox1 {
+
+    background-color: rgb(59, 149, 228);
+    position: absolute;
+  top: -20px; 
+  right: -20px; 
+  width: 150px; 
+  height: 1050px; 
+  z-index: 1;
+}
+
+.colorBox2 {
+
+    background-color: rgb(59, 149, 228);
+    position: absolute;
+  top: -20px; 
+  left: -20px; 
+  width: 150px; 
+  height: 1050px; 
+  z-index: 1;
+} */
+
+.button {
+  display: inline-block;
+  padding: 6px 16px;
+  background-color: #1976d2;
+  border-radius: 4px;
+  cursor: pointer;
+ margin: 10px;
+  border: none;
+  
+  
+}
+
+a {
+  color:white;
+  text-decoration: none;
+}
+
+.ToolBar {
+margin-bottom: 20px;
+}
+
+.list{
+  color:rgb(255, 255, 255)
+}
