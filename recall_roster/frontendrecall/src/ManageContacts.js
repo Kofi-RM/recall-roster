@@ -4,7 +4,7 @@ import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/
 import {ToolBar, MyImage} from './Miscelleneous.js'
 import './Landing.css'
 import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import useContacts from './UseContacts.js'; // Adjust the path as needed
@@ -24,6 +24,7 @@ export const RemoveContact = ({children}) => {
   
 const ManageContacts = () =>  {
     const { contacts, loading, error } = useContacts();
+    const navigate = useNavigate();
 
     if (loading) {
         console.log("d loading")
@@ -47,9 +48,9 @@ const ManageContacts = () =>  {
     // };
     // return (
       fetch("http://localhost:5000/api/contact/remove/" + id, {
-        method: 'POST',
+        method: 'DELETE',
         // Optionally, you can pass some data in the request body
-        // body: JSON.stringify({ id: contact_id }),
+        // body: JSON.stringify({ id: contactID }),
         headers: {
          
         }
@@ -63,6 +64,8 @@ const ManageContacts = () =>  {
     .then(data => {
         // Handle success
         console.log('Contact removed:', data);
+        navigate("/manageContacts");
+
     })
     .catch(error => {
         // Handle error
@@ -75,16 +78,16 @@ const ManageContacts = () =>  {
     <ul style={{ color: 'white !important' }}>
         {contacts.map(contact => (
           
-          <li  key={contact.contact_id} style={{ color: 'white !important' }}>
+          <li  key={contact.contactID} style={{ color: 'white !important' }}>
             <span>
             <h2 className = "list">{contact.firstName + " " + contact.lastName}</h2>
-          <Link to={`/editContact/${contact.contact_id}`}>
+          <Link to={`/editContact/${contact.contactID}`}>
             <button>Edit</button>
             </Link>
             <button  onClick = {() => {
-              console.log(typeof contact.contact_id);
+              console.log(typeof contact.contactID);
 
-              handleRemove(contact.contact_id)
+              handleRemove(contact.contactID)
             }}>  Remove</button>
           </span>
           </li>

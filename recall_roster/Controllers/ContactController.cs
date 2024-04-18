@@ -29,11 +29,11 @@ public class ContactController : ControllerBase
     }
 
 
-    [HttpGet("{name}")]
-    public ActionResult<Contact> GetContact(string name)
+    [HttpGet("{id}")]
+    public ActionResult<Contact> GetContact(int id)
     {
         _logger.LogInformation("Executing GetContacts action...");
-        var contact = _contactRepository.GetContact(name);
+        var contact = _contactRepository.GetContact(id);
         if (contact == null)
         {
             return NotFound();
@@ -41,12 +41,28 @@ public class ContactController : ControllerBase
         return Ok(contact);
     }
 
+[HttpPost]
+public ActionResult<Contact> AddContact(Contact contact)
+{
+    _logger.LogInformation("Executing AddContact action...");
+    try
+    {
+        _contactRepository.AddContact(contact);
+        _logger.LogInformation("Contact added successfully");
+        return CreatedAtAction(nameof(GetContact), new { id = contact.contactID }, contact);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error adding contact");
+        return StatusCode(500, "Internal server error");
+    }
+}
 
-[HttpGet("remove/{name}")]
-public ActionResult<Contact> RemoveContact(string name)
+[HttpPut("remove/{id}")]
+public ActionResult<Contact> RemoveContact(int id)
 {
     _logger.LogInformation("Executing GetContacts action...");
-    var contact = _contactRepository.GetContact(name);
+    var contact = _contactRepository.GetContact(id);
     if (contact != null)
     {
         this._contactRepository.RemoveContact(contact);

@@ -38,7 +38,7 @@ const LandingPage = () => {
 
   const navigate = useNavigate(); // needs to be declared outside the function!!
   const List = () => {
-      navigate("/manageRoster")
+      navigate("/manageContacts")
 
   }
 

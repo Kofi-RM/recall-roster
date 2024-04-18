@@ -21,9 +21,9 @@ public class ContactRepository
         return _dbContext.Contacts.ToList();
     }
 
-     public Contact GetContact(string name)
+     public Contact GetContact(int id)
     {
-        var output = this._dbContext.Contacts.FirstOrDefault(o => o.FirstName == name);
+        var output = this._dbContext.Contacts.FirstOrDefault(o => o.contactID == id);
         return output;
     }
 

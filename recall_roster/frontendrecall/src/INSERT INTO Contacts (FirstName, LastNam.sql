@@ -5,7 +5,6 @@
 --     Password varchar(255),
 --     );
 
--- Insert into Logins(Email, Password)
--- VALUES ('a', 'b');
+Insert into Roster.dbo.roster_contacts(roster_id, contactID)
+VALUES ('1', '4003');
 
-Select * from Contacts

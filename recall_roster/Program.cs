@@ -46,6 +46,7 @@ builder.Services.AddSwaggerGen(c =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<ContactRepository>(); 
+builder.Services.AddScoped<RosterRepository>();
 
 // Add your additional services here...
 

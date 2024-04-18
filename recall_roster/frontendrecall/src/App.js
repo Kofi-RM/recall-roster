@@ -11,9 +11,10 @@ import LandingPage from './Landing.js';
 import { AuthProvider } from './Auth';
 import ManageRoster from './ManageRoster';
 import InsertContact from './InsertContact.js';
-
+import ManageContacts from './ManageContacts.js'
 import axios from 'axios';
 import EditContact from './EditContact.js';
+import AddContact from './AddContact.js';
 
 
 function App() {
@@ -40,8 +41,10 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/manageContacts" element = {<ManageContacts/>} />
+          <Route path="/addContact" element = {<AddContact/>} />
           <Route path="/addContact" element = {<InsertContact/>} />
           <Route path="/editContact/:contactId" element = {<EditContact/>} />
+
            {/* <Route path="/createRoster" element = {<CreateRoster/>}/> */}
           {/* Add more routes as needed */}
         </Routes>

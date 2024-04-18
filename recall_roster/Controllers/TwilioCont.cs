@@ -20,3 +20,6 @@ namespace TwilioSMSReceiver.Controllers
         }
     }
 }
+
+//dotnet add package Twilio.AspNet.Core
+//dotnet add package Twilio 

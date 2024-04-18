@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Contact> Contacts { get; set; }
           public DbSet<LoginModel> Logins { get; set; }
+          public DbSet<Roster> Rosters { get; set; }
 
 
 

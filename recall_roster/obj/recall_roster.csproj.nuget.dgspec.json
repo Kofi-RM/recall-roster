@@ -70,7 +70,11 @@
             },
             "Twilio": {
               "target": "Package",
-              "version": "[6.16.1, )"
+              "version": "[7.0.4, )"
+            },
+            "Twilio.AspNet.Core": {
+              "target": "Package",
+              "version": "[8.0.2, )"
             }
           },
           "imports": [
