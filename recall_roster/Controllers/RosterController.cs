@@ -41,45 +41,45 @@ namespace recall_roster.Controllers;
             return Ok(roster);
         }
 
-        // [HttpPost]
-        // public ActionResult<Roster> AddRoster(Roster roster)
-        // {
-        //     _logger.LogInformation("Executing AddRoster action...");
-        //     try
-        //     {
-        //         _rosterRepository.AddRoster(roster);
-        //         _logger.LogInformation("Roster added successfully");
-        //         return CreatedAtAction(nameof(GetRoster), new { id = roster.rosterID }, roster);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Error adding roster");
-        //         return StatusCode(500, "Internal server error");
-        //     }
-        // }
+        [HttpPost]
+        public ActionResult<Roster> AddRoster(Roster roster)
+        {
+            _logger.LogInformation("Executing AddRoster action...");
+            try
+            {
+                _rosterRepository.AddRoster(roster);
+                _logger.LogInformation("Roster added successfully");
+                return CreatedAtAction(nameof(GetRoster), new { id = roster.rosterId }, roster);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding roster");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
-        // [HttpPut("update/{id}")]
-        // public ActionResult<Roster> UpdateRoster(int id, Roster roster)
-        // {
-        //     _logger.LogInformation("Executing UpdateRoster action...");
-        //     try
-        //     {
-        //         var existingRoster = _rosterRepository.GetRoster(id);
-        //         if (existingRoster == null)
-        //         {
-        //             return NotFound();
-        //         }
-        //         roster.RosterID = id; // Ensure the ID is set
-        //         _rosterRepository.UpdateRoster(roster);
-        //         _logger.LogInformation("Roster updated successfully");
-        //         return Ok(roster);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Error updating roster");
-        //         return StatusCode(500, "Internal server error");
-        //     }
-        // }
+        [HttpPut("update/{id}")]
+        public ActionResult<Roster> UpdateRoster(int id, Roster roster)
+        {
+            _logger.LogInformation("Executing UpdateRoster action...");
+            try
+            {
+                var existingRoster = _rosterRepository.GetRoster(id);
+                if (existingRoster == null)
+                {
+                    return NotFound();
+                }
+                roster.rosterId = id; // Ensure the ID is set
+                _rosterRepository.UpdateRoster(roster);
+                _logger.LogInformation("Roster updated successfully");
+                return Ok(roster);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating roster");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
         [HttpDelete("remove/{id}")]
         public ActionResult<Roster> RemoveRoster(int id)

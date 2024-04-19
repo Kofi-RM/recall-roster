@@ -412,3 +412,4 @@ C:\Users\kofir\Capstone-Gov_Recall\recall_roster\bin\Debug\net8.0\runtimes\win\l
 C:\Users\kofir\Capstone-Gov_Recall\recall_roster\obj\Debug\net8.0\recall_roster.csproj.CopyComplete
 C:\Users\kofir\Capstone-Gov_Recall\recall_roster\obj\Debug\net8.0\recall_roster.genruntimeconfig.cache
 C:\Users\kofir\Capstone-Gov_Recall\recall_roster\obj\Debug\net8.0\ref\recall_roster.dll
+C:\Users\kofir\Capstone-Gov_Recall\recall_roster\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

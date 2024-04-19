@@ -47,6 +47,9 @@ return (
   <Link style= {{fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '2px'}}to="/" onClick={handleLogout}>Logout</Link>
 </span>} 
 
+<span className = "button">
+  <Link style= {{fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '2px'}}to="/Landing" onClick={handleLogout}>Home</Link>
+</span>
 {/* Removes logout button if the user hasnt logged in yet*/}
 
                 </Toolbar>

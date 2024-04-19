@@ -14,6 +14,11 @@ using Microsoft.OpenApi.Models;
 using DotNetEnv;
 using Microsoft.Extensions.Options;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+
 
 
 
@@ -40,6 +45,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Recall Roster", Version = "v1" });
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "your-issuer",
+        ValidAudience = "your-audience",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
+    };
 });
 
 

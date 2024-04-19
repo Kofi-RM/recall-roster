@@ -73,5 +73,23 @@ public ActionResult<Contact> RemoveContact(int id)
     return Ok(contact);
 }
 
+ [HttpPut("{id}")] 
+ 
+ public ActionResult<Contact> UpdateContact(Contact contact){
 
+ try
+            {
+                _contactRepository.UpdateContact(contact);
+                return Ok(contact);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while updating the contact.");
+            }
+ }
 }
+

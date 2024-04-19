@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/material';
 
 import {ToolBar, MyImage} from './Miscelleneous.js'
-import './Landing.css'
+import './ManageContacts.css'
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -48,7 +48,7 @@ const ManageContacts = () =>  {
     // };
     // return (
       fetch("http://localhost:5000/api/contact/remove/" + id, {
-        method: 'DELETE',
+        method: 'PUT',
         // Optionally, you can pass some data in the request body
         // body: JSON.stringify({ id: contactID }),
         headers: {
@@ -75,26 +75,36 @@ const ManageContacts = () =>  {
     return (
 <div>
     <ToolBar></ToolBar>
-    <ul style={{ color: 'white !important' }}>
-        {contacts.map(contact => (
-          
-          <li  key={contact.contactID} style={{ color: 'white !important' }}>
-            <span>
-            <h2 className = "list">{contact.firstName + " " + contact.lastName}</h2>
-          <Link to={`/editContact/${contact.contactID}`}>
-            <button>Edit</button>
-            </Link>
-            <button  onClick = {() => {
-              console.log(typeof contact.contactID);
+    <div className="contact-list-container">
 
-              handleRemove(contact.contactID)
-            }}>  Remove</button>
-          </span>
+      <h1>Contact List</h1>
+      <div className="contact-list-section">
+      <ul className="contact-list">
+        {contacts.map(contact => (
+          <li className="contact-item" key={contact.contactID}>
+            <div className="contact-details">
+              <h2>{contact.firstName} {contact.lastName}</h2>
+              <p>Email: {contact.email}</p>
+              <p>Phone: {contact.phoneNumber}</p>
+            </div>
+            <div className="contact-actions">
+              <Link to={`/editContact/${contact.contactID}`}>
+                <button className="edit-button">Edit</button>
+              </Link>
+              <button className="remove-button" onClick={() => handleRemove(contact.contactID)}>
+                Remove
+              </button>
+            </div>
           </li>
         ))}
       </ul>
+      <Link to= {'/insertContact'}> <button>Add a Contact</button></Link>
+     
+       <button onClick={() => window.history.back()}>Go Back</button>
+    </div>
+    </div>
+    
       </div>
-)
-        
-}
+      )
+        }
 export default ManageContacts;

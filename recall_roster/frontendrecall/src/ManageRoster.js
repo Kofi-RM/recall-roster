@@ -2,16 +2,16 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/material';
 
 import {ToolBar, MyImage} from './Miscelleneous.js'
-import './Landing.css'
+import './ManageContacts.js'
 import { Link } from 'react-router-dom';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
-import useContacts from './UseContacts.js'; // Adjust the path as needed
+import useRoster from './UseRoster.js'; // Adjust the path as needed
 
 
 export const RemoveContact = ({children}) => {
-  const { contacts, loading, error } = useContacts();
+  
 
   return (
 
@@ -22,8 +22,9 @@ export const RemoveContact = ({children}) => {
 }
 
   
-const ManageContacts = () =>  {
-    const { contacts, loading, error } = useContacts();
+const ManageRoster = () =>  {
+    const { rosters, loading, error } = useRoster();
+    
 
     if (loading) {
         console.log("d loading")
@@ -66,32 +67,38 @@ const ManageContacts = () =>  {
     })
     .catch(error => {
         // Handle error
-        console.error('There was a problem removing the contact:', error);
+        console.error('There was a problem removing the roster:', error);
     });
   }
     return (
 <div>
     <ToolBar></ToolBar>
-    <ul style={{ color: 'white !important' }}>
-        {contacts.map(contact => (
+    <div className="contact-list-container">
+<div className="contact-list-section">
+      <h1>Roster List</h1>
+      <hr></hr>
+      <ul className="contact-list">
+        {rosters.map(roster => (
           
-          <li  key={contact.contact_id} style={{ color: 'white !important' }}>
+          <li  key={roster.rosterId} style={{ color: 'white !important' }}>
             <span>
-            <h2 className = "list">{contact.firstName + " " + contact.lastName}</h2>
-          <Link to={`/editContact/${contact.contact_id}`}>
-            <button>Edit</button>
-            </Link>
-            <button  onClick = {() => {
-              console.log(typeof contact.contact_id);
-
-              handleRemove(contact.contact_id)
-            }}>  Remove</button>
+            <h2 className = "list">{roster.name }</h2>
+            <Link to={`/editRoster/${roster.rosterId}`}>
+                <button className="edit-button">Edit</button>
+              </Link>
+              <button className="remove-button" onClick={() => handleRemove(roster.rosterId)}>
+                Remove
+              </button>
           </span>
           </li>
         ))}
       </ul>
+      <button onClick={() => window.history.back()}>Go Back</button>
       </div>
+      </div>
+    </div>
+      
 )
         
 }
-export default ManageContacts;
+export default ManageRoster;

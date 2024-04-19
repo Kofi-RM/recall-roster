@@ -18,7 +18,7 @@ public class ContactRepository
 
     public List<Contact> GetAllContacts()
     {
-        return _dbContext.Contacts.ToList();
+       return _dbContext.Contacts.Where(c => c.Active == 1).ToList();
     }
 
      public Contact GetContact(int id)
@@ -27,10 +27,17 @@ public class ContactRepository
         return output;
     }
 
-       public void RemoveContact(Contact name)
+       public void RemoveContact(Contact contact)
     {
-        this._dbContext.Contacts.Remove(name);
-       this._dbContext.SaveChanges();
+     
+
+    // If the contact exists in the database
+  
+        // Set the active property to 0
+        contact.Active = 0;
+
+        // Update the contact entity in the database
+        _dbContext.SaveChanges();
     }
 
   public void AddContact(Contact contact)
@@ -39,5 +46,23 @@ public class ContactRepository
     _dbContext.SaveChanges();
 }
 
+ public void UpdateContact(Contact updatedContact)
+        {
+            var existingContact = _dbContext.Contacts.FirstOrDefault(c => c.contactID == updatedContact.contactID);
+            if (existingContact != null)
+            {
+                existingContact.FirstName = updatedContact.FirstName;
+                existingContact.LastName = updatedContact.LastName;
+                
+                existingContact.PhoneNumber = updatedContact.PhoneNumber;
+
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                throw new ArgumentException("Contact not found");
+            }
+
     // Add other methods for CRUD operations as needed...
+        }
 }

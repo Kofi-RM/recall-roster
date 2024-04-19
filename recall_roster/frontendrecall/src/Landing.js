@@ -41,6 +41,9 @@ const LandingPage = () => {
       navigate("/manageContacts")
 
   }
+  const Roster =  () => {
+    navigate('/manageRoster')
+  }
 
   const Recall = () => {
     navigate("/")
@@ -92,7 +95,7 @@ const LandingPage = () => {
           <DbButton onClick={List}>View All</DbButton>
         )}
         {selectedTab === 2 && (
-          <DbButton onClick={List}>Make a Roster</DbButton>
+          <DbButton onClick={Roster}>Make a Roster</DbButton>
         )}
 
             </Box>

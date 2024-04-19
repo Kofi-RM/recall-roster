@@ -1,11 +1,18 @@
 // Models/Contact.cs
 
-namespace recall_roster.Models
-{
+namespace recall_roster.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+
     public class Roster
     {
+        [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int rosterId { get; set; }
-        public string name{ get; set; }
+        public required string name{ get; set; }
+
+        public string description{get; set;}
       
     }
-}
+

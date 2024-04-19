@@ -10,6 +10,8 @@ import { useAuth } from './Auth.js'
 
 
 
+
+
 // function Password() {
 //   const [Email, setEmail] = useState('');
 //   const submit = (e) => {
@@ -81,14 +83,14 @@ const LoginPage = () => {
       })
       .catch(error => {
         // Handle login failure
-        console.error('Login failed:', error.response.data);
+       // console.error('Login failed:', error.response.data);
         // Show error message or handle the error as needed
       });
   };
 
 
   const handleLogout = () => {
-logg
+
     // Additional logic (e.g., clearing session, redirecting, etc.) can be added here
   };
 

@@ -6,7 +6,7 @@ import './Landing.css'
 import { DbButton } from './Buttons.js';
 import { Link , useNavigate} from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import {prevPage} from './PageNav.js';
+
 
 
 const InsertContact = () => {
@@ -17,33 +17,39 @@ const InsertContact = () => {
    // set email and password 
 
 
-   const { goBack } = prevPage();
-
-   const handleRemove = async (id) => {
-       
   
-//       fetch("http://localhost:5000/api/login", {
-//         method: 'POST',
-//         // Optionally, you can pass some data in the request body
-//         // body: JSON.stringify({ id: contactId }),
-//         headers: {
-         
-//         }
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         // Handle success
-//         console.log('Contact removed:', data);
-//     })
-//     .catch(error => {
-//         // Handle error
-//         console.error('There was a problem removing the contact:', error);
-//     });
+
+   
+  const data = {
+    firstName,
+    lastName,
+    phoneNumber,
+    active: 1,
+    Role: selectedOption
+  };
+   const handleAdd = async (id) => {
+       
+    fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Handle success
+        console.log('Contact removed:', data);
+    })
+    .catch(error => {
+        // Handle error
+        console.error('There was a problem removing the contact:', error);
+    });
    }  
 return (
 <div className = "background">
@@ -75,7 +81,7 @@ return (
                     <Typography className = "login" variant="h4" align="center" gutterBottom margin='12px' padding-right = '30px'>
                         Phone Number
                     </Typography>
-                    <TextField label="123-456-7899" variant="outlined" value = {lastName} onChange={(e => setLast(e.target.value))}  sx={{ textAlign: 'center' }} margin='20px' />
+                    <TextField label="123-456-7899" variant="outlined" value = {phoneNumber} onChange={(e => setPhoneNumber(e.target.value))}  sx={{ textAlign: 'center' }} margin='20px' />
                 </div>
                       {/*Onchange function is what lets you typei nto the text boxes*/ }
 
@@ -88,16 +94,17 @@ return (
                         sx={{ minWidth: 200 }}
                     >
                         <MenuItem value="">Select Option</MenuItem>
-                        <MenuItem value="1">Option 1</MenuItem>
-                        <MenuItem value="2">Option 2</MenuItem>
-                        <MenuItem value="3">Option 3</MenuItem>
+                        <MenuItem value="Employee">Employee</MenuItem>
+                        <MenuItem value="Element Chief">Element Chief</MenuItem>
+                        <MenuItem value="Flight Chief">Flight Chief</MenuItem>
+                        <MenuItem value="Squadron Director">Squadron Director</MenuItem>
                     </Select>
                 </div>
                 <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Button size="large" variant="contained" color="primary" >
+                    <Button size="large" variant="contained" color="primary" onClick={() => handleAdd()} >
                         Add Contact
                     </Button>
-                    <Button onClick={goBack}>Previous Page</Button>
+                    <Button onClick={() => window.history.back()}>Previous Page</Button>
                 </div>
                 <Warner />
                 {/* Other content */}
