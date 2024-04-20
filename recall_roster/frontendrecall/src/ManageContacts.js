@@ -23,8 +23,33 @@ export const RemoveContact = ({children}) => {
 
   
 const ManageContacts = () =>  {
-    const { contacts, loading, error } = useContacts();
-    const navigate = useNavigate();
+  const { contacts, loading, error } = useContacts();
+  const navigate = useNavigate();
+  const [tabValue, setTabValue] = useState(0); // State to track the active tab index
+
+  // Filter contacts based on the selected tab value (role)
+
+  // Define roles for each tab
+  const roles = ['All', 'Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
+
+  // Function to get the role based on tab index
+  const getTabRole = (index) => {
+    switch (index) {
+      case 0:
+        return ''; // All roles
+      case 1:
+        return 'Employee';
+      case 2:
+        return 'Element Chief';
+      case 3:
+        return 'Flight Chief';
+      case 4:
+        return 'Squadron Director';
+      default:
+        return '';
+    }
+  }
+  const filteredContacts = contacts.filter(contact => contact.role === getTabRole(tabValue));
 
     if (loading) {
         console.log("d loading")
@@ -74,37 +99,39 @@ const ManageContacts = () =>  {
   }
     return (
 <div>
-    <ToolBar></ToolBar>
-    <div className="contact-list-container">
-
-      <h1>Contact List</h1>
-      <div className="contact-list-section">
-      <ul className="contact-list">
-        {contacts.map(contact => (
-          <li className="contact-item" key={contact.contactID}>
-            <div className="contact-details">
-              <h2>{contact.firstName} {contact.lastName}</h2>
-              <p>Email: {contact.email}</p>
-              <p>Phone: {contact.phoneNumber}</p>
-            </div>
-            <div className="contact-actions">
-              <Link to={`/editContact/${contact.contactID}`}>
-                <button className="edit-button">Edit</button>
-              </Link>
-              <button className="remove-button" onClick={() => handleRemove(contact.contactID)}>
-                Remove
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <Link to= {'/insertContact'}> <button>Add a Contact</button></Link>
-     
-       <button onClick={() => window.history.back()}>Go Back</button>
-    </div>
-    </div>
-    
+      <ToolBar></ToolBar>
+      <div className="contact-list-container">
+        <h1>Contact List</h1>
+        <Tabs value={tabValue} onChange={(event, newValue) => setTabValue(newValue)}>
+          {roles.map((role, index) => (
+            <Tab key={index} label={role} />
+          ))}
+        </Tabs>
+        <div className="contact-list-section">
+          <ul className="contact-list">
+            {filteredContacts.map(contact => (
+              <li className="contact-item" key={contact.contactID}>
+                <div className="contact-details">
+                  <h2>{contact.firstName} {contact.lastName}</h2>
+                  <p>Email: {contact.email}</p>
+                  <p>Phone: {contact.phoneNumber}</p>
+                </div>
+                <div className="contact-actions">
+                  <Link to={`/editContact/${contact.contactID}`}>
+                    <button className="edit-button">Edit</button>
+                  </Link>
+                  <button className="remove-button" onClick={() => handleRemove(contact.contactID)}>
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Link to={'/insertContact'}> <button>Add a Contact</button></Link>
+          <button onClick={() => window.history.back()}>Go Back</button>
+        </div>
       </div>
+    </div>
       )
         }
 export default ManageContacts;

@@ -44,7 +44,7 @@ namespace recall_roster.Repos
             _dbContext.SaveChanges();
         }
 
-        public void UpdateRosterContacts(int rosterId, List<Contact> contactsToAdd, List<Contact> contactsToRemove)
+        public void UpdateRosterContacts(int rosterId, int[] contactsToAdd, int[] contactsToRemove)
 {
     // Add new roster contacts
     foreach (var contact in contactsToAdd)
@@ -52,7 +52,7 @@ namespace recall_roster.Repos
         var rosterContactToAdd = new RosterContact
         {
             rosterId = rosterId,
-            contactId = contact.contactID // Assuming Contact class has an Id property
+            contactId = contact, // Assuming Contact class has an Id property
         };
         _dbContext.RosterContacts.Add(rosterContactToAdd);
     }
@@ -60,7 +60,7 @@ namespace recall_roster.Repos
     // Remove existing roster contacts
     foreach (var contact in contactsToRemove)
     {
-        var rosterContactToRemove = _dbContext.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contact.contactID);
+        var rosterContactToRemove = _dbContext.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contact);
         if (rosterContactToRemove != null)
         {
             _dbContext.RosterContacts.Remove(rosterContactToRemove);

@@ -20,6 +20,10 @@ namespace recall_roster.Data
         public DbSet<Roster> Rosters { get; set; }
         public DbSet<RosterContact> RosterContacts { get; set; }
 
+        public DbSet<Recall> Recalls {get; set;}
+        
+        public DbSet<Response> Responses {get; set;}
+
      protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     base.OnModelCreating(modelBuilder);

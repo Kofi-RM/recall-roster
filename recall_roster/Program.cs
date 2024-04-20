@@ -72,6 +72,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ContactRepository>(); 
 builder.Services.AddScoped<RosterRepository>();
 builder.Services.AddScoped<RosterContactRepository>();
+builder.Services.AddScoped<RecallRepository>();
+builder.Services.AddScoped<ResponseRepository>();
+
 
 // Add your additional services here...
 
