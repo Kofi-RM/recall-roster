@@ -58,28 +58,7 @@ namespace recall_roster.Controllers;
             }
         }
 
-        [HttpPut("update/{id}")]
-        public ActionResult<Roster> UpdateRoster(int id, Roster roster)
-        {
-            _logger.LogInformation("Executing UpdateRoster action...");
-            try
-            {
-                var existingRoster = _rosterRepository.GetRoster(id);
-                if (existingRoster == null)
-                {
-                    return NotFound();
-                }
-                roster.rosterId = id; // Ensure the ID is set
-                _rosterRepository.UpdateRoster(roster);
-                _logger.LogInformation("Roster updated successfully");
-                return Ok(roster);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating roster");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+    
 
         [HttpDelete("remove/{id}")]
         public ActionResult<Roster> RemoveRoster(int id)

@@ -9,7 +9,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 import useRoster from './UseRoster.js'; // Adjust the path as needed
 
-
 export const RemoveContact = ({children}) => {
   
 
@@ -80,8 +79,8 @@ const ManageRoster = () =>  {
       <ul className="contact-list">
         {rosters.map(roster => (
           
-          <li  key={roster.rosterId} style={{ color: 'white !important' }}>
-            <span>
+          <li  key={roster.rosterId} style={{ color: 'black !important' }}>
+            <span style={{ color: 'black' }}>
             <h2 className = "list">{roster.name }</h2>
             <Link to={`/editRoster/${roster.rosterId}`}>
                 <button className="edit-button">Edit</button>

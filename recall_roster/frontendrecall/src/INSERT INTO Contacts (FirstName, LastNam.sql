@@ -9,4 +9,4 @@
 -- VALUES ('1', '4003');
 -- Select * from Roster.dbo.roster_contacts
 
-Select * from Roster.dbo.roster_contact
+Select * from Roster.dbo.contacts

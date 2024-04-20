@@ -11,5 +11,7 @@ namespace recall_roster.Models
         public required string Role {get; set;}
 
         public int Active {get; set; }
+
+        public ICollection<RosterContact> RosterContacts { get; set; }
     }
 }

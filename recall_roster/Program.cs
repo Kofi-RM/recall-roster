@@ -71,6 +71,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<ContactRepository>(); 
 builder.Services.AddScoped<RosterRepository>();
+builder.Services.AddScoped<RosterContactRepository>();
 
 // Add your additional services here...
 
