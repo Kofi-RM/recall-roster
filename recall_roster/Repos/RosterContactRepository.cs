@@ -16,15 +16,18 @@ namespace recall_roster.Repos
         }
 
         // Method to retrieve all roster contacts
-        public List<RosterContact> GetAllRosterContacts()
+        public List<RosterContact> GetAllRosterContacts(int rosterId)
         {
-            return _dbContext.RosterContacts.ToList();
-        }
+       
+
+    return _dbContext.RosterContacts.Where(rc => rc.rosterId == rosterId).ToList();
+}
+        
 
         // Method to retrieve roster contacts by roster ID
-        public RosterContact GetRosterContact(int rosterId)
+        public RosterContact GetRosterContact(int rosterId, int contactId)
         {
-            return _dbContext.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId);
+            return _dbContext.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contactId);
         }
 
         // Method to add roster contact

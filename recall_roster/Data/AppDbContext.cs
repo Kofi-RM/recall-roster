@@ -40,7 +40,7 @@ namespace recall_roster.Data
         .HasForeignKey(rc => rc.contactId);     // Foreign key
 
     // You might also need to specify the table name if it's different from the convention
-    modelBuilder.Entity<RosterContact>().ToTable("Roster_Contact");
+    modelBuilder.Entity<RosterContact>().ToTable("RosterContact");
 }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

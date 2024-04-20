@@ -19,19 +19,19 @@ namespace recall_roster.Controllers
             _rosterRepository = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<RosterContact>> GetRosterContacts()
+    [HttpGet("{id}")]
+        public ActionResult<IEnumerable<RosterContact>> GetRosterContacts(int id)
         {
             _logger.LogInformation("Executing GetRosterContacts action...");
-            var rosters = _rosterRepository.GetAllRosterContacts();
+            var rosters = _rosterRepository.GetAllRosterContacts(id);
             return Ok(rosters);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<RosterContact> GetRosterContact(int id)
+        [HttpGet("{rosterId}/{contactId}")]
+        public ActionResult<RosterContact> GetRosterContact(int rosterId, int contactId)
         {
             _logger.LogInformation("Executing GetRosterContact action...");
-            var roster = _rosterRepository.GetRosterContact(id);
+            var roster = _rosterRepository.GetRosterContact(rosterId, contactId);
             if (roster == null)
             {
                 return NotFound();
@@ -60,7 +60,7 @@ namespace recall_roster.Controllers
         public ActionResult<RosterContact> RemoveRosterContact(int rosterId, int contactId)
         {
             _logger.LogInformation("Executing RemoveRosterContact action...");
-            var roster = _rosterRepository.GetRosterContact(rosterId);
+            var roster = _rosterRepository.GetRosterContact(rosterId, contactId);
             if (roster != null)
             {
                 _rosterRepository.RemoveRosterContact(roster);

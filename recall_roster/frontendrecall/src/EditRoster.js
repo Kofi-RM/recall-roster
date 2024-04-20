@@ -16,6 +16,7 @@ const EditRoster = () => {
     const { contacts, loading, error } = useContacts();
     const [contactsByRole, setContactsByRole] = useState({});
     const [selectedContacts, setSelectedContacts] = useState([]);
+    const [rosterContacts, setRosterContacts] = useState([]);
 
     useEffect(() => {
         //console.log('EditRoster component mounted');
@@ -37,6 +38,17 @@ const EditRoster = () => {
                 console.error('Error fetching roster data:', error);
             });
 
+        // Fetch roster contacts data from the API
+        axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
+            .then(response => {
+                // Set the state with retrieved roster contacts data
+            const ids =  response.data.map(rc => rc.contactId)
+                setRosterContacts(ids);
+            })
+            .catch(error => {
+                console.error('Error fetching roster contacts data:', error);
+            });
+
         // Cleanup function to clear contactsByRole state
         return () => {
             setContactsByRole({});
@@ -47,8 +59,6 @@ const EditRoster = () => {
     const groupContactsByRole = (contacts) => {
         const groupedContacts = {};
         contacts.forEach(contact => {
-          //  console.log('ContactID:', contact.contactID); // Log contactId
-          //  console.log('Role:', contact.role); // Log role
             if (!groupedContacts[contact.role]) {
                 groupedContacts[contact.role] = [];
             }
@@ -58,7 +68,6 @@ const EditRoster = () => {
         for (const role in groupedContacts) {
             groupedContacts[role].sort((a, b) => a.lastName.localeCompare(b.lastName));
         }
-      //  console.log(groupedContacts);
         return groupedContacts;
     };
 
@@ -97,24 +106,24 @@ const EditRoster = () => {
 
     const updateRosterContacts = () => {
         console.log(selectedContacts);
-        console.log(roster.rosterId);
-        // Determine contacts to add and remove
-        // const contactsToAdd = selectedContacts.filter(contactID => !roster.contacts.includes(contactID));
-        // const contactsToRemove = roster.contacts.filter(contactID => !selectedContacts.includes(contactID));
-        // // Send request to update roster_contacts
-        // axios.post('http://localhost:5000/api/roster/updateContacts', {
-        //     rosterId: rosterId,
-        //     contactsToAdd: contactsToAdd,
-        //     contactsToRemove: contactsToRemove
-        // })
-        // .then(response => {
-        //     console.log('Roster contacts updated successfully:', response.data);
-        //     // Optionally, you can update the local state or perform any other actions upon successful update.
-        // })
-        // .catch(error => {
-        //     console.error('Error updating roster contacts:', error);
-        //     // Optionally, you can handle errors here, such as displaying an error message to the user.
-        // });
+        console.log(rosterContacts);
+     //   Determine contacts to add and remove
+        const contactsToAdd = selectedContacts.filter(contactID => !rosterContacts.includes(contactID));
+        const contactsToRemove = rosterContacts.filter(contactID => !selectedContacts.includes(contactID));
+        // Send request to update roster_contacts
+        axios.post('http://localhost:5000/api/RosterContact/updateContacts', {
+            rosterId: rosterId,
+            contactsToAdd: contactsToAdd,
+            contactsToRemove: contactsToRemove
+        })
+        .then(response => {
+            console.log('Roster contacts updated successfully:', response.data);
+            // Optionally, you can update the local state or perform any other actions upon successful update.
+        })
+        .catch(error => {
+            console.error('Error updating roster contacts:', error);
+            // Optionally, you can handle errors here, such as displaying an error message to the user.
+        });
     };
 
     return (
