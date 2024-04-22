@@ -81,7 +81,7 @@ const EditRoster = () => {
 
     const handleSubmit = () => {
         // Logic to submit updated roster data
-        axios.put(`http://localhost:5000/api/roster/update/${rosterId}`, roster)
+        axios.put(`http://localhost:5000/api/roster/${rosterId}`, roster)
             .then(response => {
                 console.log('Roster updated successfully:', response.data);
                 // Reload the page to reflect changes
@@ -127,15 +127,16 @@ const EditRoster = () => {
     };
 
     return (
-        <div style={{ backgroundColor: 'rgb(241, 242, 242' }}>
-            <ToolBar />
-            <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Typography variant="h4" align="center" gutterBottom color="black">
-                    Edit this Roster
+        <div style={{ backgroundColor: 'rgb(241, 242, 242)', minHeight: '100vh', paddingTop: '64px', display: 'flex' }}>
+            {/* Left Panel for Editing Roster Details */}
+            <div style={{ width: '30%', padding: '20px' }}>
+                <ToolBar />
+                <Typography variant="h4" align="center" gutterBottom color="primary">
+                    Edit Roster
                 </Typography>
                 {initialRoster && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <Typography variant="h4" align="center" gutterBottom color="black">
+                    <div style={{ marginBottom: '20px' }}>
+                        <Typography variant="h5" align="center" gutterBottom color="textSecondary">
                             Roster Name: {initialRoster.name}
                         </Typography>
                         <TextField
@@ -143,13 +144,14 @@ const EditRoster = () => {
                             name="name"
                             value={roster.name}
                             onChange={handleChange}
-                            sx={{ backgroundColor: '#e0e0e0', margin: '15px' }}
+                            fullWidth
+                            margin="normal"
                         />
                     </div>
                 )}
                 {initialRoster && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <Typography variant="h4" align="center" gutterBottom color="black">
+                    <div style={{ marginBottom: '20px' }}>
+                        <Typography variant="h5" align="center" gutterBottom color="textSecondary">
                             Description: {initialRoster.description}
                         </Typography>
                         <TextField
@@ -157,47 +159,54 @@ const EditRoster = () => {
                             name="description"
                             value={roster.description}
                             onChange={handleChange}
-                            sx={{ backgroundColor: '#e0e0e0', margin: '15px' }}
+                            fullWidth
+                            multiline
+                            rows={4}
+                            margin="normal"
                         />
                     </div>
                 )}
-
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth>
                     Update Roster Details
                 </Button>
-                <Button variant="contained" onClick={() => navigate(-1)} style={{ position: 'fixed', bottom: '20px', left: '20px' }}>Go Back</Button>
-                 {/* Display contacts grouped by role */}
-                 {Object.entries(contactsByRole).map(([role, contacts]) => (
-                    <div key={role}>
-                        <Typography variant="h5" gutterBottom>{role}</Typography>
-                        <ul>
-                            {contacts.map(contact => {
-                              //  console.log('Contact:', contact);
-                                return (
-                                    <li key={contact.contactID} style={{ display: 'grid', gridTemplateColumns: 'auto max-content', gap: '10px' }}>
-        <div>
-            {contact.firstName} {contact.lastName}
-        </div>
-        <input
-            type="checkbox"
-            value={contact.contactID}
-            onChange={() => handleCheckboxChange(contact.contactID)}
-        />
-    </li>
-                                   
-                                );
-                            })}
-                        </ul>
-
-                       
-                 {/* Display contacts grouped by role */}
-                    </div>
-
-                ))}
-                 <Button variant="contained" onClick={() => updateRosterContacts()}>Set Roster Contacts</Button>
-            </Container>
+            </div>
+            
+            {/* Right Panel for Listing Contacts */}
+            <div style={{ width: '70%', padding: '20px' }}>
+                <Typography variant="h4" align="center" gutterBottom color="primary">
+                    Contacts
+                </Typography>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    {Object.entries(contactsByRole).map(([role, contacts]) => (
+                        <div key={role} style={{ marginTop: '20px', flexBasis: '30%' }}>
+                            <Typography variant="h5" gutterBottom color="primary">
+                                {role}
+                            </Typography>
+                            <ul>
+                                {contacts.map(contact => (
+                                    <li key={contact.contactID} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                                        <Typography variant="body1" style={{ marginRight: '10px' }}>
+                                            {contact.firstName} {contact.lastName}
+                                        </Typography>
+                                        <input
+                                            type="checkbox"
+                                            value={contact.contactID}
+                                            onChange={() => handleCheckboxChange(contact.contactID)}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+                <Button variant="contained" onClick={() => updateRosterContacts()} fullWidth style={{ marginTop: '20px' }}>
+                    Set Roster Contacts
+                </Button>
+                <Button variant="contained" onClick={() => navigate(-1)} fullWidth style={{ marginTop: '20px' }}>
+                    Go Back
+                </Button>
+            </div>
         </div>
     );
 };
-
 export default EditRoster;

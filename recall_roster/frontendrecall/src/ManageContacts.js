@@ -49,7 +49,13 @@ const ManageContacts = () =>  {
         return '';
     }
   }
-  const filteredContacts = contacts.filter(contact => contact.role === getTabRole(tabValue));
+  const filteredContacts = contacts.filter(contact => {
+    if (tabValue === 0) {
+      return true; // Include all contacts
+    } else {
+      return contact.role === getTabRole(tabValue);
+    }
+  });
 
     if (loading) {
         console.log("d loading")
@@ -107,28 +113,30 @@ const ManageContacts = () =>  {
             <Tab key={index} label={role} />
           ))}
         </Tabs>
-        <div className="contact-list-section">
+        <div className="contact-list-section"  style={{ position: 'relative' }}>
           <ul className="contact-list">
             {filteredContacts.map(contact => (
               <li className="contact-item" key={contact.contactID}>
                 <div className="contact-details">
                   <h2>{contact.firstName} {contact.lastName}</h2>
-                  <p>Email: {contact.email}</p>
+              
                   <p>Phone: {contact.phoneNumber}</p>
+                  <p>Role: {contact.role}</p>
                 </div>
                 <div className="contact-actions">
                   <Link to={`/editContact/${contact.contactID}`}>
-                    <button className="edit-button">Edit</button>
+                    <Button size="large" variant="contained" color="primary">Edit</Button>
                   </Link>
-                  <button className="remove-button" onClick={() => handleRemove(contact.contactID)}>
+                  <Button size="large" variant="contained" style={{ backgroundColor: 'red', color: 'white' }} onClick={() => handleRemove(contact.contactID)}>
                     Remove
-                  </button>
+                  </Button>
                 </div>
               </li>
             ))}
           </ul>
-          <Link to={'/insertContact'}> <button>Add a Contact</button></Link>
-          <button onClick={() => window.history.back()}>Go Back</button>
+          <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
+          <Link to={'/insertContact'}> <Button size="large" variant="contained" color="primary">Add a Contact</Button></Link>
+         </div>
         </div>
       </div>
     </div>

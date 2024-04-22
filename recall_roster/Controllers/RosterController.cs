@@ -75,6 +75,28 @@ namespace recall_roster.Controllers;
             {
                 return NotFound();
             }
+        
         }
-    }
+
+        [HttpPut("{id}")] 
+ 
+ public ActionResult<Contact> UpdateContact(Roster roster){
+
+ try
+            {
+                _rosterRepository.UpdateRoster(roster);
+                return Ok(roster);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while updating the contact.");
+            }
+ }
+}
+
+    
 

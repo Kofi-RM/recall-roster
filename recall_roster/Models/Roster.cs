@@ -13,6 +13,6 @@ using System.ComponentModel.DataAnnotations.Schema;
         public required string name{ get; set; }
 
         public string description{get; set;}
-      public ICollection<RosterContact> RosterContacts { get; set; }
+      public ICollection<RosterContact>? RosterContacts { get; set; }
     }
 

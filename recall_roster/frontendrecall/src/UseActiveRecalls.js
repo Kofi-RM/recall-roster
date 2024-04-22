@@ -7,10 +7,10 @@ const useActiveRecalls = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchContacts = async () => {
+    const fetchRecalls = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/contact');
+        const response = await axios.get('http://localhost:5000/api/recall');
         setRecalls(response.data);
         setLoading(false);
       } catch (error) {
@@ -19,10 +19,10 @@ const useActiveRecalls = () => {
       }
     };
 
-    fetchContacts();
+    fetchRecalls();
   }, []);
 
-  return { recallsActive, loading, error };
+  return [ recallsActive, loading, error ];
 };
 
 export default useActiveRecalls;

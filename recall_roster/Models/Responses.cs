@@ -7,7 +7,9 @@ namespace recall_roster.Models
         public int contactId { get; set; }
         public int recallId { get; set; }
         public DateTime responseTime { get; set; }
-        public int responded { get; set; }
+        
+
+
 
         // Navigation properties
         public Contact Contact { get; set; }

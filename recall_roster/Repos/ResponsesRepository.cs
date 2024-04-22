@@ -27,5 +27,11 @@ namespace recall_roster.Repos
             var response = _dbContext.Responses.FirstOrDefault(r => r.responseId == id);
             return response;
         }
+
+         public void AddResponse(Response response)
+        {
+            _dbContext.Responses.Add(response);
+            _dbContext.SaveChanges();
+        }
     }
 }

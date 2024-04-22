@@ -1,124 +1,88 @@
-import React, { useContext, useState } from 'react';
-import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/material';
+import React, { useState } from 'react';
+import { Typography, Paper, Tabs, Tab, Box, Grid, Button } from '@mui/material';
 
-import {ToolBar, Warner, Warner2} from './Miscelleneous.js'
-import './Landing.css'
 import { DbButton } from './Buttons.js';
-import { Link , useNavigate} from 'react-router-dom';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
-
-
+import { ToolBar } from './Miscelleneous.js';
+import ManageContacts from './ManageContacts.js';
+import ManageRoster from './ManageRoster.js';
+import ManageActiveRecalls from './ManageActiveRecall.js';
+import ManagePrevRecalls from './ManagePrevRecalls.js';
 const LandingPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const userOptions = ['Active Recalls', 'Previous Recalls', 'Edit Rosters']; // Replace with actual user options
+  const userOptions = ['Active Recalls', 'Previous Recalls', 'Edit Rosters', 'Add Contacts']; // Add 'Add Contacts' option
   const userDetails = {
-    0: 'Active Recalls with a Status Button', // Replace with actual user details based on the option
+    0: 'Active Recalls with a Status Button',
     1: 'Former Recalls sorted by date',
     2: 'Roster Info and Edit Buttons',
+    3: 'Add new contacts to the system', // Details for 'Add Contacts' option
   };
 
   const userTitle = {
-    0: 'List of Active Recalls', // Replace with actual user details based on the option
+    0: 'List of Active Recalls',
     1: 'List of Former Recalls',
     2: 'Manage Roster',
+    3: 'Add Contacts', // Title for 'Add Contacts' option
   };
-
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
 
-  const handleLogout = () => {
-    // Implement logout functionality
-    // For example: Clear user authentication context or perform logout API call
-    
+  const renderTabContent = () => {
+    switch (selectedTab) {
+      case 0:
+        return <ManageActiveRecalls/>
+      case 1:
+        return <ManagePrevRecalls/>
+      case 2:
+        return <ManageRoster/>
+        case 3:
+        return <ManageContacts/>// Render content for 'Add Contacts' option
+      default:
+        return <div>No additional content for this tab</div>; // Default message for other tabs
+    }
   };
 
-  const navigate = useNavigate(); // needs to be declared outside the function!!
-  const List = () => {
-      navigate("/manageContacts")
-
-  }
-  const Roster =  () => {
-    navigate('/manageRoster')
-  }
-
-  const Recall = () => {
-    navigate("/")
-  }
   return (
     <div>
-    
-       <ToolBar></ToolBar>
-       
-    <Container className = "landing" style={{ padding: '25px',  borderRadius: 16, boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.1)' }}>
-     
-      <div className = "colorBox1"></div>
-      <div className = "colorBox2"></div>
-      <Grid container spacing={2}>
-        {/* Left column with buttons and tabs */}
-        <Grid item xs={2}>
-          <Paper>
-            <Typography variant="h6" align="center" style={{ margin: '1rem 0', fontFamily: '"Roboto", sans-serif'  }}>
-              User Options
-            </Typography>
-            <Tabs
-              orientation="vertical"
-              variant="scrollable"
-              value={selectedTab}
-              onChange={handleTabChange}
-            >
-              {userOptions.map((option, index) => (
-                <Tab label={option} key={index} />
-              ))}
-            </Tabs>
-          </Paper>
-        </Grid>
+      <ToolBar></ToolBar>
+      <div style={{ marginTop: '-20px', display: 'flex', height: '100vh' }}> {/* Add marginTop: '-20px' to remove the gap */}
+        {/* Left Sidebar */}
+        <Paper elevation={3} style={{ width: '15%', backgroundColor: '#f0f0f0', height: '100%', overflowY: 'auto' }}>
+          <Typography variant="h6" align="center" style={{ margin: '1rem 0' }}>Navigation</Typography>
+          <Tabs
+            orientation="vertical"
+            variant="scrollable"
+            value={selectedTab}
+            onChange={handleTabChange}
+            textColor="primary"
+            indicatorColor="primary"
+            style={{ marginTop: '20px' }}
+          >
+            {userOptions.map((option, index) => (
+              <Tab label={option} key={index} />
+            ))}
+          </Tabs>
+        </Paper>
 
-        {/* Right column with user information */}
-        <Grid item xs={8}>
-          <Paper>
-            <Typography variant="h6" align="center" style={{ margin: '1rem 0', fontFamily: '"Roboto", sans-serif'  }}>
-            {userTitle[selectedTab]}
-            </Typography>
-            <Box p={2}>
-              <Typography variant="body1" style={{ margin: '1rem 0', fontFamily: '"Roboto", sans-serif'  }}>{userDetails[selectedTab]}</Typography>
-              <ul>
-               
-              </ul>
-              {selectedTab === 0 && (
-          <DbButton onClick={List}>View All</DbButton>
-        )}
-        {selectedTab === 1 && (
-          <DbButton onClick={List}>View All</DbButton>
-        )}
-        {selectedTab === 2 && (
-          <DbButton onClick={Roster}>Make a Roster</DbButton>
-        )}
-
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* Logout button 
-     <Button variant="contained" color="primary" onClick={handleLogout} style={{ marginTop: '1rem' }}>
-        Logout
-      </Button> 
-      */}
-
-      {/* <span className = "button" >
-  Button
-</span> */}
-
-<DbButton onClick={List}>List Contacts</DbButton>
-
-
-<Warner/> {/* Image at the bottom of page*/}
-    </Container>
-
+        {/* Right Content */}
+        <Box style={{ flexGrow: 1, padding: '25px', backgroundColor: '#fff', height: '100vh'  }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {/* <Typography variant="h4" gutterBottom>{userTitle[selectedTab]}</Typography> */}
+            </Grid>
+            <Grid item xs={12}>
+              {/* <Typography variant="body1">{userDetails[selectedTab]}</Typography> */}
+            </Grid>
+            <Grid item xs={12}>
+              {/* Placeholder for the content related to the selected tab */}
+              {renderTabContent()}
+            </Grid>
+          </Grid>
+          
+        </Box>
+      </div>
     </div>
   );
 };

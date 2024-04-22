@@ -81,18 +81,18 @@ const ManageRoster = () =>  {
           
           <li  key={roster.rosterId} style={{ color: 'black !important' }}>
             <span style={{ color: 'black' }}>
-            <h2 className = "list">{roster.name }</h2>
+            <h2 style={{ color: 'black' }} className = "list">{roster.name }</h2>
             <Link to={`/editRoster/${roster.rosterId}`}>
-                <button className="edit-button">Edit</button>
+                <Button size="large" variant="contained" color="primary">Edit</Button>
               </Link>
-              <button className="remove-button" onClick={() => handleRemove(roster.rosterId)}>
+              <Button size="large" variant="contained" style={{ backgroundColor: 'red', color: 'white' }}  onClick={() => handleRemove(roster.rosterId)}>
                 Remove
-              </button>
+              </Button>
           </span>
           </li>
         ))}
       </ul>
-      <button onClick={() => window.history.back()}>Go Back</button>
+     
       </div>
       </div>
     </div>

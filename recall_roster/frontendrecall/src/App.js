@@ -14,7 +14,7 @@ import InsertContact from './InsertContact.js';
 import ManageContacts from './ManageContacts.js'
 import axios from 'axios';
 import EditContact from './EditContact.js';
-
+import RecallStats from './RecallStats.js';
 import EditRoster from './EditRoster.js';
 
 
@@ -48,6 +48,7 @@ function App() {
           <Route path="/manageRoster" element = {<ManageRoster/>} />
           <Route path="/editRoster/:rosterId" element = {<EditRoster/>} />
           <Route path="/insertContact" element = {<InsertContact/>} />
+          <Route path="/recallStats/:recallId" element = {<RecallStats/>} />
 
            {/* <Route path="/createRoster" element = {<CreateRoster/>}/> */}
           {/* Add more routes as needed */}

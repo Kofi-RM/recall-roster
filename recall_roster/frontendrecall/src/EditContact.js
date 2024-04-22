@@ -105,7 +105,7 @@ const EditContact = () => {
             <Button variant="contained" color="primary" onClick={handleSubmit}>
                 Update Contact
             </Button>
-            <button onClick={() => window.history.back()}>Go Back</button>
+            <Button variant="contained" color="primary" onClick={() => window.history.back()}>Go Back</Button>
         </Container>
         </div>
     );

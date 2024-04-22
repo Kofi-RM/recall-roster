@@ -12,6 +12,6 @@ namespace recall_roster.Models
 
         public int Active {get; set; }
 
-        public ICollection<RosterContact> RosterContacts { get; set; }
+        public ICollection<RosterContact>? RosterContacts { get; set; }
     }
 }
