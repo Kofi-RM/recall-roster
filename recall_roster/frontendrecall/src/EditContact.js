@@ -40,7 +40,7 @@ const EditContact = () => {
         axios.put(`http://localhost:5000/api/contact/${contactId}`, contact)
         .then(response => {
             console.log('Contact updated successfully:', response.data);
-            navigate("/manageContacts");
+            navigate("/Landing");
             console.log("navigate");
             
             // Optionally, you can perform further actions after the contact has been updated, such as redirecting to another page or displaying a success message.

@@ -192,6 +192,7 @@ const EditRoster = () => {
                                             type="checkbox"
                                             value={contact.contactID}
                                             onChange={() => handleCheckboxChange(contact.contactID)}
+                                            checked={rosterContacts.includes(contact.contactID)}
                                         />
                                     </li>
                                 ))}

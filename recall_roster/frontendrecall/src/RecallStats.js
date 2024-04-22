@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useNavigationType } from 'react-router-dom';
-import { Typography, Paper, Tabs, Tab, Box, Grid, Button } from '@mui/material';
-
-import { DbButton } from './Buttons.js';
-import { ToolBar } from './Miscelleneous.js';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Typography, Paper, Tabs, Tab, Grid, Button, LinearProgress } from '@mui/material';
 import axios from 'axios';
-
 
 const RecallStats = () => {
     const navigate = useNavigate();
@@ -15,44 +11,112 @@ const RecallStats = () => {
         timeEnded: '',
         message: ''
     });
+    const [contacts, setContacts] = useState([]);
+    const [activeTab, setActiveTab] = useState('all');
+    let rosterId;
+
     useEffect(() => {
-        // Fetch contact data from the API
-        axios.get('http://localhost:5000/api/recall/' + recallId) // Assuming endpoint to fetch contact details
-            .then(response => {
-                // Set the state with retrieved contact data
-                setRecall(response.data)
-                console.log(recall);
-               
-            })
-            .catch(error => {
-                console.error('Error fetching contact data:', error);
-            });
+        // Fetch recall details
+        axios.get('http://localhost:5000/api/recall/' + recallId)
+        .then(response => {
+            setRecall(response.data);
+            const rosterId = response.data.rosterId;
+    
+            // Fetch contacts associated with the recall
+            axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
+                .then(rosterContactResponse => {
+                    // Iterate through rosterContacts and make individual calls for each contact
+                    Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
+                        .then(contactResponses => {
+                            // Process each contact response
+                            const contactsData = contactResponses.map(contactResponse => contactResponse.data);
+                            setContacts(contactsData);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching contact data:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching roster contact data:', error);
+                });
+        })
+        .catch(error => {
+            console.error('Error fetching recall data:', error);
+        });
     }, [recallId]);
+
+    // Filter contacts based on role
+    const filteredContacts = contacts.filter(contact => {
+        if (activeTab === 'all') return true;
+        return contact.role === activeTab;
+    });
+
+    const calculateProgress = (role) => {
+        if (role === 'all') {
+            const totalContacts = contacts.length;
+            const respondedContacts = contacts.filter(contact => contact.responded).length;
+            if (totalContacts === 0) return 0; // to prevent division by zero
+            return (respondedContacts / totalContacts) * 100;
+        } else {
+            const totalContacts = contacts.filter(contact => contact.role === role).length;
+            const respondedContacts = filteredContacts.filter(contact => contact.role === role && contact.responded).length;
+            if (totalContacts === 0) return 0; // to prevent division by zero
+            return (respondedContacts / totalContacts) * 100;
+        }
+    };
+
     return (
-        <div>
-            <ToolBar />
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
             <Paper>
                 <Typography variant="h4">Recall Details</Typography>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <Typography variant="h6">Message: {recall.message}</Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Typography variant="body1">Time Started: {recall.timeStarted}</Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Typography variant="body1">Time Ended: {recall.timeEnded}</Typography>
-                    </Grid>
-                    {/* Add more details if needed */}
-                </Grid>
+                {/* Display recall details */}
             </Paper>
+
+            {/* Tabs for different roles */}
+            <Tabs value={activeTab} onChange={(event, newValue) => setActiveTab(newValue)} aria-label="roles">
+                <Tab label="All" value="all" />
+                <Tab label="Employees" value="Employee" />
+                <Tab label="Element Chiefs" value="Element Chief" />
+                <Tab label="Flight Chiefs" value="Flight Chief" />
+                <Tab label="Squadron Directors" value="Squadron Director" />
+            </Tabs>
+
+            <Typography variant="body1">
+    Current Progress: {calculateProgress(activeTab)}%
+</Typography>
+            <LinearProgress 
+    variant="determinate" 
+    value={calculateProgress(activeTab)} 
+    style={{ margin: '20px 0', height: '10px' }} // Adjusted margin and height
+/>
+            {filteredContacts.length === 0 ? (
+    <Typography variant="body1">You have no contacts of this role</Typography>
+) : (
+    filteredContacts.map(contact => (
+        <div key={contact.contactId} style={{ backgroundColor: 'white', padding: '10px', margin: '10px', borderRadius: '5px' }}>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="body1">Name:{contact.firstName + contact.lastName}</Typography>
+                    <Typography variant="body2">Role: {contact.role}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                    {/* Show response status */}
+                    <Typography variant="body1">{contact.responded ? 'Responded' : 'Not Responded'}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    {/* Progress bar */}
+                   
+                </Grid>
+            </Grid>
+        </div>
+    ))
+)}
+
             <Button variant="contained" onClick={() => navigate(-1)} fullWidth style={{ marginTop: '20px' }}>
-                    Go Back
-                </Button>
+                Go Back
+            </Button>
         </div>
     );
 };
 
-
-
-export default  RecallStats;
+export default RecallStats;

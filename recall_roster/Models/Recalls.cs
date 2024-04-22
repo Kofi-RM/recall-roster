@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace recall_roster.Models
 {
@@ -17,6 +19,8 @@ namespace recall_roster.Models
      public int FlightChief { get; set;}
 
      public int SquadronDirector { get; set;}
+
+     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
      public int Total { get; set;}
      public int EmployeesMax { get; set;}
      public int ElementChiefMax { get; set;}

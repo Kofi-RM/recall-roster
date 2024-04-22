@@ -41,8 +41,8 @@ const recallActive = recallsActive.filter(recall => recall.active === 1);
             ))}
           </ul>
         </div>
-        <div  style={{ position: 'fixed', bottom: '20px', left: '350px' }}>
-          <Link to={'/insertContact'}> <Button size="large" variant="contained" color="primary">Start a Recall</Button></Link>
+        <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
+          <Link to={'/StartRecall'}> <Button size="large" variant="contained" color="primary">Start a Recall</Button></Link>
          </div>
       </div>
     </div>
