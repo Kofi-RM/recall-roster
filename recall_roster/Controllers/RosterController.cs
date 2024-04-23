@@ -13,9 +13,9 @@ namespace recall_roster.Controllers;
     public class RosterController : ControllerBase
     {
         private readonly ILogger<RosterController> _logger;
-        private readonly RosterRepository _rosterRepository;
+        private readonly IRosterRepositoryService _rosterRepository;
 
-        public RosterController(ILogger<RosterController> logger, RosterRepository rosterRepository)
+        public RosterController(ILogger<RosterController> logger, IRosterRepositoryService rosterRepository)
         {
             _logger = logger;
             _rosterRepository = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));

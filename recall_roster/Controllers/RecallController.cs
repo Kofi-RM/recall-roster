@@ -8,19 +8,19 @@ namespace recall_roster.Repos
     public class RecallController : ControllerBase
     {
         private readonly ILogger<RecallController> _logger;
-        private readonly RecallRepository _recallRepository;
+        private readonly IRecallResultsService _recallResultsService;
 
-        public RecallController(ILogger<RecallController> logger, RecallRepository recallRepository)
+        public RecallController(ILogger<RecallController> logger, IRecallResultsService recallResultsService)
         {
             _logger = logger;
-            _recallRepository = recallRepository ?? throw new ArgumentNullException(nameof(recallRepository));
+            _recallResultsService = recallResultsService ?? throw new ArgumentNullException(nameof(recallResultsService));
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Recall>> GetRecalls()
         {
             _logger.LogInformation("Executing GetRecalls action...");
-            var recalls = _recallRepository.GetAllRecalls();
+            var recalls = _recallResultsService.GetAllRecalls();
             return Ok(recalls);
         }
 
@@ -28,7 +28,7 @@ namespace recall_roster.Repos
         public ActionResult<Recall> GetRecall(int id)
         {
             _logger.LogInformation("Executing GetRecall action...");
-            var recall = _recallRepository.GetRecall(id);
+            var recall = _recallResultsService.GetRecall(id);
             if (recall == null)
             {
                 return NotFound();
@@ -42,7 +42,7 @@ namespace recall_roster.Repos
             _logger.LogInformation("Executing AddRecall action...");
             try
             {
-                _recallRepository.AddRecall(recall);
+                _recallResultsService.AddRecall(recall);
                 _logger.LogInformation("Recall added successfully");
                 return CreatedAtAction(nameof(GetRecall), new { id = recall.recallId }, recall);
             }

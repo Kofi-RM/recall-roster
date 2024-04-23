@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Models;
-using recall_roster.Repos;
 
 namespace recall_roster.Controllers
 {
@@ -9,9 +8,9 @@ namespace recall_roster.Controllers
     public class RosterContactController : ControllerBase
     {
         private readonly ILogger<RosterContactController> _logger;
-        private readonly RosterContactRepository _rosterRepository;
+        private readonly RosterContactRepositoryService _rosterRepository;
 
-        public RosterContactController(ILogger<RosterContactController> logger, RosterContactRepository rosterRepository)
+        public RosterContactController(ILogger<RosterContactController> logger, RosterContactRepositoryService rosterRepository)
         {
             _logger = logger;
             _rosterRepository = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
