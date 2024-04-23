@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using recall_roster.Models;
 using recall_roster.Repos;
-using System;
 
 namespace recall_roster.Controllers
 {

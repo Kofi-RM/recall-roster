@@ -1,9 +1,7 @@
-// Controllers/ContactController.cs
-
-using recall_roster.Data;
 using recall_roster.Models;
-using Microsoft.AspNetCore.Mvc;
 using recall_roster.Repos;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace recall_roster.Controllers;
 

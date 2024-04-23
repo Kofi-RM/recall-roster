@@ -1,10 +1,5 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using recall_roster.Data;
 using recall_roster.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace recall_roster.Repos
 {
@@ -28,9 +23,10 @@ namespace recall_roster.Repos
             return recall;
         }
 
-        public void AddRecall(Recall recall) {
-   _dbContext.Recalls.Add(recall);
-    _dbContext.SaveChanges();
+        public void AddRecall(Recall recall)
+        {
+            _dbContext.Recalls.Add(recall);
+            _dbContext.SaveChanges();
 
         }
     }

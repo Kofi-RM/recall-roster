@@ -2,11 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
 using recall_roster.Models;
-using System;
-using System.Threading.Tasks;
-
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace recall_roster.Controllers
 {
