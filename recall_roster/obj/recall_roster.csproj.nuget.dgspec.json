@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\maxgo\\Documents\\projects\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {}
+    "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {}
   },
   "projects": {
-    "C:\\Users\\maxgo\\Documents\\projects\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {
+    "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\maxgo\\Documents\\projects\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "projectUniqueName": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
         "projectName": "recall_roster",
-        "projectPath": "C:\\Users\\maxgo\\Documents\\projects\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
-        "packagesPath": "C:\\Users\\maxgo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\maxgo\\Documents\\projects\\Capstone-Gov_Recall\\recall_roster\\obj\\",
+        "projectPath": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "packagesPath": "C:\\Users\\kofir\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\maxgo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\kofir\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -104,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.104/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
