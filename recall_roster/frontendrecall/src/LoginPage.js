@@ -1,46 +1,20 @@
-import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box, Toolbar, TextField } from '@mui/material';
+import { Box, TextField, Button, Checkbox, FormControlLabel, Grid, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import warner from './warner.png'
-import './LoginPage.css';
+import './css/LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { ToolBar, MyImage, Warner } from './Miscelleneous.js';
+import { ToolBar, MyImage, Warner, Footer } from './Miscelleneous.js';
 import { useAuth } from './Auth.js'
+import { NavyButton } from './Buttons.js';
 
-
-
-
-
-// function Password() {
-//   const [Email, setEmail] = useState('');
-//   const submit = (e) => {
-//     e.preventDefault();
-//     console.log("submit")
-//   }
-
-//   return (
-//     <div>
-//       <h2>Password Recovery</h2>
-//       <form onSubmit={submit}>
-//         <div>
-//           <label>Email:</label>
-//           <input
-//             type="email"
-//             value={Email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             required
-//           />
-//         </div>
-//       </form>
-//     </div>
-//   )
-// }
 
 const LoginPage = () => {
 
-  const [Email, setEmail] = useState('');
-  const [Password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   // set email and password 
   const { login, loggedIn } = useAuth();
   // load login varaibles from Global instances
@@ -61,16 +35,10 @@ const LoginPage = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // if (email === 'a' && password === 'p') {
-    //   login()
-    //   navigate("/landing")
-    // } else {
-    //   alert('Invalid email or password');
-    // }
 
     const loginData = {
-      Email: Email,
-      Password: Password
+      Email: email,
+      Password: password
     };
     console.log(loginData);
 
@@ -107,38 +75,48 @@ const LoginPage = () => {
     <div className="background">
       <ToolBar ></ToolBar>
 
-      <Container style={{ padding: '25px', borderRadius: 16 }}>
-        <Typography variant="h4" align="center" gutterBottom className="logoName">
-          Warner Robins Recall Roster
-        </Typography>
-        <Typography variant="h4" align="center" gutterBottom className="logoName">
-          Login
-        </Typography>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-          <span style={{ marginLeft: '13px' }}>
-            <Typography className="login" variant="h4" align="center" gutterBottom margin='10px' padding='20px'>
-              Email
-            </Typography>
-          </span>
-          <span style={{ marginLeft: '15px' }}>
-            <TextField label="Email" variant="outlined" value={Email} onChange={(e => setEmail(e.target.value))} sx={{ textAlign: 'center' }} InputProps={{ style: { borderColor: 'white' } }} />
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-          <Typography className="login" variant="h4" align="center" gutterBottom margin='12px' padding-right='30px'>
-            Password
+      <Grid container justifyContent="center" alignItems="center" height="100vh">
+      <Grid item>
+        <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: '100%' }}>
+          <Typography variant="h5" gutterBottom align="center">
+            Officer Login
           </Typography>
-          <TextField label="Password" variant="outlined" value={Password} onChange={(e => setPassword(e.target.value))} sx={{ textAlign: 'center' }} margin='20px' />
-        </div>
-        {/*Onchange function is what lets you typei nto the text boxes*/}
-        <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Button size="large" variant="contained" color="primary" onClick={handleLogin}>
-            Login
-          </Button>
-        </div>
-        <Warner />
-        {/* Other content */}
-      </Container>
+          <form onSubmit={handleLogin}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <FormControlLabel
+              control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
+              label="Remember me"
+            />
+            <NavyButton width= {'20%'} type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+              Login
+            </NavyButton>
+          </form>
+          <Box mt={2} textAlign="center">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
+  ;
+  <Footer></Footer>
     </div>
 
   );

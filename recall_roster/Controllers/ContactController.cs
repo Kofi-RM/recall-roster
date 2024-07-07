@@ -1,5 +1,4 @@
 using recall_roster.Models;
-using recall_roster.Repos;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -10,19 +9,19 @@ namespace recall_roster.Controllers;
 public class ContactController : ControllerBase
 {
     private readonly ILogger<ContactController> _logger;
-    private readonly ContactRepository _contactRepository;
+    private readonly IContactService _contactService;
 
-    public ContactController(ILogger<ContactController> logger, ContactRepository contactRepository)
+    public ContactController(ILogger<ContactController> logger, IContactService contactService)
     {
         _logger = logger;
-        _contactRepository = contactRepository ?? throw new ArgumentNullException(nameof(contactRepository));
+        _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Contact>> GetContacts()
     {
         _logger.LogInformation("Executing GetContacts action...");
-        var contacts = _contactRepository.GetAllContacts();
+        var contacts = _contactService.GetAllContacts();
         return Ok(contacts);
     }
 
@@ -31,7 +30,7 @@ public class ContactController : ControllerBase
     public ActionResult<Contact> GetContact(int id)
     {
         _logger.LogInformation("Executing GetContacts action...");
-        var contact = _contactRepository.GetContact(id);
+        var contact = _contactService.GetContactById(id);
         if (contact == null)
         {
             return NotFound();
@@ -45,7 +44,7 @@ public ActionResult<Contact> AddContact(Contact contact)
     _logger.LogInformation("Executing AddContact action...");
     try
     {
-        _contactRepository.AddContact(contact);
+        _contactService.AddContact(contact);
         _logger.LogInformation("Contact added successfully");
         return CreatedAtAction(nameof(GetContact), new { id = contact.contactID }, contact);
     }
@@ -60,10 +59,10 @@ public ActionResult<Contact> AddContact(Contact contact)
 public ActionResult<Contact> RemoveContact(int id)
 {
     _logger.LogInformation("Executing GetContacts action...");
-    var contact = _contactRepository.GetContact(id);
+    var contact = _contactService.GetContactById(id);
     if (contact != null)
     {
-        this._contactRepository.RemoveContact(contact);
+        this._contactService.RemoveContact(contact);
         Console.WriteLine("Contact removed");
     } else {
         return NotFound();
@@ -77,7 +76,7 @@ public ActionResult<Contact> RemoveContact(int id)
 
  try
             {
-                _contactRepository.UpdateContact(contact);
+                _contactService.UpdateContact(contact);
                 return Ok(contact);
             }
             catch (ArgumentException ex)

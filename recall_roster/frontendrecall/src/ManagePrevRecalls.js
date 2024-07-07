@@ -4,6 +4,7 @@ import { ToolBar } from './Miscelleneous.js';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import useActiveRecalls from './UseActiveRecalls.js';
+import { NavyButton } from './Buttons.js';
 
 const RemoveRecall = ({ children }) => {
   return <span className="button">{children}</span>;
@@ -38,7 +39,7 @@ const ManagePrevRecalls = () => {
                 </div>
                 <div>
                   <Link to={`/recallStats/${recall.recallId}`}>
-                    <Button size="large" variant="contained" color="primary">Check Stats</Button>
+                    <NavyButton size="large" variant="contained" color="primary">Check Stats</NavyButton>
                   </Link>
                 </div>
               </li>

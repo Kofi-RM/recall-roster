@@ -1,0 +1,41 @@
+.contact-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.contact-list-section {
+  width: 100%;
+}
+
+.contact-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.contact-list li {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-list h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.contact-list .button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.contact-list .button-container button {
+  flex: 1;
+  margin: 0 4px;
+}

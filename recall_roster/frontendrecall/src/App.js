@@ -1,10 +1,9 @@
 import logo from './logo.svg';
-import './App.css';
+
 
 import React, { useState, useEffect,  createContext, useContext, Component } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/material';
-import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginPage from './LoginPage.js';
 import LandingPage from './Landing.js';
@@ -18,29 +17,16 @@ import RecallStats from './RecallStats.js';
 import EditRoster from './EditRoster.js';
 import StartRecall from './StartRecall.js';
 import CreateRoster from './CreateRoster.js';
+import Home from './Home.js';
 
 function App() {
-
-// Step 2: Provide the context
-
-
-  // useEffect(() => {
-  //   // Axios GET request to your .NET Core backend API endpoint
-  //   axios.get('http://localhost:5000/api/contact')
-  //     .then(response => {
-  //       console.log('Response:', response.data);
-  //       // Do something with the response data
-  //     })
-  //     .catch(error => {
-  //       console.error('Error:', error);
-  //     });
-  // }, []); // Empty dependency array ensures that this effect runs only once, when the component mounts
   
   return (
     <AuthProvider>
     <Router>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage/>} />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/manageContacts" element = {<ManageContacts/>} />
           

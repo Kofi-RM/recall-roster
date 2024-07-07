@@ -1,13 +1,23 @@
 import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/material';
 
-import warner from './warner.png'
-import './App.css';
 import { Link,  useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import useContacts from './UseContacts';
-import styled from 'styled-components';
 
+import React, { useState, useEffect } from 'react';
+
+import styled from 'styled-components';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { NavyTheme } from './ButtonTheme';
+
+export const NavyButton = ({children, className, onClick, width, height}) => {
+  return (
+<ThemeProvider theme = {NavyTheme}>
+  <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button sx={{width: width, height: height}} size="large" variant="contained" color="custom" onClick={ onClick}>
+            {children}
+          </Button>
+        </div>
+        </ThemeProvider>
+)}
 // Styled DbButton component
 const StyledDbButton = styled.button`
   /* Your button styles */

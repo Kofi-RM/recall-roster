@@ -53,7 +53,8 @@ function App() {
   return (
   <Router>
   <Routes>
-    <Route path="/" element={<LoginPage/>} />
+    <Route path="/" element={<Home/>} />
+    <Route path="/login" element={<LoginPage/>} />
     <Route path="/landing" element={<LandingComponent/>} />
     
     {/* Add more routes as needed */}

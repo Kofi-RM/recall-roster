@@ -8,19 +8,19 @@ namespace recall_roster.Repos
     public class ResponseController : ControllerBase
     {
         private readonly ILogger<ResponseController> _logger;
-        private readonly ResponseRepository _responseRepository;
+        private readonly IResponseService _responseService;
 
-        public ResponseController(ILogger<ResponseController> logger, ResponseRepository responseRepository)
+        public ResponseController(ILogger<ResponseController> logger, IResponseService responseService)
         {
             _logger = logger;
-            _responseRepository = responseRepository ?? throw new ArgumentNullException(nameof(responseRepository));
+            _responseService = responseService ?? throw new ArgumentNullException(nameof(responseService));
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Response>> GetResponses()
         {
             _logger.LogInformation("Executing GetResponses action...");
-            var responses = _responseRepository.GetAllResponses();
+            var responses = _responseService.GetAllResponses();
             return Ok(responses);
         }
 
@@ -28,7 +28,7 @@ namespace recall_roster.Repos
         public ActionResult<Response> GetResponse(int id)
         {
             _logger.LogInformation("Executing GetResponse action...");
-            var response = _responseRepository.GetResponse(id);
+            var response = _responseService.GetResponse(id);
             if (response == null)
             {
                 return NotFound();
@@ -42,7 +42,7 @@ namespace recall_roster.Repos
             _logger.LogInformation("Executing AddResponse action...");
             try
             {
-                _responseRepository.AddResponse(response);
+                _responseService.AddResponse(response);
                 _logger.LogInformation("Response added successfully");
                 return CreatedAtAction(nameof(GetResponse), new { id = response.responseId }, response);
             }

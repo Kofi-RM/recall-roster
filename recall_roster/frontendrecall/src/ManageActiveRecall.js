@@ -4,6 +4,7 @@ import { ToolBar } from './Miscelleneous.js';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import useActiveRecalls from './UseActiveRecalls.js';
+import { NavyButton } from './Buttons.js';
 
 
 const ManageActiveRecalls = () => {
@@ -34,7 +35,7 @@ const recallActive = recallsActive.filter(recall => recall.active === 1);
                 </div>
                 <div>
                   <Link to={`/recallStats/${recall.recallId}`}>
-                    <Button size="large" variant="contained" color="primary">Check Progress</Button>
+                    <NavyButton size="large" variant="contained" color="primary">Check Progress</NavyButton>
                   </Link>
                 </div>
               </li>
@@ -42,7 +43,7 @@ const recallActive = recallsActive.filter(recall => recall.active === 1);
           </ul>
         </div>
         <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
-          <Link to={'/StartRecall'}> <Button size="large" variant="contained" color="primary">Start a Recall</Button></Link>
+          <Link to={'/StartRecall'}> <NavyButton size="large" variant="contained" color="primary">Start a Recall</NavyButton></Link>
          </div>
       </div>
     </div>

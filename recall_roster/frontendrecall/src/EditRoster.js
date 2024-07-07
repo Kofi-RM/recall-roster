@@ -59,14 +59,14 @@ const EditRoster = () => {
     const groupContactsByRole = (contacts) => {
         const groupedContacts = {};
         contacts.forEach(contact => {
-            if (!groupedContacts[contact.role]) {
-                groupedContacts[contact.role] = [];
+            if (!groupedContacts[contact.rank]) {
+                groupedContacts[contact.rank] = [];
             }
-            groupedContacts[contact.role].push(contact);
+            groupedContacts[contact.rank].push(contact);
         });
         // Sort contacts alphabetically within each role
-        for (const role in groupedContacts) {
-            groupedContacts[role].sort((a, b) => a.lastName.localeCompare(b.lastName));
+        for (const rank in groupedContacts) {
+            groupedContacts[rank].sort((a, b) => a.lastName.localeCompare(b.lastName));
         }
         return groupedContacts;
     };
@@ -177,10 +177,10 @@ const EditRoster = () => {
                     Contacts
                 </Typography>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {Object.entries(contactsByRole).map(([role, contacts]) => (
-                        <div key={role} style={{ marginTop: '20px', flexBasis: '30%' }}>
+                    {Object.entries(contactsByRole).map(([rank, contacts]) => (
+                        <div key={rank} style={{ marginTop: '20px', flexBasis: '30%' }}>
                             <Typography variant="h5" gutterBottom color="primary">
-                                {role}
+                                {rank}
                             </Typography>
                             <ul>
                                 {contacts.map(contact => (

@@ -2,7 +2,7 @@ import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/
 import { styled } from '@mui/material/styles';
 import warner from './warner.png'
 import warner2 from './warner2.jpg'
-import './App.css';
+import './css/Miscelleneous.css';
 import { Link,  useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
@@ -39,7 +39,7 @@ return (
     
     <div className='toolbar'>
     <AppBar >
-                <Toolbar>
+                <Toolbar sx={{ backgroundColor: '#f1f1f1;' }}>
                     <Typography className = "toolbarName" variant="h6">Warner Robins Air Force Base</Typography>
                     {/* <Button color="inherit">Login</Button> */}
                    
@@ -47,9 +47,9 @@ return (
   <Link style= {{fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '2px'}}to="/" onClick={handleLogout}>Logout</Link>
 </span>} 
 
-<span className = "button">
+{ loggedIn &&  <span className = "button">
   <Link style= {{fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '2px'}}to="/Landing" onClick={handleLogout}>Home</Link>
-</span>
+</span>}
 {/* Removes logout button if the user hasnt logged in yet*/}
 
                 </Toolbar>
@@ -58,7 +58,17 @@ return (
             </div>
 )}
 
+export const Footer = () => {
 
+  return (
+    <footer className="footer">
+    <div className="footer-content">
+      <span> Warner Robins Recall Roster 2024©</span>
+      <Link to="/contact" className="footer-link">Contact Us</Link>
+    </div>
+  </footer>
+  )
+}
    
 
 

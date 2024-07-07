@@ -47,7 +47,7 @@ const LandingPage = () => {
   return (
     <div>
       <ToolBar></ToolBar>
-      <div style={{ marginTop: '-20px', display: 'flex', height: '100vh' }}> {/* Add marginTop: '-20px' to remove the gap */}
+      <div style={{paddingTop:'20px', marginTop: '-20px', display: 'flex', height: '100vh' }}> {/* Add marginTop: '-20px' to remove the gap */}
         {/* Left Sidebar */}
         <Paper elevation={3} style={{ width: '15%', backgroundColor: '#f0f0f0', height: '100%', overflowY: 'auto' }}>
           <Typography variant="h6" align="center" style={{ margin: '1rem 0' }}>Navigation</Typography>
@@ -61,13 +61,13 @@ const LandingPage = () => {
             style={{ marginTop: '20px' }}
           >
             {userOptions.map((option, index) => (
-              <Tab label={option} key={index} />
+              <Tab sx = {{color:'#1c2347'}}label={option} key={index} />
             ))}
           </Tabs>
         </Paper>
 
         {/* Right Content */}
-        <Box style={{ flexGrow: 1, padding: '25px', backgroundColor: '#fff', height: '100vh'  }}>
+        <Box style={{ marginTop: '-40px',flexGrow: 1, paddingRight: '25px', paddingLeft: '25px', backgroundColor: '#fff', height: '100vh'  }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               {/* <Typography variant="h4" gutterBottom>{userTitle[selectedTab]}</Typography> */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { ToolBar } from './Miscelleneous.js';
-import './Landing.css';
+import './css/Landing.css';
 import { useNavigate } from 'react-router-dom';
 const InsertContact = () => {
     const [firstName, setFirst] = useState('');

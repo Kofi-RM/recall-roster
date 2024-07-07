@@ -3,13 +3,6 @@
 }
 
 
-body {
-  background-color: rgb(29, 175, 78);
-}
-
-#poop {
-  background-color: rgb(170, 150, 150);
-}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -60,7 +53,29 @@ body {
   margin-left: 270px;
 }
 
+.image {
+  width: 100px;
+  height: auto; /* To maintain aspect ratio */
+  /* Other styles as needed */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+
+  margin-top: 150px;
+  margin-right: 50px;
+  margin-bottom: 15px;
+  margin-left: 270px;
+}
+
 .toolbar {
   z-index: 2;
-  margin-bottom: 150px;
+  margin-bottom: 64px;
+}
+
+.css-2ulfj5-MuiTypography-root.toolbarName {
+  font-family: "Orbitron", sans-serif; 
+      font-optical-sizing: auto;
+    color:#1c2347;
+      font-style: normal;
 }

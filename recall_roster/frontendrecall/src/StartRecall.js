@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { ToolBar } from './Miscelleneous.js';
-import './Landing.css';
+import './css/Landing.css';
 import { useNavigate } from 'react-router-dom';
 import useRoster from './UseRoster.js';
 import axios from 'axios';
+import { NavyButton } from './Buttons.js';
 
 const StartRecall = () => {
     const [selectedRoster, setSelectedRoster] = useState('');
@@ -159,10 +160,10 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
                     />
                 </div>
                 <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Button size="large" variant="contained" color="primary" onClick={handleSubmit}>
+                    <NavyButton size="large" variant="contained" color="primary" onClick={handleSubmit}>
                         Start Recall
-                    </Button>
-                    <Button variant="contained" onClick={() => navigate(-1)} style={{ position: 'fixed', bottom: '20px', left: '20px' }}>Go Back</Button>
+                    </NavyButton>
+                    <NavyButton variant="contained" onClick={() => navigate(-1)} style={{ position: 'sticky', bottom: '20px', left: '20px' }}>Go Back</NavyButton>
                 </div>
             </Container>
         </div>

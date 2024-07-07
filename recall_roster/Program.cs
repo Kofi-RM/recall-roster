@@ -2,14 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using recall_roster.Controllers;
 using recall_roster.Data;
-using recall_roster.Repos;
 using System.Text;
-using Twilio;
-
-
-
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,13 +53,12 @@ builder.Services.AddAuthentication(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddScoped<ContactRepository>();
-builder.Services.AddScoped<RosterRepository>();
-builder.Services.AddScoped<RosterContactRepository>();
-builder.Services.AddScoped<RecallRepository>();
-builder.Services.AddScoped<ResponseRepository>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IRecallResultsService, RecallResultsService>();
+builder.Services.AddScoped<IResponseService, RecallResponseService>();
+builder.Services.AddScoped<IRosterContactRepository, RosterContactRepositoryService>();
+builder.Services.AddScoped<IRosterRepositoryService, RosterRepositoryService>();
 
 
 var app = builder.Build();

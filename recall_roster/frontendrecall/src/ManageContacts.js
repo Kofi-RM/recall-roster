@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/material';
 
 import {ToolBar, MyImage} from './Miscelleneous.js'
-import './ManageContacts.css'
+import './css/ItemRows.css'
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -113,33 +113,42 @@ const ManageContacts = () =>  {
             <Tab key={index} label={role} />
           ))}
         </Tabs>
-        <div className="contact-list-section"  style={{ position: 'relative' }}>
-          <ul className="contact-list">
+        <div className="contact-list-section">
+        <table className="contact-table">
+          <thead>
+            <tr className="table-header">
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
             {filteredContacts.map(contact => (
-              <li className="contact-item" key={contact.contactID}>
-                <div className="contact-details">
-                  <h2>{contact.firstName} {contact.lastName}</h2>
-              
-                  <p>Phone: {contact.phoneNumber}</p>
-                  <p>Role: {contact.role}</p>
-                </div>
-                <div className="contact-actions">
+              <tr key={contact.contactID} className="contact-row">
+                <td>{contact.firstName} {contact.lastName}</td>
+                <td>{contact.phoneNumber}</td>
+                <td>{contact.rank}</td>
+                <td className="action-buttons">
                   <Link to={`/editContact/${contact.contactID}`}>
-                    <Button size="large" variant="contained" color="primary">Edit</Button>
+                    <Button size="small" variant="contained" color="primary">Edit</Button>
                   </Link>
-                  <Button size="large" variant="contained" style={{ backgroundColor: 'red', color: 'white' }} onClick={() => handleRemove(contact.contactID)}>
+                  <Button size="small" variant="contained" style={{ backgroundColor: 'red', color: 'white' }} onClick={() => handleRemove(contact.contactID)}>
                     Remove
                   </Button>
-                </div>
-              </li>
+                </td>
+              </tr>
             ))}
-          </ul>
-          <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
-          <Link to={'/insertContact'}> <Button size="large" variant="contained" color="primary">Add a Contact</Button></Link>
-         </div>
+          </tbody>
+        </table>
+        <div className="add-contact-button">
+          <Link to={'/insertContact'}>
+            <Button size="large" variant="contained" color="primary">Add a Contact</Button>
+          </Link>
         </div>
       </div>
     </div>
-      )
-        }
+    </div>
+  );
+};
 export default ManageContacts;
