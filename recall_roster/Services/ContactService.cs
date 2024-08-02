@@ -1,5 +1,6 @@
 using recall_roster.Data;
 using recall_roster.Models;
+using recall_roster.DTOs;
 
 public class ContactService : IContactService
 {
@@ -26,11 +27,31 @@ public class ContactService : IContactService
         _context.SaveChanges();
     }
 
-    public void AddContact(Contact contact)
+    public void AddContact(ContactCreateDto contactDto)
 {
-    _context.Contacts.Add(contact);
-    _context.SaveChanges();
-}
+     try
+            {
+                var contact = new Contact
+                {
+                    FirstName = contactDto.FirstName,
+                    LastName = contactDto.LastName,
+                    PhoneNumber = contactDto.PhoneNumber,
+                    Rank = contactDto.Rank,
+                    Active = 1 // Assuming default value for Active field
+                };
+
+                _context.Contacts.Add(contact);
+                _context.SaveChanges();
+
+                // _logger.LogInformation("Contact added successfully");
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, "Error adding contact");
+                throw; // Propagate the exception to the caller
+            }
+        }
+
 
     public void UpdateContact(Contact updatedContact)
         {
@@ -57,6 +78,6 @@ public interface IContactService
     Contact? GetContactById(int contactId);
     List<Contact>? GetAllContacts();
     void RemoveContact(Contact contact);
-    void AddContact(Contact contact);
+    void AddContact(ContactCreateDto contact);
     void UpdateContact(Contact updatedContact);
 }

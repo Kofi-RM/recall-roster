@@ -1,111 +1,112 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box} from '@mui/material';
-
-import {ToolBar, MyImage} from './Miscelleneous.js'
-import './css/ItemRows.css'
+import React, { useState, useEffect } from 'react';
+import { Tabs, Tab, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import axios from 'axios';
 import useContacts from './UseContacts.js'; // Adjust the path as needed
+import { NavyButton } from './Buttons.js';
+import './css/ItemRows.css';
 
+const EditableRow = ({ item, onSave }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [editedItem, setEditedItem] = useState(item);
 
-export const RemoveContact = ({children}) => {
-  const { contacts, loading, error } = useContacts();
+  useEffect(() => {
+    setEditedItem(item);
+  }, [item]);
+
+  const handleToggleEditMode = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedItem((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    onSave(editedItem);
+    setEditMode(false); // Exit edit mode after saving
+  };
 
   return (
+    <tr>
+      {editMode ? (
+        <>
+          <td>
+            <input
+              type="text"
+              name="name"
+              value={`${editedItem.firstName} ${editedItem.lastName}`}
+              onChange={handleChange}
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              name="phone"
+              value={editedItem.phoneNumber}
+              onChange={handleChange}
+            />
+          </td>
+          <td>
+            <select name="rank" value={editedItem.rank} onChange={handleChange}>
+              <option value="">Select Option</option>
+              <option value="Employee">Employee</option>
+              <option value="Element Chief">Element Chief</option>
+              <option value="Flight Chief">Flight Chief</option>
+              <option value="Squadron Director">Squadron Director</option>
+            </select>
+          </td>
+          <td>
+            <NavyButton onClick={handleSave}>Save</NavyButton>
+            <NavyButton onClick={handleToggleEditMode}>Cancel</NavyButton>
+          </td>
+        </>
+      ) : (
+        <>
+          <td>{`${editedItem.firstName} ${editedItem.lastName}`}</td>
+          <td>{editedItem.phoneNumber}</td>
+          <td>{editedItem.rank}</td>
+          <td>
+            <NavyButton onClick={handleToggleEditMode}>Edit</NavyButton>
+          </td>
+        </>
+      )}
+    </tr>
+  );
+};
 
-      <span className = "button" >{children}</span>
-  )
-      
-  
-}
-
-  
-const ManageContacts = () =>  {
+const ManageContacts = () => {
   const { contacts, loading, error } = useContacts();
-  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0); // State to track the active tab index
 
-  // Filter contacts based on the selected tab value (role)
+  const handleSaveItem = (updatedItem) => {
+    console.log('Saving item:', updatedItem);
+    // Implement saving logic here, e.g., API call to update the item
+    // Update your data source (not shown in this example)
+  };
 
   // Define roles for each tab
   const roles = ['All', 'Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
 
-  // Function to get the role based on tab index
-  const getTabRole = (index) => {
-    switch (index) {
-      case 0:
-        return ''; // All roles
-      case 1:
-        return 'Employee';
-      case 2:
-        return 'Element Chief';
-      case 3:
-        return 'Flight Chief';
-      case 4:
-        return 'Squadron Director';
-      default:
-        return '';
-    }
-  }
-  const filteredContacts = contacts.filter(contact => {
-    if (tabValue === 0) {
-      return true; // Include all contacts
-    } else {
-      return contact.role === getTabRole(tabValue);
-    }
+  // Filter contacts based on the selected tab value (role)
+  const filteredContacts = contacts.filter((contact) => {
+    const role = roles[tabValue];
+    return role === 'All' || contact.rank === role;
   });
 
-    if (loading) {
-        console.log("d loading")
-        return <div>Loading...</div>;
-      }
-    
-      if (error) {
-        return <div>Error: {error.message}</div>;
-      }
-    const handleEdit = async (id) => {
-
-    }
-      const handleRemove = async (id) => {
-       
-    //     try {
-    //         const response = await axios.get(`http://localhost:5000/api/contact/remove/${id}`);
-    //         console.log(response.data); // Log the response from the server
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //     }
-    // };
-    // return (
-      fetch("http://localhost:5000/api/contact/remove/" + id, {
-        method: 'PUT',
-        // Optionally, you can pass some data in the request body
-        // body: JSON.stringify({ id: contactID }),
-        headers: {
-         
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle success
-        console.log('Contact removed:', data);
-        navigate("/manageContacts");
-
-    })
-    .catch(error => {
-        // Handle error
-        console.error('There was a problem removing the contact:', error);
-    });
+  if (loading) {
+    return <div>Loading...</div>;
   }
-    return (
-<div>
-      <ToolBar></ToolBar>
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  return (
+    <div>
       <div className="contact-list-container">
         <h1>Contact List</h1>
         <Tabs value={tabValue} onChange={(event, newValue) => setTabValue(newValue)}>
@@ -114,41 +115,32 @@ const ManageContacts = () =>  {
           ))}
         </Tabs>
         <div className="contact-list-section">
-        <table className="contact-table">
-          <thead>
-            <tr className="table-header">
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredContacts.map(contact => (
-              <tr key={contact.contactID} className="contact-row">
-                <td>{contact.firstName} {contact.lastName}</td>
-                <td>{contact.phoneNumber}</td>
-                <td>{contact.rank}</td>
-                <td className="action-buttons">
-                  <Link to={`/editContact/${contact.contactID}`}>
-                    <Button size="small" variant="contained" color="primary">Edit</Button>
-                  </Link>
-                  <Button size="small" variant="contained" style={{ backgroundColor: 'red', color: 'white' }} onClick={() => handleRemove(contact.contactID)}>
-                    Remove
-                  </Button>
-                </td>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="add-contact-button">
-          <Link to={'/insertContact'}>
-            <Button size="large" variant="contained" color="primary">Add a Contact</Button>
-          </Link>
+            </thead>
+            <tbody>
+              {filteredContacts.map((item) => (
+                <EditableRow key={item.id} item={item} onSave={handleSaveItem} />
+              ))}
+            </tbody>
+          </table>
+          <div className="contact-list-buttons">
+            <Link to="/insertContact">
+              <NavyButton size="large" variant="contained" color="primary">
+                Add a Contact
+              </NavyButton>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
-    </div>
   );
 };
+
 export default ManageContacts;

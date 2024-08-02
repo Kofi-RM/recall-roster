@@ -25,7 +25,7 @@ const ManagePrevRecalls = () => {
   }
   return (
     <div>
-      <ToolBar />
+  
       <div className="contact-list-container">
         <div className="contact-list-section">
           <h1>Recall List</h1>

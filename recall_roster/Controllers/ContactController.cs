@@ -1,4 +1,5 @@
 using recall_roster.Models;
+using recall_roster.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -39,10 +40,16 @@ public class ContactController : ControllerBase
     }
 
 [HttpPost]
-public ActionResult<Contact> AddContact(Contact contact)
+public ActionResult<ContactCreateDto> AddContact(ContactCreateDto contact)
 {
     _logger.LogInformation("Executing AddContact action...");
-    try
+     {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
     {
         _contactService.AddContact(contact);
         _logger.LogInformation("Contact added successfully");
@@ -53,6 +60,7 @@ public ActionResult<Contact> AddContact(Contact contact)
         _logger.LogError(ex, "Error adding contact");
         return StatusCode(500, "Internal server error");
     }
+}
 }
 
 [HttpPut("remove/{id}")]

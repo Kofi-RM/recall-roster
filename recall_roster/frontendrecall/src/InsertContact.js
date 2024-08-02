@@ -19,11 +19,12 @@ const InsertContact = () => {
         lastName,
         phoneNumber,
         active: 1,
-        Role: selectedOption
+        Rank: selectedOption
     };
 
     const handleAdd = async () => {
-        fetch('http://localhost:5000/api/contact', {
+        console.log(data);
+        fetch('http://localhost:5000/api/Contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -49,7 +50,7 @@ const InsertContact = () => {
         })
         .catch(error => {
             // Handle error
-            console.error('There was a problem removing the contact:', error);
+            console.error('There was a problem adding the contact:', error);
         });
     };
 
@@ -59,7 +60,7 @@ const InsertContact = () => {
     // }, []);
 
     return (
-        <div className="background">
+        <div className="h">
             <ToolBar />
              {/* Display a Snackbar for the alert */}
              <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert} anchorOrigin={{

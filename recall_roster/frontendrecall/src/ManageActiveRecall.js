@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button } from '@mui/material';
 import { ToolBar } from './Miscelleneous.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useActiveRecalls from './UseActiveRecalls.js';
 import { NavyButton } from './Buttons.js';
 
-
 const ManageActiveRecalls = () => {
 const [ recallsActive, loading, error] = useActiveRecalls();
-
 const recallActive = recallsActive.filter(recall => recall.active === 1);
+const navigate = useNavigate();
 
+const StartRecall = () => {
+  
+  navigate('/startRecall');
+  } 
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -19,9 +23,17 @@ const recallActive = recallsActive.filter(recall => recall.active === 1);
   if (error) {
     return <div>Error: {error.message}</div>;
   }
+  if( recallActive.length === 0) {
+    return (<>
+    <div><br></br><br></br><h1>There are currently have no Active Recalls.</h1></div>
+    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+      <NavyButton onClick={StartRecall}>Start Recall</NavyButton>
+    </div>
+    </>
+  )}
   return (
     <div>
-      <ToolBar />
+    
       <div className="contact-list-container">
         <div className="contact-list-section">
           <h1>Recall List</h1>

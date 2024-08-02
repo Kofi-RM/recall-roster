@@ -11,11 +11,11 @@ import { NavyTheme } from './ButtonTheme';
 export const NavyButton = ({children, className, onClick, width, height}) => {
   return (
 <ThemeProvider theme = {NavyTheme}>
-  <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  {/* <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}> */}
           <Button sx={{width: width, height: height}} size="large" variant="contained" color="custom" onClick={ onClick}>
             {children}
           </Button>
-        </div>
+    
         </ThemeProvider>
 )}
 // Styled DbButton component

@@ -116,7 +116,7 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
     };
 
     return (
-        <div className="background">
+        <div className="recallBackground">
             <ToolBar />
             {/* Display a Snackbar for the alert */}
             <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert} anchorOrigin={{

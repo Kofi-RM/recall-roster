@@ -6,6 +6,7 @@ using Twilio.Types;
 public interface IMessageService
 {
     void SendMessageByID(int contactId);
+    void SendMessage(string name, string content);
 }
 
 public class MessageService : IMessageService
@@ -33,15 +34,15 @@ public class MessageService : IMessageService
         }
     }
 
-    private void SendMessage(string to, string body)
+    public void SendMessage(string recipient, string body)
     {
         var accountSid = _configuration["Twilio:AccountSid"];
         var authToken = _configuration["Twilio:AuthToken"];
         TwilioClient.Init(accountSid, authToken);
 
-        var messageOptions = new CreateMessageOptions(new PhoneNumber($"whatsapp:+1{to}"))
+        var messageOptions = new CreateMessageOptions(new PhoneNumber($"+1{recipient}"))
         {
-            From = new PhoneNumber("whatsapp:+14155238886"),
+            From = new PhoneNumber("+18336223946"),
             Body = body
         };
 

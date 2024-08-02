@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToolBar } from './Miscelleneous.js';
 import useContacts from './UseContacts.js'; // Adjust the path as needed
+import { NavyButton } from './Buttons.js';
 
 const EditRoster = () => {
     const navigate = useNavigate();
@@ -166,9 +167,9 @@ const EditRoster = () => {
                         />
                     </div>
                 )}
-                <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth>
+                <NavyButton variant="contained" color="primary" onClick={handleSubmit} fullWidth>
                     Update Roster Details
-                </Button>
+                </NavyButton>
             </div>
             
             {/* Right Panel for Listing Contacts */}
@@ -200,12 +201,12 @@ const EditRoster = () => {
                         </div>
                     ))}
                 </div>
-                <Button variant="contained" onClick={() => updateRosterContacts()} fullWidth style={{ marginTop: '20px' }}>
+                <NavyButton variant="contained" onClick={() => updateRosterContacts()} fullWidth style={{ marginTop: '20px' }}>
                     Set Roster Contacts
-                </Button>
-                <Button variant="contained" onClick={() => navigate(-1)} fullWidth style={{ marginTop: '20px' }}>
+                </NavyButton>
+                <NavyButton variant="contained" onClick={() => navigate(-1)} fullWidth style={{ marginTop: '20px' }}>
                     Go Back
-                </Button>
+                </NavyButton>
             </div>
         </div>
     );

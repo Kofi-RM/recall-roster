@@ -57,8 +57,8 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IRecallResultsService, RecallResultsService>();
 builder.Services.AddScoped<IResponseService, RecallResponseService>();
-builder.Services.AddScoped<IRosterContactRepository, RosterContactRepositoryService>();
 builder.Services.AddScoped<IRosterRepositoryService, RosterRepositoryService>();
+builder.Services.AddScoped<IRosterContactRepository, RosterContactRepositoryService>();
 
 
 var app = builder.Build();

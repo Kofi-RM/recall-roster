@@ -10,7 +10,7 @@ import ManagePrevRecalls from './ManagePrevRecalls.js';
 const LandingPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const userOptions = ['Active Recalls', 'Previous Recalls', 'Edit Rosters', 'Add Contacts']; // Add 'Add Contacts' option
+  const userOptions = ['Active Recalls', 'Recall History', 'Custom Rosters', 'View Staff']; // Add 'Add Contacts' option
   const userDetails = {
     0: 'Active Recalls with a Status Button',
     1: 'Former Recalls sorted by date',
@@ -49,7 +49,7 @@ const LandingPage = () => {
       <ToolBar></ToolBar>
       <div style={{paddingTop:'20px', marginTop: '-20px', display: 'flex', height: '100vh' }}> {/* Add marginTop: '-20px' to remove the gap */}
         {/* Left Sidebar */}
-        <Paper elevation={3} style={{ width: '15%', backgroundColor: '#f0f0f0', height: '100%', overflowY: 'auto' }}>
+        <Paper elevation={3} style={{display: 'block', position: 'fixed', width: '15%', backgroundColor: '#f0f0f0', height: '100%', overflowY: 'auto' }}>
           <Typography variant="h6" align="center" style={{ margin: '1rem 0' }}>Navigation</Typography>
           <Tabs
             orientation="vertical"
@@ -67,7 +67,7 @@ const LandingPage = () => {
         </Paper>
 
         {/* Right Content */}
-        <Box style={{ marginTop: '-40px',flexGrow: 1, paddingRight: '25px', paddingLeft: '25px', backgroundColor: '#fff', height: '100vh'  }}>
+        <Box style={{marginLeft: '15%', width:'85%', marginTop: '-40px',flexGrow: 1, paddingRight: '25px', paddingLeft: '25px', backgroundColor: '#fff', height: '100vh'  }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               {/* <Typography variant="h4" gutterBottom>{userTitle[selectedTab]}</Typography> */}

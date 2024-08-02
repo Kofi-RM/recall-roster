@@ -3,6 +3,7 @@ import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import useRoster from './UseRoster'; // Adjust the path as needed
 import { NavyButton } from './Buttons';
+import { useNavigate } from 'react-router-dom';
 import { ToolBar } from './Miscelleneous';
 import './css/ItemRows.css'
 
@@ -13,7 +14,7 @@ export const RemoveContact = ({ children }) => (
 
 const ManageRoster = () => {
   const { rosters, loading, error } = useRoster();
-
+const navigate = useNavigate();
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -36,9 +37,12 @@ const ManageRoster = () => {
     }
   };
 
+  const handleEdit = (id) => {
+    navigate("/editRoster/" +id)
+  }
   return (
     <div>
-      <ToolBar />
+    
       <div className="contact-list-container">
         <div className="contact-list-section">
           <h1>Roster List</h1>
@@ -47,10 +51,10 @@ const ManageRoster = () => {
             {rosters.map((roster) => (
               <li key={roster.rosterId} style={{ color: 'black' }}>
                 <h2 className="list" style={{ color: 'black' }}>{roster.name}</h2>
-                <div className="button-container">
-                  <Link to={`/editRoster/${roster.rosterId}`}>
-                    <NavyButton size="large" variant="contained" color="primary">Edit</NavyButton>
-                  </Link>
+             
+                  
+                    <NavyButton size="large" variant="contained" color="primary" onClick={() => handleEdit(roster.rosterId)}>Edit</NavyButton>
+                  
                   <Button
                     size="large"
                     variant="contained"
@@ -59,10 +63,12 @@ const ManageRoster = () => {
                   >
                     Remove
                   </Button>
-                </div>
+                  <hr></hr>
               </li>
             ))}
+            
           </ul>
+    
         </div>
       </div>
     </div>

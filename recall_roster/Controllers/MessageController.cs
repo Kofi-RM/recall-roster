@@ -48,5 +48,20 @@ public class MessageController : TwilioController
             return BadRequest($"Failed to send message: {ex.Message}");
         }
     }
+
+    [HttpPost("SendMessage")]
+    public ActionResult Send() 
+        {
+    
+        try 
+        {
+         _messageService.SendMessage("4707862142", "We go");
+        return Ok("Message sent successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Failed to send message: {ex.Message}");
+        }
+}
 }
 }

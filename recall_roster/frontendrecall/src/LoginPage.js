@@ -34,7 +34,7 @@ const LoginPage = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
+console.log("tryna login");
 
     const loginData = {
       Email: email,
@@ -81,7 +81,7 @@ const LoginPage = () => {
           <Typography variant="h5" gutterBottom align="center">
             Officer Login
           </Typography>
-          <form onSubmit={handleLogin}>
+       
             <TextField
               label="Email"
               variant="outlined"
@@ -105,10 +105,10 @@ const LoginPage = () => {
               control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
               label="Remember me"
             />
-            <NavyButton width= {'20%'} type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+            <NavyButton onClick = {handleLogin} width= {'20%'} type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
               Login
             </NavyButton>
-          </form>
+         
           <Box mt={2} textAlign="center">
             <Link to="/forgot-password">Forgot Password?</Link>
           </Box>

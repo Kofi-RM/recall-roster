@@ -38,15 +38,12 @@ body, html {
     font-size: 1.2rem;
   }
   
-  .contact-item .criteria-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Adjust the number of columns as needed */
-    gap: 8px;
+
+  .table-header th{
+    padding:10px 0 10px 0;
   }
-  
-  .criteria {
-    padding: 8px;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+
+  .contact-list h2 {
+    display: inline;
+    margin-right: 10px;
   }
