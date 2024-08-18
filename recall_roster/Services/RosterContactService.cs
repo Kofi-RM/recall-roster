@@ -1,11 +1,11 @@
 using recall_roster.Data;
 using recall_roster.Models;
 
-    public class RosterContactRepositoryService : IRosterContactRepository
+    public class RosterContactService : IRosterContactService
     {
         private readonly AppDbContext _context;
 
-        public RosterContactRepositoryService(AppDbContext context)
+        public RosterContactService(AppDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -68,7 +68,7 @@ using recall_roster.Models;
         // Add other methods for CRUD operations as needed...
     }
 
-    public interface IRosterContactRepository
+    public interface IRosterContactService
     {
         List<RosterContact> GetAllRosterContacts(int rosterId);
         RosterContact? GetRosterContact(int rosterId, int contactId);

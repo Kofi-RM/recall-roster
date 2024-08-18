@@ -8,6 +8,9 @@ import useRoster from './UseRoster.js';
 import axios from 'axios';
 import { NavyButton } from './Buttons.js';
 
+
+
+
 const StartRecall = () => {
     const [selectedRoster, setSelectedRoster] = useState('');
     const [message, setMessage] = useState('');
@@ -47,16 +50,23 @@ const StartRecall = () => {
 
         };
         
-        
-        const { rosterContacts } = await fetchRosterContacts(selectedRoster);
+        const contactsArray = [];
+        var recallId;
+        const rosterContacts = await fetchRosterContacts(selectedRoster);
 
+        console.log("roster contacts" + rosterContacts);
         for (const rc of rosterContacts)
             {
                 const id = rc.contactId;
                 const response = await axios.get(`http://localhost:5000/api/contact/${id}`);
-                const role = response.data.role;
-                console.log(role + "role")
-                switch (role) {
+                 console.log(response);
+                const contact = response.data;
+                console.log("contact" + contact)
+                const rank = contact.rank;
+                contactsArray.push(contact);
+                console.log("contacts array" + contactsArray)
+                console.log(rank + "rank")
+                switch (rank) {
                 case 'Employee':
                     employeesMax++;
                     break;
@@ -75,19 +85,27 @@ const StartRecall = () => {
      };
     
      data.EmployeesMax = employeesMax;
-     console.log(employeesMax);
+     console.log("employee max" + employeesMax);
 data.FlightChiefMax = flightChiefMax;
 data.ElementChiefMax = elementChiefMax;
 data.SquadronDirectorMax = squadronDirectorMax;
 data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirectorMax;
 
-        data.TotalMax = data.EmployeesMax + data.FlightChiefMax + data.ElementChiefMax + data.SquadronDirectorMax;
         console.log(data);
+        console.log(contactsArray);
       
 
         axios.post('http://localhost:5000/api/Recall', data)
         .then(response => {
             console.log('Recall data posted successfully:', response.data);
+            recallId = response.data.recallId;
+           
+             contactsArray.forEach(contact => {
+                 axios.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactID}/${recallId}`)
+            // console.log(contact);
+            // console.log(contact.contactID)
+            // console.log(recallId)
+             })
             // Handle response as needed
         })
         .catch(error => {
@@ -95,6 +113,7 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
             // Handle error as needed
         });
 
+       
 
     }
 
@@ -102,17 +121,21 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
         try {
             const response = await axios.get(`http://localhost:5000/api/rostercontact/${selectedRoster}`);
             const rosterContacts = response.data;
-            return { rosterContacts };
+            return  rosterContacts ;
         } catch (error) {
             console.error('Error fetching roster contacts:', error);
             return { rosterContacts: [] };
         }
     };
-    const handleSubmit = () => {
+    const handleSubmit  = async () => {
         // // Logic to submit the message
-       
-        setIsSubmitting(true);
+        
         addRecall();
+        setAlertOpen(true);
+        setTimeout(() => {
+            navigate("/landing");
+        }, 2000); 
+   
     };
 
     return (
@@ -124,7 +147,7 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
                 horizontal: 'right',
             }}>
                 <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%', fontSize: '1.2rem' }}>
-                    Message sent successfully!
+                    Recall initatied!
                 </Alert>
             </Snackbar>
             <Container style={{ padding: '25px', borderRadius: 16 }}>

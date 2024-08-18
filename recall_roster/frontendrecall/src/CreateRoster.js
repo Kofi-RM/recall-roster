@@ -110,7 +110,7 @@ const CreateRoster = () => {
    
 
     return (
-        <div className="background">
+        <div>
             <ToolBar />
             {/* Display a Snackbar for the alert */}
             <Snackbar

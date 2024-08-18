@@ -1,26 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Models;
 
-namespace recall_roster.Controllers
-{
+
+namespace recall_roster.Controllers;
+
     [Route("api/[controller]")]
     [ApiController]
     public class RosterContactController : ControllerBase
     {
         private readonly ILogger<RosterContactController> _logger;
-        private readonly RosterContactRepositoryService _rosterRepository;
+        private readonly IRosterContactService _rosterContactService;
 
-        public RosterContactController(ILogger<RosterContactController> logger, RosterContactRepositoryService rosterRepository)
+        public RosterContactController(ILogger<RosterContactController> logger, IRosterContactService rosterRepository)
         {
             _logger = logger;
-            _rosterRepository = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
+            _rosterContactService = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
         }
 
     [HttpGet("{id}")]
         public ActionResult<IEnumerable<RosterContact>> GetRosterContacts(int id)
         {
             _logger.LogInformation("Executing GetRosterContacts action...");
-            var rosters = _rosterRepository.GetAllRosterContacts(id);
+            var rosters = _rosterContactService.GetAllRosterContacts(id);
             return Ok(rosters);
         }
 
@@ -28,7 +29,7 @@ namespace recall_roster.Controllers
         public ActionResult<RosterContact> GetRosterContact(int rosterId, int contactId)
         {
             _logger.LogInformation("Executing GetRosterContact action...");
-            var roster = _rosterRepository.GetRosterContact(rosterId, contactId);
+            var roster = _rosterContactService.GetRosterContact(rosterId, contactId);
             if (roster == null)
             {
                 return NotFound();
@@ -42,7 +43,7 @@ namespace recall_roster.Controllers
             _logger.LogInformation("Executing AddRosterContact action...");
             try
             {
-                _rosterRepository.AddRosterContact(roster);
+                _rosterContactService.AddRosterContact(roster);
                 _logger.LogInformation("Roster_Contact added successfully");
                return CreatedAtAction(nameof(GetRosterContact), new { id = roster.rosterId, id2 = roster.contactId }, roster);
             }
@@ -53,14 +54,14 @@ namespace recall_roster.Controllers
             }
         }
 
-        [HttpDelete("remove/{id}")]
+        [HttpDelete("remove/{rosterId}/{contactId}")]
         public ActionResult<RosterContact> RemoveRosterContact(int rosterId, int contactId)
         {
             _logger.LogInformation("Executing RemoveRosterContact action...");
-            var roster = _rosterRepository.GetRosterContact(rosterId, contactId);
+            var roster = _rosterContactService.GetRosterContact(rosterId, contactId);
             if (roster != null)
             {
-                _rosterRepository.RemoveRosterContact(roster);
+                _rosterContactService.RemoveRosterContact(roster);
                 _logger.LogInformation("Roster_Contact removed successfully");
                 return Ok(roster);
             }
@@ -76,7 +77,7 @@ public IActionResult UpdateRosterContacts([FromBody] UpdateRosterContacts reques
 {
     try
     {
-        _rosterRepository.UpdateRosterContacts(request.RosterId, request.ContactsToAdd, request.ContactsToRemove);
+        _rosterContactService.UpdateRosterContacts(request.RosterId, request.ContactsToAdd, request.ContactsToRemove);
         _logger.LogInformation("Roster contacts updated successfully");
         return Ok();
     }
@@ -87,4 +88,4 @@ public IActionResult UpdateRosterContacts([FromBody] UpdateRosterContacts reques
     }
 }
     }
-}
+

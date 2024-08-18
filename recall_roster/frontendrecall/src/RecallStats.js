@@ -16,20 +16,25 @@ const RecallStats = () => {
     let rosterId;
 
     useEffect(() => {
+        console.log(recallId);
         // Fetch recall details
         axios.get('http://localhost:5000/api/recall/' + recallId)
         .then(response => {
-            setRecall(response.data);
+            setRecall(response.data)
+            console.log("recall response" + response.data);
             const rosterId = response.data.rosterId;
+            console.log("rosterId" + rosterId);
     
             // Fetch contacts associated with the recall
             axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
                 .then(rosterContactResponse => {
                     // Iterate through rosterContacts and make individual calls for each contact
+                    console.log("rc response" + rosterContactResponse);
                     Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
                         .then(contactResponses => {
                             // Process each contact response
                             const contactsData = contactResponses.map(contactResponse => contactResponse.data);
+                            console.log(contactsData);
                             setContacts(contactsData);
                         })
                         .catch(error => {
@@ -48,18 +53,18 @@ const RecallStats = () => {
     // Filter contacts based on role
     const filteredContacts = contacts.filter(contact => {
         if (activeTab === 'all') return true;
-        return contact.role === activeTab;
+        return contact.rank === activeTab;
     });
 
-    const calculateProgress = (role) => {
-        if (role === 'all') {
+    const calculateProgress = (rank) => {
+        if (rank === 'all') {
             const totalContacts = contacts.length;
             const respondedContacts = contacts.filter(contact => contact.responded).length;
             if (totalContacts === 0) return 0; // to prevent division by zero
             return (respondedContacts / totalContacts) * 100;
         } else {
-            const totalContacts = contacts.filter(contact => contact.role === role).length;
-            const respondedContacts = filteredContacts.filter(contact => contact.role === role && contact.responded).length;
+            const totalContacts = contacts.filter(contact => contact.rank === rank).length;
+            const respondedContacts = filteredContacts.filter(contact => contact.rank === rank && contact.responded).length;
             if (totalContacts === 0) return 0; // to prevent division by zero
             return (respondedContacts / totalContacts) * 100;
         }
@@ -90,14 +95,14 @@ const RecallStats = () => {
     style={{ margin: '20px 0', height: '10px' }} // Adjusted margin and height
 />
             {filteredContacts.length === 0 ? (
-    <Typography variant="body1">You have no contacts of this role</Typography>
+    <Typography variant="body1">You have no contacts of this rank</Typography>
 ) : (
     filteredContacts.map(contact => (
         <div key={contact.contactId} style={{ backgroundColor: 'white', padding: '10px', margin: '10px', borderRadius: '5px' }}>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <Typography variant="body1">Name:{contact.firstName + contact.lastName}</Typography>
-                    <Typography variant="body2">Role: {contact.role}</Typography>
+                    <Typography variant="body1">Name:{contact.firstName + " " + contact.lastName}</Typography>
+                    <Typography variant="body2">Rank: {contact.rank}</Typography>
                 </Grid>
                 <Grid item xs={6}>
                     {/* Show response status */}

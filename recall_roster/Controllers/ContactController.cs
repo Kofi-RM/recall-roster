@@ -39,6 +39,18 @@ public class ContactController : ControllerBase
         return Ok(contact);
     }
 
+[HttpGet("bynumber/{number}")]
+    public ActionResult<Contact> GetContactByNumber(string number)
+    {
+        _logger.LogInformation("Executing GetContacts action...");
+        var contact = _contactService.GetContactByNumber(number);
+        if (contact == null)
+        {
+            return NotFound();
+        }
+        return Ok(contact);
+    }
+
 [HttpPost]
 public ActionResult<ContactCreateDto> AddContact(ContactCreateDto contact)
 {

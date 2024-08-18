@@ -52,13 +52,14 @@ builder.Services.AddAuthentication(options =>
 
 
 // Add services to the container.
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IRecallResultsService, RecallResultsService>();
-builder.Services.AddScoped<IResponseService, RecallResponseService>();
+builder.Services.AddScoped<IResponseService, ResponseService>();
 builder.Services.AddScoped<IRosterRepositoryService, RosterRepositoryService>();
-builder.Services.AddScoped<IRosterContactRepository, RosterContactRepositoryService>();
+builder.Services.AddScoped<IRosterContactService, RosterContactService>();
 
 
 var app = builder.Build();

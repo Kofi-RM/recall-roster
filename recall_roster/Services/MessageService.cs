@@ -5,7 +5,7 @@ using Twilio.Types;
 
 public interface IMessageService
 {
-    void SendMessageByID(int contactId);
+    void SendMessageByID(int contactId, int recallId);
     void SendMessage(string name, string content);
 }
 
@@ -20,13 +20,13 @@ public class MessageService : IMessageService
         _configuration = configuration;
     }
 
-    public void SendMessageByID(int contactId)
+    public void SendMessageByID(int contactId, int recallId)
     {
         var contact = _contactService.GetContactById(contactId);
         if (contact != null)
         {
             Console.WriteLine($"Sending message to {contact.FirstName} {contact.LastName}");
-            SendMessage(contact.PhoneNumber, "A recall has been initiated. Please respond with your contact ID to confirm your presence.");
+            SendMessage(contact.PhoneNumber, "A recall has been initiated. Please respond with your contact ID and corresponding recall ID to confirm your presence. \n Your contact ID is: " + contactId +". \nYour recall ID is: " + recallId + ".");
         }
         else
         {

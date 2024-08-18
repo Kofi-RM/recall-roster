@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Models;
 
-namespace recall_roster.Repos
+namespace recall_roster.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

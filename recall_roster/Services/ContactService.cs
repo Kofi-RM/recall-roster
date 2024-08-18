@@ -16,6 +16,12 @@ public class ContactService : IContactService
         return contact;
     }
 
+    public Contact? GetContactByNumber(string number)
+    {
+        var contact = _context.Contacts.FirstOrDefault(c => c.PhoneNumber == number);
+        return contact;
+    }
+
     public List<Contact> GetAllContacts()
     {
        return _context.Contacts.Where(c => c.Active == 1).ToList();
@@ -76,6 +82,7 @@ public class ContactService : IContactService
 public interface IContactService
 {
     Contact? GetContactById(int contactId);
+    Contact? GetContactByNumber(string number);
     List<Contact>? GetAllContacts();
     void RemoveContact(Contact contact);
     void AddContact(ContactCreateDto contact);

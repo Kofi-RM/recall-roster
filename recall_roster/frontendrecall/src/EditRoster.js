@@ -28,6 +28,7 @@ const EditRoster = () => {
                 // Set the state with retrieved roster data
                 setRoster(response.data);
                 setInitialRoster(response.data);
+               
 
                 // Group contacts by role and update state
                 if (contacts && contacts.length > 0) {
@@ -43,8 +44,9 @@ const EditRoster = () => {
         axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
             .then(response => {
                 // Set the state with retrieved roster contacts data
-            const ids =  response.data.map(rc => rc.contactId)
-                setRosterContacts(ids);
+                const ids = response.data.map(rc => rc.contactId);
+                setSelectedContacts(ids);
+             
             })
             .catch(error => {
                 console.error('Error fetching roster contacts data:', error);
@@ -108,7 +110,7 @@ const EditRoster = () => {
     const updateRosterContacts = () => {
         console.log(selectedContacts);
         console.log(rosterContacts);
-     //   Determine contacts to add and remove
+        // Determine contacts to add and remove
         const contactsToAdd = selectedContacts.filter(contactID => !rosterContacts.includes(contactID));
         const contactsToRemove = rosterContacts.filter(contactID => !selectedContacts.includes(contactID));
         // Send request to update roster_contacts
@@ -117,14 +119,14 @@ const EditRoster = () => {
             contactsToAdd: contactsToAdd,
             contactsToRemove: contactsToRemove
         })
-        .then(response => {
-            console.log('Roster contacts updated successfully:', response.data);
-            // Optionally, you can update the local state or perform any other actions upon successful update.
-        })
-        .catch(error => {
-            console.error('Error updating roster contacts:', error);
-            // Optionally, you can handle errors here, such as displaying an error message to the user.
-        });
+            .then(response => {
+                console.log('Roster contacts updated successfully:', response.data);
+                // Optionally, you can update the local state or perform any other actions upon successful update.
+            })
+            .catch(error => {
+                console.error('Error updating roster contacts:', error);
+                // Optionally, you can handle errors here, such as displaying an error message to the user.
+            });
     };
 
     return (
@@ -171,7 +173,7 @@ const EditRoster = () => {
                     Update Roster Details
                 </NavyButton>
             </div>
-            
+
             {/* Right Panel for Listing Contacts */}
             <div style={{ width: '70%', padding: '20px' }}>
                 <Typography variant="h4" align="center" gutterBottom color="primary">
@@ -193,7 +195,7 @@ const EditRoster = () => {
                                             type="checkbox"
                                             value={contact.contactID}
                                             onChange={() => handleCheckboxChange(contact.contactID)}
-                                            checked={rosterContacts.includes(contact.contactID)}
+                                            checked={selectedContacts.includes(contact.contactID)}
                                         />
                                     </li>
                                 ))}
@@ -211,4 +213,5 @@ const EditRoster = () => {
         </div>
     );
 };
+
 export default EditRoster;

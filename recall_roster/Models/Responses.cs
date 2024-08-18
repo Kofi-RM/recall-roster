@@ -8,6 +8,7 @@ namespace recall_roster.Models
         public int recallId { get; set; }
         public DateTime responseTime { get; set; }
         
+        public string response {  get; set; }
 
 
 
