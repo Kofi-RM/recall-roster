@@ -23,7 +23,7 @@ const CreateRoster = () => {
         const groupedContacts = groupContactsByRole(contacts);
         setContactsByRank(groupedContacts);
         }
-    }, []) 
+    }, [contacts]) 
     const handleCloseAlert = () => {
         setAlertOpen(false);
     };
@@ -42,16 +42,14 @@ const CreateRoster = () => {
             const rosterId = rosterResponse.data.rosterId;
     
             // Create roster contact entries
-            const rosterContactData = {
-                rosterId: rosterId,
-                contactIds: rosterContacts
-            };
+            const contactsToAdd = rosterContacts;
     
-           const  contactsToRemove = [];
+    
+           const  contactsToRemove = []; // Always empty due to creating the roster
             // Send a POST request to create roster contacts
             axios.post('http://localhost:5000/api/RosterContact/updateContacts', {
             rosterId: rosterId,
-            contactsToAdd: rosterContactData,
+            contactsToAdd: contactsToAdd,
             contactsToRemove: contactsToRemove
            
         }) .then(response => {
@@ -100,9 +98,9 @@ const CreateRoster = () => {
             if (!groupedContacts[contact.rank]) {
                 groupedContacts[contact.rank] = [];
             }
-            if (Number(contact.active) === 1) {
+             if (Number(contact.active) === 1) {
                 groupedContacts[contact.rank].push(contact);
-        }
+             }
         });
         // Sort contacts alphabetically within each rank
         for (const rank in groupedContacts) {

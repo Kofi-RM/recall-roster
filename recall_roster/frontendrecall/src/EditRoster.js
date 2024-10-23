@@ -113,6 +113,9 @@ const EditRoster = () => {
         // Determine contacts to add and remove
         const contactsToAdd = selectedContacts.filter(contactID => !rosterContacts.includes(contactID));
         const contactsToRemove = rosterContacts.filter(contactID => !selectedContacts.includes(contactID));
+
+        console.log("add" + contactsToAdd)
+        console.log("out" + contactsToRemove)
         // Send request to update roster_contacts
         axios.post('http://localhost:5000/api/RosterContact/updateContacts', {
             rosterId: rosterId,
