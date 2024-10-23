@@ -70,6 +70,9 @@ const navigate = useNavigate();
           </ul>
     
         </div>
+        <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
+          <Link to={'/CreateRoster'}> <NavyButton size="large" variant="contained" color="primary">Make a New Roster</NavyButton></Link>
+         </div>
       </div>
     </div>
   );

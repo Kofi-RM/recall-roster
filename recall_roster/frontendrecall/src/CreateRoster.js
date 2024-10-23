@@ -9,8 +9,10 @@ const CreateRoster = () => {
     const [rosterName, setRosterName] = useState('');
     const [description, setDescription] = useState('');
     const [alertOpen, setAlertOpen] = useState(false);
+    
     const { contacts, loading, error } = useContacts();
-    const [contactsByRole, setContactsByRole] = useState({});
+
+    const [contactsByRank, setContactsByRank] = useState({});
     const [selectedContacts, setSelectedContacts] = useState([]);
     const [rosterContacts, setRosterContacts] = useState([]);
     const navigate = useNavigate();
@@ -19,9 +21,9 @@ const CreateRoster = () => {
     useEffect(() => {
         if (contacts && contacts.length > 0) {
         const groupedContacts = groupContactsByRole(contacts);
-        setContactsByRole(groupedContacts);
+        setContactsByRank(groupedContacts);
         }
-    }) 
+    }, []) 
     const handleCloseAlert = () => {
         setAlertOpen(false);
     };
@@ -95,14 +97,16 @@ const CreateRoster = () => {
     const groupContactsByRole = (contacts) => {
         const groupedContacts = {};
         contacts.forEach(contact => {
-            if (!groupedContacts[contact.role]) {
-                groupedContacts[contact.role] = [];
+            if (!groupedContacts[contact.rank]) {
+                groupedContacts[contact.rank] = [];
             }
-            groupedContacts[contact.role].push(contact);
+            if (Number(contact.active) === 1) {
+                groupedContacts[contact.rank].push(contact);
+        }
         });
-        // Sort contacts alphabetically within each role
-        for (const role in groupedContacts) {
-            groupedContacts[role].sort((a, b) => a.lastName.localeCompare(b.lastName));
+        // Sort contacts alphabetically within each rank
+        for (const rank in groupedContacts) {
+            groupedContacts[rank].sort((a, b) => a.lastName.localeCompare(b.lastName));
         }
         return groupedContacts;
     };
@@ -159,10 +163,10 @@ const CreateRoster = () => {
             Contacts
         </Typography>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-            {Object.entries(contactsByRole).map(([role, contacts]) => (
-                <div key={role} style={{ marginTop: '20px', flexBasis: '30%' }}>
+            {Object.entries(contactsByRank).map(([rank, contacts]) => (
+                <div key={rank} style={{ marginTop: '20px', flexBasis: '30%' }}>
                     <Typography variant="h6" gutterBottom color="primary">
-                        {role}
+                        {rank}
                     </Typography>
                     <ul>
                         {contacts.map(contact => (

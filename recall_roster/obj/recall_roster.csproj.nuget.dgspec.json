@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {}
+    "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {
+    "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "projectUniqueName": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
         "projectName": "recall_roster",
-        "projectPath": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "projectPath": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
         "packagesPath": "C:\\Users\\kofir\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kofir\\Expo\\Capstone-Gov_Recall\\recall_roster\\obj\\",
+        "outputPath": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kofir\\AppData\\Roaming\\NuGet\\NuGet.Config"
