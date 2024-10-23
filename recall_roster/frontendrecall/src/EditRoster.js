@@ -17,6 +17,7 @@ const EditRoster = () => {
     const { contacts, loading, error } = useContacts();
     const [contactsByRole, setContactsByRole] = useState({});
     const [selectedContacts, setSelectedContacts] = useState([]);
+    const [initialContacts, setInitialContacts] = useState([]);
     const [rosterContacts, setRosterContacts] = useState([]);
 
     useEffect(() => {
@@ -46,6 +47,7 @@ const EditRoster = () => {
                 // Set the state with retrieved roster contacts data
                 const ids = response.data.map(rc => rc.contactId);
                 setSelectedContacts(ids);
+                setInitialContacts(ids);
              
             })
             .catch(error => {
@@ -109,10 +111,14 @@ const EditRoster = () => {
 
     const updateRosterContacts = () => {
         console.log(selectedContacts);
-        console.log(rosterContacts);
+        console.log(initialContacts);
+
+      
+            
+        
         // Determine contacts to add and remove
-        const contactsToAdd = selectedContacts.filter(contactID => !rosterContacts.includes(contactID));
-        const contactsToRemove = rosterContacts.filter(contactID => !selectedContacts.includes(contactID));
+        const contactsToAdd = selectedContacts.filter(contactID => !initialContacts.includes(contactID));
+        const contactsToRemove = initialContacts.filter(contactID => !selectedContacts.includes(contactID));
 
         console.log("add" + contactsToAdd)
         console.log("out" + contactsToRemove)
