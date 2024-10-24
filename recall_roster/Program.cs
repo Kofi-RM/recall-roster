@@ -19,11 +19,11 @@ var react = builder.Services.AddCors(options =>
   {
       options.AddPolicy("AllowOrigin",
           builder => builder
-              .WithOrigins("http://localhost:3000") // Replace with your frontend URL
+              .WithOrigins("http://localhost:3000", "https://fb38-98-62-120-34.ngrok-free.app") // Replace with your frontend URL
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
-  });
+  }); // need to allow access to ngrok url
 
 
 builder.Services.AddSwaggerGen(c =>

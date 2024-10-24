@@ -21,7 +21,7 @@ const RecallStats = () => {
         axios.get('http://localhost:5000/api/recall/' + recallId)
         .then(response => {
             setRecall(response.data)
-            console.log("recall response" + response.data);
+            console.log( response.data);
             const rosterId = response.data.rosterId;
             console.log("rosterId" + rosterId);
     
@@ -29,7 +29,7 @@ const RecallStats = () => {
             axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
                 .then(rosterContactResponse => {
                     // Iterate through rosterContacts and make individual calls for each contact
-                    console.log("rc response" + rosterContactResponse);
+                    console.log(rosterContactResponse);
                     Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
                         .then(contactResponses => {
                             // Process each contact response

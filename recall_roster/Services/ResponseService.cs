@@ -27,12 +27,12 @@ using Microsoft.AspNetCore.Mvc;
 
          public string AddResponse( string from, string body, int recallId) {
        
+       Console.WriteLine("TOP OF ADD RESPONSE");
         var contact = _contactService.GetContactByNumber(from);
-        if (contact == null)
-        {
+        if (contact == null) {
             return $"Contact with phone number {from} not found.";
         } else {
-            Console.WriteLine("contact found");
+            Console.WriteLine("CONTACT IN ADD RESPONSE");
         }
     // } catch (Exception ex) {
     //     _logger.LogError(ex, "Error adding response");
@@ -49,6 +49,7 @@ using Microsoft.AspNetCore.Mvc;
         
         _context.Responses.Add(response);
         _context.SaveChanges();
+        Console.WriteLine("ADDED RESPOMSE INSIDE ADD RESPONSE");
 
         return "Response added";
         // _logger.LogInformation("Response added successfully");
