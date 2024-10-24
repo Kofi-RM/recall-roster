@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 
         public Response? GetResponse(int id)
         {
-            var response = _context.Responses.FirstOrDefault(r => r.responseId == id);
+            var response = _context.Responses.FirstOrDefault(r => r.contactId == id);
             return response;
         }
 

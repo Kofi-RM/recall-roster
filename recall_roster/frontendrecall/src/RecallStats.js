@@ -27,19 +27,28 @@ const RecallStats = () => {
     
             // Fetch contacts associated with the recall
             axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
-                .then(rosterContactResponse => {
+                .then(rc => {
+                    Promise.all(rc.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
+                    .then(contactResponses => {
+                        const contactsData = contactResponses.map(contactResponse => contactResponse.data);
+                        setContacts(contactsData);
+                        // maps each response to an array of contacts
+                    })
+                    
+
+
                     // Iterate through rosterContacts and make individual calls for each contact
-                    console.log(rosterContactResponse);
-                    Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
-                        .then(contactResponses => {
-                            // Process each contact response
-                            const contactsData = contactResponses.map(contactResponse => contactResponse.data);
-                            console.log(contactsData);
-                            setContacts(contactsData);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching contact data:', error);
-                        });
+                    // console.log(rosterContactResponse);
+                    // Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
+                    //     .then(contactResponses => {
+                    //         // Process each contact response
+                    //         const contactsData = contactResponses.map(contactResponse => contactResponse.data);
+                    //         console.log(contactsData);
+                    //         setContacts(contactsData);
+                    //     })
+                    //     .catch(error => {
+                    //         console.error('Error fetching contact data:', error);
+                    //     });
                 })
                 .catch(error => {
                     console.error('Error fetching roster contact data:', error);
@@ -48,6 +57,15 @@ const RecallStats = () => {
         .catch(error => {
             console.error('Error fetching recall data:', error);
         });
+
+        contacts.map(contact => {
+            try {
+                axios.get('http://localhost:5000/api/Response/' + contact.contactId)
+                .then(response => )
+            } catch (error) {
+                console.error("An error occurred:", error.message);
+            }
+        })
     }, [recallId]);
 
     // Filter contacts based on role
