@@ -84,7 +84,7 @@ public class MessageController : TwilioController
     return new TwiMLResult(new MessagingResponse());
 }
 
-        if (contact.contactID == num[0])
+        if (contact.contactId == num[0])
         {
             Console.WriteLine("Right before add response");
             

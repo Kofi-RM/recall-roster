@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {}
+    "C:\\Users\\kofir\\Recall Roster\\recall-roster\\recall_roster\\recall_roster.csproj": {}
   },
   "projects": {
-    "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj": {
+    "C:\\Users\\kofir\\Recall Roster\\recall-roster\\recall_roster\\recall_roster.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "projectUniqueName": "C:\\Users\\kofir\\Recall Roster\\recall-roster\\recall_roster\\recall_roster.csproj",
         "projectName": "recall_roster",
-        "projectPath": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\recall_roster.csproj",
+        "projectPath": "C:\\Users\\kofir\\Recall Roster\\recall-roster\\recall_roster\\recall_roster.csproj",
         "packagesPath": "C:\\Users\\kofir\\.nuget\\packages\\",
-        "outputPath": "D:\\kofir\\Documents\\Capstone Github\\Capstone-Gov_Recall\\recall_roster\\obj\\",
+        "outputPath": "C:\\Users\\kofir\\Recall Roster\\recall-roster\\recall_roster\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kofir\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net9.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net9.0": {
+            "targetAlias": "net9.0",
             "projectReferences": {}
           }
         },
@@ -32,11 +32,17 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net9.0": {
+          "targetAlias": "net9.0",
           "dependencies": {
             "DotNetEnv": {
               "target": "Package",
@@ -104,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

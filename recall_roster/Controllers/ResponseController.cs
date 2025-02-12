@@ -28,11 +28,11 @@ namespace recall_roster.Controllers
             return Ok(responses);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Response> GetResponse(int id)
+        [HttpGet("{recallId}/{contactId}")]
+        public ActionResult<Response> GetResponse(int contactId, int recallId)
         {
             _logger.LogInformation("Executing GetResponse action...");
-            var response = _responseService.GetResponse(id);
+            var response = _responseService.GetResponse(contactId, recallId);
             if (response == null)
             {
                 return NotFound();

@@ -11,6 +11,8 @@ const RecallStats = () => {
         timeEnded: '',
         message: ''
     });
+    const [responses, setResponses] = useState({});
+    
     const [contacts, setContacts] = useState([]);
     const [activeTab, setActiveTab] = useState('all');
     let rosterId;
@@ -24,31 +26,16 @@ const RecallStats = () => {
             console.log( response.data);
             const rosterId = response.data.rosterId;
             console.log("rosterId" + rosterId);
-    
+            console.log("recallId" + recallId);
             // Fetch contacts associated with the recall
             axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
                 .then(rc => {
-                    Promise.all(rc.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
+                   return Promise.all(rc.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
                     .then(contactResponses => {
-                        const contactsData = contactResponses.map(contactResponse => contactResponse.data);
+                        const contactsData = contactResponses.map(response => response.data);
                         setContacts(contactsData);
                         // maps each response to an array of contacts
                     })
-                    
-
-
-                    // Iterate through rosterContacts and make individual calls for each contact
-                    // console.log(rosterContactResponse);
-                    // Promise.all(rosterContactResponse.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
-                    //     .then(contactResponses => {
-                    //         // Process each contact response
-                    //         const contactsData = contactResponses.map(contactResponse => contactResponse.data);
-                    //         console.log(contactsData);
-                    //         setContacts(contactsData);
-                    //     })
-                    //     .catch(error => {
-                    //         console.error('Error fetching contact data:', error);
-                    //     });
                 })
                 .catch(error => {
                     console.error('Error fetching roster contact data:', error);
@@ -57,16 +44,29 @@ const RecallStats = () => {
         .catch(error => {
             console.error('Error fetching recall data:', error);
         });
-
-        contacts.map(contact => {
-            try {
-                axios.get('http://localhost:5000/api/Response/' + contact.contactId)
-                .then(response => )
-            } catch (error) {
-                console.error("An error occurred:", error.message);
-            }
-        })
+        
     }, [recallId]);
+
+    useEffect(() => {
+        if (contacts.length === 0) return; // Prevents running on empty contacts
+        Promise.all(
+            contacts.map(contact => {
+                console.log("Fetching response for:", contact.contactId);
+                return axios.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`)
+                    .then(response => ({...contact, responded: true}))
+                    .catch(error => {
+                        console.error("Error fetching response:", error.message);
+                        return {...contact, responded: false};
+                    });
+            })
+        )
+        .then(updatedContacts => {
+            setContacts(updatedContacts);
+        })
+        .catch(error => {
+            console.error("Error fetching response:", error.message);
+        });
+    }, [contacts, recallId]);
 
     // Filter contacts based on role
     const filteredContacts = contacts.filter(contact => {
@@ -115,8 +115,8 @@ const RecallStats = () => {
             {filteredContacts.length === 0 ? (
     <Typography variant="body1">You have no contacts of this rank</Typography>
 ) : (
-    filteredContacts.map(contact => (
-        <div key={contact.contactId} style={{ backgroundColor: 'white', padding: '10px', margin: '10px', borderRadius: '5px' }}>
+    filteredContacts.map((contact, index) => (
+        <div  key={`${contact.contactId}-${index}`} style={{ backgroundColor: 'white', padding: '10px', margin: '10px', borderRadius: '5px' }}>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <Typography variant="body1">Name:{contact.firstName + " " + contact.lastName}</Typography>

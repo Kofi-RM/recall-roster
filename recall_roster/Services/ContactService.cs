@@ -12,7 +12,7 @@ public class ContactService : IContactService
     }
     public Contact? GetContactById(int contactId)
     {
-        var contact = _context.Contacts.FirstOrDefault(c => c.contactID == contactId);
+        var contact = _context.Contacts.FirstOrDefault(c => c.contactId == contactId);
         return contact;
     }
 
@@ -61,7 +61,7 @@ public class ContactService : IContactService
 
     public void UpdateContact(Contact updatedContact)
         {
-            var existingContact = _context.Contacts.FirstOrDefault(c => c.contactID == updatedContact.contactID);
+            var existingContact = _context.Contacts.FirstOrDefault(c => c.contactId == updatedContact.contactId);
             if (existingContact != null)
             {
                 existingContact.FirstName = updatedContact.FirstName;

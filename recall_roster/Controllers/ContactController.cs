@@ -65,7 +65,7 @@ public ActionResult<ContactCreateDto> AddContact(ContactCreateDto contact)
     {
         _contactService.AddContact(contact);
         _logger.LogInformation("Contact added successfully");
-        return CreatedAtAction(nameof(GetContact), new { id = contact.contactID }, contact);
+        return CreatedAtAction(nameof(GetContact), new { id = contact.contactId }, contact);
     }
     catch (Exception ex)
     {

@@ -2,7 +2,7 @@ namespace recall_roster.DTOs
 {
     public class ContactCreateDto
     {
-           public int contactID{ get; set; }
+           public int contactId{ get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string PhoneNumber { get; set; }

@@ -19,9 +19,9 @@ using Microsoft.AspNetCore.Mvc;
             return _context.Responses.ToList();
         }
 
-        public Response? GetResponse(int id)
+        public Response? GetResponse(int contactId, int recallId)
         {
-            var response = _context.Responses.FirstOrDefault(r => r.contactId == id);
+            var response = _context.Responses.FirstOrDefault(r => r.contactId == contactId && r.recallId == recallId);
             return response;
         }
 
@@ -41,7 +41,7 @@ using Microsoft.AspNetCore.Mvc;
         
         var response = new Response
         {
-            contactId = contact.contactID,
+            contactId = contact.contactId,
             response = body,
             responseTime = DateTime.UtcNow,
             recallId = recallId,
@@ -64,6 +64,6 @@ using Microsoft.AspNetCore.Mvc;
 public interface IResponseService
 {
     List<Response> GetAllResponses();
-    Response? GetResponse(int id);
+    Response? GetResponse(int contactId, int recallId);
     string AddResponse(string from, string body, int recallId);
 }
