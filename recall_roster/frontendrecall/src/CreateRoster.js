@@ -3,6 +3,7 @@ import { Typography, Button, Container, TextField, Snackbar, Alert } from '@mui/
 import { ToolBar } from './Miscelleneous.js';
 import { useNavigate } from 'react-router-dom';
 import useContacts from './UseContacts.js';
+import { NavyButton } from './Buttons.js';
 import axios from 'axios';
 
 const CreateRoster = () => {
@@ -24,6 +25,7 @@ const CreateRoster = () => {
         setContactsByRank(groupedContacts);
         }
     }, [contacts]) 
+
     const handleCloseAlert = () => {
         setAlertOpen(false);
     };
@@ -77,20 +79,14 @@ const CreateRoster = () => {
     };
 
 
-    const handleCheckboxChange = (contactID) => {
-        // Check if the contactID is already in rosterContacts
-        const contactIndex = rosterContacts.indexOf(contactID);
-        if (contactIndex === -1) {
-            // If not found, add it to the array
-            setRosterContacts(prevRosterContacts => [...prevRosterContacts, contactID]);
-        } else {
-            // If found, remove it from the array
-            setRosterContacts(prevRosterContacts => {
-                const updatedRosterContacts = [...prevRosterContacts];
-                updatedRosterContacts.splice(contactIndex, 1);
-                return updatedRosterContacts;
-            });
-        }
+    const handleCheckboxChange = (contactId) => {
+        const id = Number(contactId);
+    
+        setRosterContacts(prev => 
+            prev.includes(id)
+                ? prev.filter(c => c !== id)  // remove
+                : [...prev, id]               // add
+        );
     };
     const groupContactsByRole = (contacts) => {
         const groupedContacts = {};
@@ -168,16 +164,16 @@ const CreateRoster = () => {
                     </Typography>
                     <ul>
                         {contacts.map(contact => (
-                            <li key={contact.contactID} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                            <li key={contact.contactId} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
                                 <Typography variant="body1" style={{ marginRight: '10px' }}>
                                     {contact.firstName} {contact.lastName}
                                 </Typography>
-                                <input
-                                    type="checkbox"
-                                    value={contact.contactID}
-                                    onChange={() => handleCheckboxChange(contact.contactID)}
-                                    checked={rosterContacts.includes(contact.contactID)}
-                                />
+                                <input type="checkbox"
+    value={contact.contactId}
+    aria-label={`Select contact ${contact.name}`}
+    onChange={(e) => handleCheckboxChange(e.target.value)}
+    checked={rosterContacts.includes(Number(contact.contactId))}
+/>
                             </li>
                         ))}
                     </ul>
@@ -187,12 +183,12 @@ const CreateRoster = () => {
     </div>
 
     <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Button size="large" variant="contained" color="primary" onClick={handleAddRoster}>
+        <NavyButton size="large" variant="contained" color="primary" onClick={handleAddRoster}>
             Submit
-        </Button>
-        <Button variant="contained" onClick={() => navigate(-1)} style={{ marginLeft: '20px' }}>
+        </NavyButton>
+        <NavyButton variant="contained" onClick={() => navigate(-1)} style={{ marginLeft: '20px' }}>
             Go Back
-        </Button>
+        </NavyButton>
     </div>
 </Container>
         </div>

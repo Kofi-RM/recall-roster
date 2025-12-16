@@ -98,16 +98,15 @@ const EditRoster = () => {
             });
     };
 
-    const handleCheckboxChange = (contactID) => {
-        // Add or remove contactID from selectedContacts based on checkbox change
-        setSelectedContacts(prevSelectedContacts => {
-            if (prevSelectedContacts.includes(contactID)) {
-                return prevSelectedContacts.filter(id => id !== contactID);
-            } else {
-                return [...prevSelectedContacts, contactID];
-            }
-        });
-    };
+   const handleCheckboxChange = (contactId) => {
+    setSelectedContacts(prevSelectedContacts => {
+        if (prevSelectedContacts.includes(contactId)) {
+            return prevSelectedContacts.filter(id => id !== contactId);
+        } else {
+            return [...prevSelectedContacts, contactId];
+        }
+    });
+};
 
     const updateRosterContacts = () => {
         console.log(selectedContacts);
@@ -117,8 +116,8 @@ const EditRoster = () => {
             
         
         // Determine contacts to add and remove
-        const contactsToAdd = selectedContacts.filter(contactID => !initialContacts.includes(contactID));
-        const contactsToRemove = initialContacts.filter(contactID => !selectedContacts.includes(contactID));
+        const contactsToAdd = selectedContacts.filter(contactId => !initialContacts.includes(contactId));
+        const contactsToRemove = initialContacts.filter(contactId => !selectedContacts.includes(contactId));
 
         console.log("add" + contactsToAdd)
         console.log("out" + contactsToRemove)
@@ -196,15 +195,15 @@ const EditRoster = () => {
                             </Typography>
                             <ul>
                                 {contacts.map(contact => (
-                                    <li key={contact.contactID} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                                    <li key={contact.contactId} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
                                         <Typography variant="body1" style={{ marginRight: '10px' }}>
                                             {contact.firstName} {contact.lastName}
                                         </Typography>
                                         <input
                                             type="checkbox"
-                                            value={contact.contactID}
-                                            onChange={() => handleCheckboxChange(contact.contactID)}
-                                            checked={selectedContacts.includes(contact.contactID)}
+                                            value={contact.contactId}
+                                            onChange={() => handleCheckboxChange(Number(contact.contactId))}
+                                            checked={selectedContacts.includes(Number(contact.contactId))}
                                         />
                                     </li>
                                 ))}

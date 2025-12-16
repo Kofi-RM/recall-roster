@@ -65,31 +65,34 @@ public class MessageController : TwilioController
             return new TwiMLResult(new MessagingResponse().Message("Your response has not been counted. Please include your contact and recall ID."));
         }
 
-        var num = ExtractIds(Body);
+        var num = ExtractIds(Body); // extract numbers from message body
 
         if (num == null || num.Length < 2)
         {
             Console.WriteLine("Failed to parse valid numbers from the message.");
             return new TwiMLResult(new MessagingResponse().Message("Failed to parse your message. Please correct your info to be counted in this recall."));
-        }
+        } // return error message if parsing fails
 
       
-        var sender = From;
+        var sender = From; 
         sender = sender.Length > 10 ? sender.Substring(sender.Length - 10) : sender; // only use the digits of the phone number aka ignore country code
         var contact = _contactService.GetContactByNumber(sender);
        Console.WriteLine("from " + From);
        if (contact == null)
 {
-    Console.WriteLine("No contact found for phone number: " + From);
-    return new TwiMLResult(new MessagingResponse());
+    Console.WriteLine("No contact found for phone number: " + From); // return error if no contact found
+    return new TwiMLResult(new MessagingResponse().Message("No contact found for phone number: " + From));
 }
 
-        if (contact.contactId == num[0])
+        if (contact.contactId == num[0]) // if contact ID matches
         {
             Console.WriteLine("Right before add response");
             
-            _responseService.AddResponse(sender, Body, num[1]);
+            _responseService.AddResponse(sender, Body, num[1]); // add response
 
+        } else {
+            Console.WriteLine("Contact ID does not match the sender's contact ID.");
+            return new TwiMLResult(new MessagingResponse().Message("Contact ID does not match the sender's contact ID. Please correct your info to be counted in this recall."));
         }
     
     

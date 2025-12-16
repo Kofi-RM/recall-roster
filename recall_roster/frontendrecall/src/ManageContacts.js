@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab, Button } from '@mui/material';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import useContacts from './UseContacts.js'; // Adjust the path as needed
 import { NavyButton } from './Buttons.js';
@@ -35,17 +36,24 @@ const EditableRow = ({ item, onSave }) => {
       {editMode ? (
         <>
           <td>
-            <input
-              type="text"
-              name="name"
-              value={`${editedItem.firstName} ${editedItem.lastName}`}
-              onChange={handleChange}
-            />
-          </td>
+  <input
+    type="text"
+    name="firstName"
+    value={editedItem.firstName}
+    onChange={handleChange}
+  />
+  <input
+    type="text"
+    name="lastName"
+    value={editedItem.lastName}
+    onChange={handleChange}
+    style={{ marginLeft: "6px" }}
+  />
+</td>
           <td>
             <input
               type="text"
-              name="phone"
+              name="phoneNumber"
               value={editedItem.phoneNumber}
               onChange={handleChange}
             />
@@ -83,18 +91,27 @@ const ManageContacts = () => {
   const [tabValue, setTabValue] = useState(0); // State to track the active tab index
 
   const handleSaveItem = (updatedItem) => {
-    console.log('Saving item:', updatedItem);
-    // Implement saving logic here, e.g., API call to update the item
-    // Update your data source (not shown in this example)
+    console.log("Saving item:", updatedItem);
+  
+    axios
+      .put(`http://localhost:5000/api/contact/${updatedItem.contactId}`, updatedItem)
+      .then((response) => {
+        console.log("Contact updated successfully:", response.data);
+        // Optionally update your state here instead of reloading
+        // e.g., refetch contacts or update local list
+      })
+      .catch((error) => {
+        console.error("Error updating contact:", error);
+      });
   };
 
   // Define roles for each tab
-  const roles = ['All', 'Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
+  const ranks = ['All', 'Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
 
   // Filter contacts based on the selected tab value (role)
   const filteredContacts = contacts.filter((contact) => {
-    const role = roles[tabValue];
-    return role === 'All' || contact.rank === role;
+    const rank = ranks[tabValue];
+    return rank === 'All' || contact.rank === rank;
   });
 
   if (loading) {
@@ -110,8 +127,8 @@ const ManageContacts = () => {
       <div className="contact-list-container">
         <h1>Contact List</h1>
         <Tabs value={tabValue} onChange={(event, newValue) => setTabValue(newValue)}>
-          {roles.map((role, index) => (
-            <Tab key={index} label={role} />
+          {ranks.map((rank, index) => (
+            <Tab key={index} label={rank} />
           ))}
         </Tabs>
         <div className="contact-list-section">
@@ -120,7 +137,7 @@ const ManageContacts = () => {
               <tr>
                 <th>Name</th>
                 <th>Phone</th>
-                <th>Role</th>
+                <th>Rank</th>
                 <th>Action</th>
               </tr>
             </thead>

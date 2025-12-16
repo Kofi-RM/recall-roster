@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const RecallStats = () => {
     const navigate = useNavigate();
-    const { recallId } = useParams();
+    const { recallId } = useParams(); // snag recallId from URL params
     const [recall, setRecall] = useState({
         timeStarted: '',
         timeEnded: '',
@@ -47,27 +47,31 @@ const RecallStats = () => {
         
     }, [recallId]);
 
-    useEffect(() => {
-        if (contacts.length === 0) return; // Prevents running on empty contacts
-        Promise.all(
-            contacts.map(contact => {
-                console.log("Fetching response for:", contact.contactId);
-                return axios.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`)
-                    .then(response => ({...contact, responded: true}))
-                    .catch(error => {
-                        console.error("Error fetching response:", error.message);
-                        return {...contact, responded: false};
-                    });
-            })
-        )
-        .then(updatedContacts => {
-            setContacts(updatedContacts);
-        })
-        .catch(error => {
-            console.error("Error fetching response:", error.message);
-        });
-    }, [contacts, recallId]);
+  useEffect(() => {
+    const fetchResponses = async () => {
+      try {
+        const updatedContacts = await Promise.all(
+          contacts.map(async contact => {
+            if (contact.responded !== undefined) return contact; // Already has response info
+            try {
+              await axios.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
+              return { ...contact, responded: true };
+            } catch (error) {
+              console.error(`Error fetching response for ${contact.contactId}:`, error.message);
+              return { ...contact, responded: false };
+            }
+          })
+        );
+        setContacts(updatedContacts);
+      } catch (error) {
+        console.error("Error fetching responses:", error.message);
+      }
+    };
 
+    if (contacts.length > 0) {
+      fetchResponses();
+    }
+  }, [recallId, contacts.length]);
     // Filter contacts based on role
     const filteredContacts = contacts.filter(contact => {
         if (activeTab === 'all') return true;

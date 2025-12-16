@@ -24,6 +24,7 @@ const StartRecall = () => {
         setAlertOpen(false);
     };
 
+    const now = new Date();
 
      const addRecall  = async () => {
         let employeesMax = 0;
@@ -33,8 +34,8 @@ const StartRecall = () => {
         const data = {
             rosterId: selectedRoster,
             message: message,
-            timeStarted: "2024-04-04T12:00:00",
-            timeEnded: "2024-04-04T12:00:00",
+            timeStarted: now.toISOString(),
+            timeEnded: "2025-12-02T22:43:32.769Z",
             active: 1,
             Employees: 0,
             FlightChief: 0,
@@ -101,10 +102,8 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
             recallId = response.data.recallId;
            
              contactsArray.forEach(contact => {
-                 axios.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactID}/${recallId}`)
-            // console.log(contact);
-            // console.log(contact.contactID)
-            // console.log(recallId)
+                 axios.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`)
+            
              })
             // Handle response as needed
         })

@@ -43,34 +43,10 @@ namespace recall_roster.Controllers
         [HttpPost]
 public ActionResult<Response> AddResponse( string from, string body, int recallId)
 {
-//     Console.WriteLine($"For recall {recallId}");
-//    // Console.WriteLine($"Received message from {from}: {body}");
-        
-//     _logger.LogInformation("Executing AddResponse action...");
-//     try
-//     {
-//         var contact = _contactService.GetContactByNumber(from);
-//         if (contact == null)
-//         {
-//             return NotFound($"Contact with phone number {from} not found.");
-//         } else {
-//             Console.WriteLine("contact found");
-//         }
-//     } catch (Exception ex) {
-//         _logger.LogError(ex, "Error adding response");
-//         return StatusCode(600, "Internal server error");
-//     }
-//         try {
-//         var response = new Response
-//         {
-//             contactId = 1,
-//             response = body,
-//             responseTime = DateTime.UtcNow,
-//             recallId = recallId,
-//         };
+
         try {
         _responseService.AddResponse(from, body, recallId);
-        _logger.LogInformation("Response added successfully");
+        //_logger.LogInformation("Response added successfully");
          return Ok("Response added successfully.");
     
     }

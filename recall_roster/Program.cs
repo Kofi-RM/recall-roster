@@ -19,7 +19,7 @@ var react = builder.Services.AddCors(options =>
   {
       options.AddPolicy("AllowOrigin",
           builder => builder
-              .WithOrigins("http://localhost:3000", "https://fb38-98-62-120-34.ngrok-free.app") // Replace with your frontend URL
+              .WithOrigins("http://localhost:3001","http://localhost:3000", "https://micellar-shearless-corazon.ngrok-free.dev") // Replace with your frontend URL
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
@@ -71,6 +71,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recall Roster V1");
+    c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
 });
 
 app.UseCors("AllowOrigin");

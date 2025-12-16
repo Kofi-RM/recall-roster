@@ -3,6 +3,7 @@ import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, A
 import { ToolBar } from './Miscelleneous.js';
 import './css/Landing.css';
 import { useNavigate } from 'react-router-dom';
+import { NavyButton } from './Buttons.js';
 const InsertContact = () => {
     const [firstName, setFirst] = useState('');
     const [lastName, setLast] = useState('');
@@ -119,10 +120,10 @@ const InsertContact = () => {
                     </Select>
                 </div>
                 <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Button size="large" variant="contained" color="primary" onClick={() => handleAdd()}>
+                    <NavyButton size="large" variant="contained" color="primary" onClick={() => handleAdd()}>
                         Submit
-                    </Button>
-                    <Button variant="contained" onClick={() => navigate(-1)} style={{ position: 'fixed', bottom: '20px', left: '20px' }}>Go Back</Button>
+                    </NavyButton>
+                    <NavyButton variant="contained" onClick={() => navigate(-1)} style={{ position: 'fixed', bottom: '20px', left: '20px' }}>Go Back</NavyButton>
                 </div>
                
             </Container>

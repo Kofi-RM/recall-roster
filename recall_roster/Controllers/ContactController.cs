@@ -1,6 +1,7 @@
 using recall_roster.Models;
 using recall_roster.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using recall_roster.Data;
 
 
 namespace recall_roster.Controllers;
@@ -12,10 +13,14 @@ public class ContactController : ControllerBase
     private readonly ILogger<ContactController> _logger;
     private readonly IContactService _contactService;
 
-    public ContactController(ILogger<ContactController> logger, IContactService contactService)
+    private readonly AppDbContext _dbContext;
+    
+
+    public ContactController(ILogger<ContactController> logger, IContactService contactService, AppDbContext dbContext)
     {
         _logger = logger;
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
     [HttpGet]
@@ -92,21 +97,20 @@ public ActionResult<Contact> RemoveContact(int id)
 
  [HttpPut("{id}")] 
  
- public ActionResult<Contact> UpdateContact(Contact contact){
+public void UpdateContact(Contact contact)
+{
+    var existingContact = _dbContext.Contacts.Find(contact.contactId);
+    if (existingContact == null)
+        throw new ArgumentException("Contact not found.");
 
- try
-            {
-                _contactService.UpdateContact(contact);
-                return Ok(contact);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while updating the contact.");
-            }
- }
+    // Update all editable fields
+    existingContact.FirstName = contact.FirstName;
+    existingContact.LastName = contact.LastName;
+    existingContact.PhoneNumber = contact.PhoneNumber;
+    existingContact.Rank = contact.Rank;   // <-- Make sure this line exists
+    existingContact.Active = contact.Active;
+
+    _dbContext.SaveChanges();
+}
 }
 

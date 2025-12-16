@@ -34,12 +34,14 @@ namespace recall_roster.Data
     modelBuilder.Entity<RosterContact>()
         .HasOne(rc => rc.Roster)                 // Roster_Contact has one Roster
         .WithMany(r => r.RosterContacts)         // Roster has many Roster_Contacts
-        .HasForeignKey(rc => rc.rosterId);      // Foreign key
+        .HasForeignKey(rc => rc.rosterId)      // Foreign key
+        .OnDelete(DeleteBehavior.Cascade);
 
     modelBuilder.Entity<RosterContact>()
         .HasOne(rc => rc.Contact)                // Roster_Contact has one Contact
         .WithMany(c => c.RosterContacts)         // Contact has many Roster_Contacts
-        .HasForeignKey(rc => rc.contactId);     // Foreign key
+        .HasForeignKey(rc => rc.contactId)     // Foreign key
+        .OnDelete(DeleteBehavior.Cascade);
 
     // You might also need to specify the table name if it's different from the convention
     modelBuilder.Entity<RosterContact>().ToTable("RosterContact");
