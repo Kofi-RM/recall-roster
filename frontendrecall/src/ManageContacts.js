@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, Tab, Button } from '@mui/material';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import useContacts from './UseContacts.js'; // Adjust the path as needed
-import { NavyButton } from './Buttons.js';
+import useContacts from './hooks/UseContacts.js'; // Adjust the path as needed
+import { NavyButton } from './components/Buttons.js';
 import './css/ItemRows.css';
 
 const EditableRow = ({ item, onSave }) => {

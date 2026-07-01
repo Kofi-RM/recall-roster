@@ -2,6 +2,7 @@ using recall_roster.Models;
 using recall_roster.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Data;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace recall_roster.Controllers;
@@ -22,7 +23,7 @@ public class ContactController : ControllerBase
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
-
+    [Authorize]
     [HttpGet]
     public ActionResult<IEnumerable<Contact>> GetContacts()
     {
@@ -31,7 +32,7 @@ public class ContactController : ControllerBase
         return Ok(contacts);
     }
 
-
+    [Authorize]
     [HttpGet("{id}")]
     public ActionResult<Contact> GetContact(int id)
     {
@@ -43,7 +44,7 @@ public class ContactController : ControllerBase
         }
         return Ok(contact);
     }
-
+[Authorize]
 [HttpGet("bynumber/{number}")]
     public ActionResult<Contact> GetContactByNumber(string number)
     {
@@ -55,7 +56,7 @@ public class ContactController : ControllerBase
         }
         return Ok(contact);
     }
-
+[Authorize]
 [HttpPost]
 public ActionResult<ContactCreateDto> AddContact(ContactCreateDto contact)
 {
@@ -79,7 +80,7 @@ public ActionResult<ContactCreateDto> AddContact(ContactCreateDto contact)
     }
 }
 }
-
+[Authorize]
 [HttpPut("remove/{id}")]
 public ActionResult<Contact> RemoveContact(int id)
 {
@@ -94,7 +95,7 @@ public ActionResult<Contact> RemoveContact(int id)
     }
     return Ok(contact);
 }
-
+[Authorize]
  [HttpPut("{id}")] 
  
 public void UpdateContact(Contact contact)

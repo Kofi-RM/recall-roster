@@ -2,8 +2,8 @@
 import React from 'react';
 import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box, Toolbar, TextField } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import picture from "../src/images/AF1.avif"
- import './css/HomeBanner.css';
+import picture from "../../src/images/AF1.avif"
+ import '../css/HomeBanner.css';
 import { Footer } from '../Miscelleneous';
 
 const HomeBanner = () => {

@@ -3,8 +3,8 @@ import { Typography, Button } from '@mui/material';
 import { ToolBar } from './Miscelleneous.js';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import useActiveRecalls from './UseActiveRecalls.js';
-import { NavyButton } from './Buttons.js';
+import useActiveRecalls from './hooks/UseActiveRecalls.js';
+import { NavyButton } from './components/Buttons.js';
 
 const ManageActiveRecalls = () => {
 const [ recallsActive, loading, error] = useActiveRecalls();

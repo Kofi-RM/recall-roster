@@ -9,15 +9,15 @@ import LoginPage from './LoginPage.js';
 import LandingPage from './Landing.js';
 import { AuthProvider } from './Auth';
 import ManageRoster from './ManageRoster';
-import InsertContact from './InsertContact.js';
+import InsertContact from "./nav/InsertContact.js"
 import ManageContacts from './ManageContacts.js'
-import axios from 'axios';
-import EditContact from './EditContact.js';
-import RecallStats from './RecallStats.js';
-import EditRoster from './EditRoster.js';
+import ProtectedRoute from './ProtectedRoute.js';
+import EditContact from './nav/EditContact.js';
+import RecallStats from './nav/RecallStats.js';
+import EditRoster from './nav/EditRoster.js';
 import StartRecall from './StartRecall.js';
-import CreateRoster from './CreateRoster.js';
-import Home from './Home.js';
+import CreateRoster from './nav/CreateRoster.js';
+import Home from './nav/Home.js';
 
 function App() {
   
@@ -25,19 +25,100 @@ function App() {
     <AuthProvider>
     <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage/>} />
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/manageContacts" element = {<ManageContacts/>} />
-          
-          <Route path="/addContact" element = {<InsertContact/>} />
-          <Route path="/editContact/:contactId" element = {<EditContact/>} />
-          <Route path="/manageRoster" element = {<ManageRoster/>} />
-          <Route path="/editRoster/:rosterId" element = {<EditRoster/>} />
-          <Route path="/insertContact" element = {<InsertContact/>} />
-          <Route path="/recallStats/:recallId" element = {<RecallStats/>} />
-          <Route path="/startRecall" element = {<StartRecall/>} />
-          <Route path="/createRoster" element = {<CreateRoster/>} />
+           {/* PUBLIC */}
+  <Route path="/" element={<Home />} />
+  <Route path="/login" element={<LoginPage />} />
+
+  {/* PROTECTED */}
+  <Route
+    path="/landing"
+    element={
+      <ProtectedRoute>
+        <LandingPage />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/manageContacts"
+    element={
+      <ProtectedRoute>
+        <ManageContacts />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/addContact"
+    element={
+      <ProtectedRoute>
+        <InsertContact />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/editContact/:contactId"
+    element={
+      <ProtectedRoute>
+        <EditContact />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/manageRoster"
+    element={
+      <ProtectedRoute>
+        <ManageRoster />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/editRoster/:rosterId"
+    element={
+      <ProtectedRoute>
+        <EditRoster />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/insertContact"
+    element={
+      <ProtectedRoute>
+        <InsertContact />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/recallStats/:recallId"
+    element={
+      <ProtectedRoute>
+        <RecallStats />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/startRecall"
+    element={
+      <ProtectedRoute>
+        <StartRecall />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/createRoster"
+    element={
+      <ProtectedRoute>
+        <CreateRoster />
+      </ProtectedRoute>
+    }
+  />
 
 
            {/* <Route path="/createRoster" element = {<CreateRoster/>}/> */}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Models;
 
@@ -15,7 +16,7 @@ namespace recall_roster.Controllers
             _logger = logger;
             _recallResultsService = recallResultsService ?? throw new ArgumentNullException(nameof(recallResultsService));
         }
-
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<Recall>> GetRecalls()
         {
@@ -23,7 +24,7 @@ namespace recall_roster.Controllers
             var recalls = _recallResultsService.GetAllRecalls();
             return Ok(recalls);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<Recall> GetRecall(int id)
         {
@@ -35,7 +36,7 @@ namespace recall_roster.Controllers
             }
             return Ok(recall);
         }
-
+        [Authorize]
         [HttpPost]
         public ActionResult<Recall> AddRecall(Recall recall)
         {

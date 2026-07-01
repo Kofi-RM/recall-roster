@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Paper, Tabs, Tab, Grid, Button, LinearProgress } from '@mui/material';
 import axios from 'axios';
+import api from '../api/api';
 
 const RecallStats = () => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const RecallStats = () => {
     useEffect(() => {
         console.log(recallId);
         // Fetch recall details
-        axios.get('http://localhost:5000/api/recall/' + recallId)
+        api.get('http://localhost:5000/api/recall/' + recallId)
         .then(response => {
             setRecall(response.data)
             console.log( response.data);
@@ -28,9 +29,9 @@ const RecallStats = () => {
             console.log("rosterId" + rosterId);
             console.log("recallId" + recallId);
             // Fetch contacts associated with the recall
-            axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
+            api.get('http://localhost:5000/api/rostercontact/' + rosterId)
                 .then(rc => {
-                   return Promise.all(rc.data.map(rc => axios.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
+                   return Promise.all(rc.data.map(rc => api.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
                     .then(contactResponses => {
                         const contactsData = contactResponses.map(response => response.data);
                         setContacts(contactsData);
@@ -54,7 +55,7 @@ const RecallStats = () => {
           contacts.map(async contact => {
             if (contact.responded !== undefined) return contact; // Already has response info
             try {
-              await axios.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
+              await api.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
               return { ...contact, responded: true };
             } catch (error) {
               console.error(`Error fetching response for ${contact.contactId}:`, error.message);

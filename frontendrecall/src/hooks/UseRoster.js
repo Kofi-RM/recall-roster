@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/api';
 
 const useRoster = () => {
   const [rosters, setRosters] = useState([]);
@@ -10,7 +11,7 @@ const useRoster = () => {
     const fetchRosters = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/roster');
+        const response = await api.get('http://localhost:5000/api/roster');
         setRosters(response.data);
         setLoading(false);
       } catch (error) {

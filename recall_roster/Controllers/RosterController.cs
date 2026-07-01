@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using recall_roster.Models;
@@ -19,6 +20,7 @@ namespace recall_roster.Controllers;
             _rosterRepository = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<Roster>> GetRosters()
         {
@@ -27,6 +29,7 @@ namespace recall_roster.Controllers;
             return Ok(rosters);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<Roster> GetRoster(int id)
         {
@@ -39,6 +42,7 @@ namespace recall_roster.Controllers;
             return Ok(roster);
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult<Roster> AddRoster(Roster roster)
         {
@@ -57,7 +61,7 @@ namespace recall_roster.Controllers;
         }
 
     
-
+    [Authorize]
         [HttpDelete("remove/{id}")]
         public ActionResult<Roster> RemoveRoster(int id)
         {

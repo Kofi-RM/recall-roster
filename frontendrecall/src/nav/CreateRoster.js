@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Button, Container, TextField, Snackbar, Alert } from '@mui/material';
 import { ToolBar } from '../Miscelleneous.js';
 import { useNavigate } from 'react-router-dom';
-import useContacts from './UseContacts.js';
+import useContacts from '../hooks/UseContacts.js';
 import { NavyButton } from '../components/Buttons.js';
 import axios from 'axios';
+import api from '../api/api.js';
 
 const CreateRoster = () => {
     const [rosterName, setRosterName] = useState('');
@@ -39,7 +40,7 @@ const CreateRoster = () => {
     
         try {
             // Send a POST request to create the roster
-            const rosterResponse = await axios.post('http://localhost:5000/api/roster', rosterData);
+            const rosterResponse = await api.post('http://localhost:5000/api/roster', rosterData);
     
             const rosterId = rosterResponse.data.rosterId;
     
@@ -49,7 +50,7 @@ const CreateRoster = () => {
     
            const  contactsToRemove = []; // Always empty due to creating the roster
             // Send a POST request to create roster contacts
-            axios.post('http://localhost:5000/api/RosterContact/updateContacts', {
+            api.post('http://localhost:5000/api/RosterContact/updateContacts', {
             rosterId: rosterId,
             contactsToAdd: contactsToAdd,
             contactsToRemove: contactsToRemove

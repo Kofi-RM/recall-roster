@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/api';
 
 const useContacts = () => {
   const [contacts, setContacts] = useState([]);
@@ -10,7 +11,7 @@ const useContacts = () => {
     const fetchContacts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/contact');
+        const response = await api.get('http://localhost:5000/api/contact');
         setContacts(response.data);
         setLoading(false);
       } catch (error) {

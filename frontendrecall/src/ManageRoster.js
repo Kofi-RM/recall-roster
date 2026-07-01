@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import useRoster from './UseRoster'; // Adjust the path as needed
-import { NavyButton } from './Buttons';
+import useRoster from './hooks/UseRoster'; // Adjust the path as needed
+import { NavyButton } from './components/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { ToolBar } from './Miscelleneous';
 import './css/ItemRows.css'

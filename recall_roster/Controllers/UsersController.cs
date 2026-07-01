@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
@@ -19,6 +20,7 @@ namespace recall_roster.Controllers
         }
 
 // Get one user
+[Authorize]
 [HttpGet("{id}")]
 public async Task<IActionResult> GetUser(int id)
 {
@@ -37,6 +39,7 @@ public async Task<IActionResult> GetUser(int id)
     }
 }
 // get all users
+[Authorize]
    [HttpGet]
 public async Task<IActionResult> GetAllUsers()
 {
@@ -58,7 +61,7 @@ public async Task<IActionResult> GetAllUsers()
         return StatusCode(500, "An error occurred while processing your request.");
     }
 }
-
+[Authorize]
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeleteUser(int id)
         {

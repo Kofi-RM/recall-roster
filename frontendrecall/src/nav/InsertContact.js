@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { ToolBar } from '../Miscelleneous.js';
-import './css/Landing.css';
+import '../css/Landing.css';
 import { useNavigate } from 'react-router-dom';
-import { NavyButton } from './Buttons.js';
+import { NavyButton } from '../components/Buttons.js';
 const InsertContact = () => {
     const [firstName, setFirst] = useState('');
     const [lastName, setLast] = useState('');

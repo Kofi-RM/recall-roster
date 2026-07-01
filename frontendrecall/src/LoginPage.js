@@ -31,18 +31,13 @@ console.log("tryna login");
     };
     console.log(loginData);
 
-    const res = await axios.post("/api/user/login", {
+    const res = await axios.post(" http://localhost:5000/api/auth/login", {
     email,
     password
   });
 
   login(res.data.token);
-  };
-
-
-  const handleLogout = () => {
-    logout()
-    // Additional logic (e.g., clearing session, redirecting, etc.) can be added here
+  navigate("/landing")
   };
 
  

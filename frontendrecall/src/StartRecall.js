@@ -4,10 +4,10 @@ import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, A
 import { ToolBar } from './Miscelleneous.js';
 import './css/Landing.css';
 import { useNavigate } from 'react-router-dom';
-import useRoster from './UseRoster.js';
+import useRoster from './hooks/UseRoster.js';
 import axios from 'axios';
-import { NavyButton } from './Buttons.js';
-
+import { NavyButton } from './components/Buttons.js';
+import api from './api/api.js';
 
 
 
@@ -59,7 +59,7 @@ const StartRecall = () => {
         for (const rc of rosterContacts)
             {
                 const id = rc.contactId;
-                const response = await axios.get(`http://localhost:5000/api/contact/${id}`);
+                const response = await api.get(`http://localhost:5000/api/contact/${id}`);
                  console.log(response);
                 const contact = response.data;
                 console.log("contact" + contact)
@@ -96,13 +96,13 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
         console.log(contactsArray);
       
 
-        axios.post('http://localhost:5000/api/Recall', data)
+        api.post('http://localhost:5000/api/Recall', data)
         .then(response => {
             console.log('Recall data posted successfully:', response.data);
             recallId = response.data.recallId;
            
              contactsArray.forEach(contact => {
-                 axios.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`)
+                 api.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`)
             
              })
             // Handle response as needed
@@ -118,7 +118,7 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
 
     const fetchRosterContacts = async (selectedRoster) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/rostercontact/${selectedRoster}`);
+            const response = await api.get(`http://localhost:5000/api/rostercontact/${selectedRoster}`);
             const rosterContacts = response.data;
             return  rosterContacts ;
         } catch (error) {

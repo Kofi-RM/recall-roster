@@ -1,13 +1,13 @@
-import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import {  Typography, AppBar, Toolbar} from '@mui/material';
+
 import warner from './warner.png'
 import warner2 from './warner2.jpg'
 import './css/Miscelleneous.css';
 import { Link,  useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import setLoggedIn from './LoginPage'
+
 import { useAuth } from './Auth';
 
 
@@ -29,7 +29,7 @@ export const Warner = () => {
 }
  
 export const ToolBar = () => {
-  const {  loggedIn, logout } = useAuth();
+  const {  logout, isLoggedIn } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -44,11 +44,11 @@ return (
                     <Typography className = "toolbarName" variant="h6">Warner Robins Air Force Base</Typography>
                     {/* <Button color="inherit">Login</Button> */}
                    
-                    {loggedIn &&  <span className = "button">
+                    {isLoggedIn &&  <span className = "button">
   <Link style= {{color: '#1c2347', fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '1px'}}to="/" onClick={handleLogout}>Logout</Link>
 </span>} 
 
-{ loggedIn &&  <span className = "button">
+{isLoggedIn &&  <span className = "button">
   <Link style= {{color: '#1c2347', fontSize: '1.2rem', fontFamily: '"Orbitron", sans-serif', letterSpacing: '1px'}}to="/Landing" >Home</Link>
 </span>}
 {/* Removes logout button if the user hasnt logged in yet*/}

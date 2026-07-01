@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using recall_roster.Models;
 
@@ -16,7 +17,7 @@ namespace recall_roster.Controllers;
             _logger = logger;
             _rosterContactService = rosterRepository ?? throw new ArgumentNullException(nameof(rosterRepository));
         }
-
+    [Authorize]
     [HttpGet("{id}")]
         public ActionResult<IEnumerable<RosterContact>> GetRosterContacts(int id)
         {
@@ -24,7 +25,7 @@ namespace recall_roster.Controllers;
             var rosters = _rosterContactService.GetAllRosterContacts(id);
             return Ok(rosters);
         }
-
+        [Authorize]
         [HttpGet("{rosterId}/{contactId}")]
         public ActionResult<RosterContact> GetRosterContact(int rosterId, int contactId)
         {
@@ -36,7 +37,7 @@ namespace recall_roster.Controllers;
             }
             return Ok(roster);
         }
-
+        [Authorize]
         [HttpPost]
         public ActionResult<RosterContact> AddRosterContact(RosterContact roster)
         {
@@ -53,7 +54,7 @@ namespace recall_roster.Controllers;
                 return StatusCode(500, "Internal server error");
             }
         }
-
+        [Authorize]
         [HttpDelete("remove/{rosterId}/{contactId}")]
         public ActionResult<RosterContact> RemoveRosterContact(int rosterId, int contactId)
         {
@@ -71,7 +72,7 @@ namespace recall_roster.Controllers;
             }
         }
     
-
+        [Authorize]
         [HttpPost("updateContacts")]
 public IActionResult UpdateRosterContacts([FromBody] UpdateRosterContacts request)
 {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/api';
 
 const useActiveRecalls = () => {
   const [recallsActive, setRecalls] = useState([]);
@@ -10,7 +11,7 @@ const useActiveRecalls = () => {
     const fetchRecalls = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/recall');
+        const response = await api.get('http://localhost:5000/api/recall');
         setRecalls(response.data);
         setLoading(false);
       } catch (error) {

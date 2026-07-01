@@ -3,8 +3,9 @@ import { Typography, Button, Container, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToolBar } from '../Miscelleneous.js';
-import useContacts from './UseContacts.js'; // Adjust the path as needed
+import useContacts from '../hooks/UseContacts.js'; // Adjust the path as needed
 import { NavyButton } from '../components/Buttons.js';
+import api from '../api/api.js';
 
 const EditRoster = () => {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ const EditRoster = () => {
         //console.log('EditRoster component mounted');
 
         // Fetch roster data from the API
-        axios.get('http://localhost:5000/api/roster/' + rosterId)
+        api.get('http://localhost:5000/api/roster/' + rosterId)
             .then(response => {
                 // Set the state with retrieved roster data
                 setRoster(response.data);
@@ -42,7 +43,7 @@ const EditRoster = () => {
             });
 
         // Fetch roster contacts data from the API
-        axios.get('http://localhost:5000/api/rostercontact/' + rosterId)
+        api.get('http://localhost:5000/api/rostercontact/' + rosterId)
             .then(response => {
                 // Set the state with retrieved roster contacts data
                 const ids = response.data.map(rc => rc.contactId);
@@ -86,7 +87,7 @@ const EditRoster = () => {
 
     const handleSubmit = () => {
         // Logic to submit updated roster data
-        axios.put(`http://localhost:5000/api/roster/${rosterId}`, roster)
+        api.put(`http://localhost:5000/api/roster/${rosterId}`, roster)
             .then(response => {
                 console.log('Roster updated successfully:', response.data);
                 // Reload the page to reflect changes
@@ -122,7 +123,7 @@ const EditRoster = () => {
         console.log("add" + contactsToAdd)
         console.log("out" + contactsToRemove)
         // Send request to update roster_contacts
-        axios.post('http://localhost:5000/api/RosterContact/updateContacts', {
+        api.post('http://localhost:5000/api/RosterContact/updateContacts', {
             rosterId: rosterId,
             contactsToAdd: contactsToAdd,
             contactsToRemove: contactsToRemove
