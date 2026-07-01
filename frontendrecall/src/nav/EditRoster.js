@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToolBar } from './Miscelleneous.js';
+import { ToolBar } from '../Miscelleneous.js';
 import useContacts from './UseContacts.js'; // Adjust the path as needed
-import { NavyButton } from './Buttons.js';
+import { NavyButton } from '../components/Buttons.js';
 
 const EditRoster = () => {
     const navigate = useNavigate();

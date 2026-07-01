@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {ToolBar, MyImage} from './Miscelleneous.js'
+import {ToolBar, MyImage} from '../Miscelleneous.js'
 
 const EditContact = () => {
     const navigate = useNavigate();

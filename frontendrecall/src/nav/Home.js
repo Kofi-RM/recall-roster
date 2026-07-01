@@ -1,10 +1,10 @@
-import { ToolBar } from "./Miscelleneous";
-import HomeBanner from "./HomeBanner";
+import { ToolBar } from "../Miscelleneous.js";
+import HomeBanner from "../components/HomeBanner.js";
 import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box, Toolbar, TextField } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {NavyButton } from './Buttons.js'
-import { Footer } from "./Miscelleneous";
+import { Footer } from "../Miscelleneous.js";
 const theme = createTheme({
   palette: {
     custom: {

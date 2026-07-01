@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@mui/icons-material": "^7.3.5"
+    "@mui/icons-material": "^7.3.5",
+    "bcrypt": "^6.0.0"
   }
 }

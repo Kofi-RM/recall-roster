@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using recall_roster.Data;
+using recall_roster.Services;
 using System.Text;
 
 
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 
+git commit -m "Changed Login to Users and added Login/Register DTO. Separated login functionality to AuthController.cs. Added Jwt Service
 
 );
 
@@ -60,7 +62,7 @@ builder.Services.AddScoped<IRecallResultsService, RecallResultsService>();
 builder.Services.AddScoped<IResponseService, ResponseService>();
 builder.Services.AddScoped<IRosterRepositoryService, RosterRepositoryService>();
 builder.Services.AddScoped<IRosterContactService, RosterContactService>();
-
+builder.Services.AddScoped<JwtService>();
 
 var app = builder.Build();
 

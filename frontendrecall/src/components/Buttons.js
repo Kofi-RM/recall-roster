@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 
 import styled from 'styled-components';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { NavyTheme } from './ButtonTheme';
+import { NavyTheme } from '../css/ButtonTheme';
 
 export const NavyButton = ({children, className, onClick, width, height}) => {
   return (

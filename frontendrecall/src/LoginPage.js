@@ -1,13 +1,12 @@
 import { Box, TextField, Button, Checkbox, FormControlLabel, Grid, Paper, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import warner from './warner.png'
+
 import './css/LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { ToolBar, MyImage, Warner, Footer } from './Miscelleneous.js';
+import React, { useState} from 'react';
+import { ToolBar, Footer } from './Miscelleneous.js';
 import { useAuth } from './Auth.js'
-import { NavyButton } from './Buttons.js';
+import { NavyButton } from './components/Buttons.js';
 
 
 const LoginPage = () => {
@@ -16,23 +15,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   // set email and password 
-  const { login, loggedIn } = useAuth();
+  const { login, logout } = useAuth();
   // load login varaibles from Global instances
 
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-    if (loggedIn) {
-      console.log("well done");
-      console.log(loggedIn);
-
-    } else {
-      console.log("logged out")
-    }
-  }, [loggedIn]); // Run the effect whenever the loggedIn state changes
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 console.log("tryna login");
 
@@ -42,34 +31,21 @@ console.log("tryna login");
     };
     console.log(loginData);
 
-    axios.post("http://localhost:5000/api/login", loginData)
-      .then(response => {
-        // Handle successful login
-        console.log('Login successful:', response.data);
-        login(); // Call your login function from the useAuth hook
-        navigate("/landing"); // Redirect to landing page
-      })
-      .catch(error => {
-        // Handle login failure
-        console.error('Login failed:', error.response.data);
-        // Show error message or handle the error as needed
-      });
+    const res = await axios.post("/api/user/login", {
+    email,
+    password
+  });
+
+  login(res.data.token);
   };
 
 
   const handleLogout = () => {
-
+    logout()
     // Additional logic (e.g., clearing session, redirecting, etc.) can be added here
   };
 
-  if (loggedIn) {
-    return (
-      <div>
-        <h1>Welcome!</h1>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="background">

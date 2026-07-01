@@ -14,7 +14,7 @@ namespace recall_roster.Data
         }
 
         public DbSet<Contact> Contacts { get; set; }
-        public DbSet<LoginModel> Logins { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Roster> Rosters { get; set; }
         public DbSet<RosterContact> RosterContacts { get; set; }
 

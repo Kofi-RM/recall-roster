@@ -4,7 +4,7 @@ import { Typography, Button, Container, Grid, Paper, Tabs, Tab, Box, Toolbar, Te
 import { Link, useNavigate } from 'react-router-dom';
 import picture from "../src/images/AF1.avif"
  import './css/HomeBanner.css';
-import { Footer } from './Miscelleneous';
+import { Footer } from '../Miscelleneous';
 
 const HomeBanner = () => {
 
