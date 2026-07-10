@@ -106,14 +106,16 @@ public class MessageController : TwilioController
     [HttpPost("SendMessage/{contactId}/{recallId}")]
     public ActionResult SendMessage(int contactId, int recallId)
     {
+        
         try
         {
+
             _messageService.SendMessageByID(contactId, recallId);
             return Ok("Message sent successfully.");
         }
         catch (Exception ex)
         {
-            return BadRequest($"Failed to send message: {ex.Message}");
+            return BadRequest($"Failed to send message: {ex}");
         }
     }
 
@@ -128,7 +130,7 @@ public class MessageController : TwilioController
         }
         catch (Exception ex)
         {
-            return BadRequest($"Failed to send message: {ex.Message}");
+            return BadRequest($"Failed to send message: {ex}");
         }
 }
 }

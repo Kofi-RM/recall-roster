@@ -15,7 +15,7 @@ import ProtectedRoute from './ProtectedRoute.js';
 import EditContact from './nav/EditContact.js';
 import RecallStats from './nav/RecallStats.js';
 import EditRoster from './nav/EditRoster.js';
-import StartRecall from './StartRecall.js';
+import StartRecall from './nav/StartRecall.js';
 import CreateRoster from './nav/CreateRoster.js';
 import Home from './nav/Home.js';
 

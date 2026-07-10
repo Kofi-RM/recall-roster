@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, Alert } from '@mui/material';
-import { ToolBar } from './Miscelleneous.js';
-import './css/Landing.css';
+import { ToolBar } from '../Miscelleneous.js';
+import '../css/Landing.css';
 import { useNavigate } from 'react-router-dom';
-import useRoster from './hooks/UseRoster.js';
+import useRoster from '../hooks/UseRoster.js';
 import axios from 'axios';
-import { NavyButton } from './components/Buttons.js';
-import api from './api/api.js';
+import { NavyButton } from '../components/Buttons.js';
+import api from '../api/api.js';
 
 
 
@@ -19,6 +19,10 @@ const StartRecall = () => {
  
     const [alertOpen, setAlertOpen] = useState(false);
     const navigate = useNavigate();
+
+    const [days, setDays] = useState(0);
+const [hours, setHours] = useState(0);
+const [minutes, setMinutes] = useState(30);
   
     const handleCloseAlert = () => {
         setAlertOpen(false);
@@ -27,6 +31,12 @@ const StartRecall = () => {
     const now = new Date();
 
      const addRecall  = async () => {
+        const endTime = new Date();
+
+endTime.setDate(endTime.getDate() + days);
+endTime.setHours(endTime.getHours() + hours);
+endTime.setMinutes(endTime.getMinutes() + minutes);
+
         let employeesMax = 0;
         let flightChiefMax = 0;
         let elementChiefMax = 0;
@@ -35,7 +45,7 @@ const StartRecall = () => {
             rosterId: selectedRoster,
             message: message,
             timeStarted: now.toISOString(),
-            timeEnded: "2025-12-02T22:43:32.769Z",
+            timeEnded: endTime.toISOString(),
             active: 1,
             Employees: 0,
             FlightChief: 0,
@@ -101,10 +111,14 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
             console.log('Recall data posted successfully:', response.data);
             recallId = response.data.recallId;
            
-             contactsArray.forEach(contact => {
-                 api.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`)
-            
-             })
+               contactsArray.forEach(contact => {
+                api.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`, {
+                    message: message
+                })
+                .catch(error => {
+                    console.error(`Error sending message to contact ${contact.contactId}:`, error);
+                });
+            })
             // Handle response as needed
         })
         .catch(error => {
@@ -181,6 +195,47 @@ data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirect
                         sx={{ minWidth: 400 }}
                     />
                 </div>
+
+                <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: "20px",
+    gap: "15px",
+  }}
+>
+  <Typography className="login" variant="h4">
+    Ends In
+  </Typography>
+
+  <TextField
+    label="Days"
+    type="number"
+    value={days}
+    onChange={(e) => setDays(Number(e.target.value))}
+    inputProps={{ min: 0 }}
+    sx={{ width: 100 }}
+  />
+
+  <TextField
+    label="Hours"
+    type="number"
+    value={hours}
+    onChange={(e) => setHours(Number(e.target.value))}
+    inputProps={{ min: 0, max: 23 }}
+    sx={{ width: 100 }}
+  />
+
+  <TextField
+    label="Minutes"
+    type="number"
+    value={minutes}
+    onChange={(e) => setMinutes(Number(e.target.value))}
+    inputProps={{ min: 0, max: 59 }}
+    sx={{ width: 120 }}
+  />
+</div>
                 <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <NavyButton size="large" variant="contained" color="primary" onClick={handleSubmit}>
                         Start Recall

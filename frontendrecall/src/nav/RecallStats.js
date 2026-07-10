@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Paper, Tabs, Tab, Grid, Button, LinearProgress } from '@mui/material';
 import axios from 'axios';
 import api from '../api/api';
-
 const RecallStats = () => {
     const navigate = useNavigate();
     const { recallId } = useParams(); // snag recallId from URL params
@@ -55,8 +54,9 @@ const RecallStats = () => {
           contacts.map(async contact => {
             if (contact.responded !== undefined) return contact; // Already has response info
             try {
-              await api.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
-              return { ...contact, responded: true };
+             const response = await api.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
+             console.log(response)
+             return { ...contact, responded: true, responseTime: response.data.responseTime };
             } catch (error) {
               console.error(`Error fetching response for ${contact.contactId}:`, error.message);
               return { ...contact, responded: false };
@@ -72,7 +72,7 @@ const RecallStats = () => {
     if (contacts.length > 0) {
       fetchResponses();
     }
-  }, [recallId, contacts.length]);
+  }, [recallId, contacts.length, contacts]);
     // Filter contacts based on role
     const filteredContacts = contacts.filter(contact => {
         if (activeTab === 'all') return true;
@@ -93,11 +93,48 @@ const RecallStats = () => {
         }
     };
 
+    const formatDateTime = (value) => {
+        if (!value) return 'N/A';
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? value : date.toLocaleString();
+    };
+
+    const calculateLateness = (responseTime, deadline) => {
+        if (!responseTime || !deadline) return null;
+        const responseDate = new Date(responseTime);
+        const deadlineDate = new Date(deadline);
+        const diffMs = responseDate - deadlineDate;
+        if (isNaN(diffMs) || diffMs <= 0) return null;
+
+        const minutes = Math.floor(diffMs / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (days > 0) {
+            const remHours = hours % 24;
+            return `${days}d ${remHours}h late`;
+        } else if (hours > 0) {
+            const remMinutes = minutes % 60;
+            return `${hours}h ${remMinutes}m late`;
+        } else {
+            return `${minutes}m late`;
+        }
+    };
+
     return (
-        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
-            <Paper>
-                <Typography variant="h4">Recall Details</Typography>
-                {/* Display recall details */}
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px', border: '1px solid #e0e0e0' }}>
+            <Paper style={{ padding: '16px', marginBottom: '20px' }}>
+                <Typography variant="h4" gutterBottom>Recall Details</Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                        <Typography variant="overline" color="textSecondary">Time Started</Typography>
+                        <Typography variant="h6">{formatDateTime(recall.timeStarted)}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Typography variant="overline" color="textSecondary">Time Ended</Typography>
+                        <Typography variant="h6">{formatDateTime(recall.timeEnded)}</Typography>
+                    </Grid>
+                </Grid>
             </Paper>
 
             {/* Tabs for different roles */}
@@ -121,19 +158,26 @@ const RecallStats = () => {
     <Typography variant="body1">You have no contacts of this rank</Typography>
 ) : (
     filteredContacts.map((contact, index) => (
-        <div  key={`${contact.contactId}-${index}`} style={{ backgroundColor: 'white', padding: '10px', margin: '10px', borderRadius: '5px' }}>
-            <Grid container spacing={2}>
+        <div
+            key={`${contact.contactId}-${index}`}
+            style={{
+                backgroundColor: 'white',
+                padding: '10px',
+                margin: '10px 0'
+            }}
+        >
+            <Grid container spacing={2} alignItems="center">
                 <Grid item xs={6}>
                     <Typography variant="body1">Name:{contact.firstName + " " + contact.lastName}</Typography>
                     <Typography variant="body2">Rank: {contact.rank}</Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={3}>
                     {/* Show response status */}
                     <Typography variant="body1">{contact.responded ? 'Responded' : 'Not Responded'}</Typography>
                 </Grid>
-                <Grid item xs={12}>
-                    {/* Progress bar */}
-                   
+                <Grid item xs={3} style={{ textAlign: 'right' }}>
+                    <Typography variant="body2">{contact.responseTime > recall.timeEnded ? "After deadline" : "Responded within timeframe"}</Typography>
+                <Typography color ="error" variant="body2">{calculateLateness(contact.responseTime, recall.timeEnded) ? `${calculateLateness(contact.responseTime, recall.timeEnded)}` : ""}</Typography>
                 </Grid>
             </Grid>
         </div>

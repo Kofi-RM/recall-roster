@@ -31,13 +31,17 @@ console.log("tryna login");
     };
     console.log(loginData);
 
-    const res = await axios.post(" http://localhost:5000/api/auth/login", {
+    const res = await axios.post("http://localhost:5000/api/auth/login", {
     email,
     password
   });
 
   login(res.data.token);
-  navigate("/landing")
+  console.log("before nav")
+ setTimeout(() => {
+  navigate("/landing");
+}, 0);
+  console.log("after nav")
   };
 
  

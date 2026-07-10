@@ -30,7 +30,8 @@ namespace recall_roster.Models
           public int TotalMax { get; set;}
 
     
-        public int active { get; set; }
+       [NotMapped]
+public int active => DateTime.UtcNow < timeEnded ? 1 : 0;
 
 
 
