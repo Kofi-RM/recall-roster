@@ -1,4 +1,3 @@
-using System.Drawing.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
@@ -29,20 +28,27 @@ public class AuthController : ControllerBase
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var email = request.Email.Trim().ToUpperInvariant();
             var existingUser = await _dbContext.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             if (existingUser != null)
                 return BadRequest("User already exists.");
 
             var user = new User
             {
-                Email = request.Email,
+                Email = email,
                 Password = BCrypt.Net.BCrypt.HashPassword(request.Password)
             };
 
             _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
+            try { await _dbContext.SaveChangesAsync(); }
+            catch (DbUpdateException)
+            {
+                if (await _dbContext.Users.AsNoTracking().AnyAsync(u => u.Email == email))
+                    return Conflict("User already exists.");
+                throw;
+            }
 
             return Ok("User registered successfully.");
         }
@@ -61,8 +67,9 @@ public class AuthController : ControllerBase
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var email = request.Email.Trim().ToUpperInvariant();
             var user = await _dbContext.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null)
                 return Unauthorized("Invalid email or password.");
@@ -92,5 +99,3 @@ public class AuthController : ControllerBase
         }
     }
 }
-
-  

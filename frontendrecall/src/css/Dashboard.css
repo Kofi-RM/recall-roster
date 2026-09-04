@@ -1,0 +1,22 @@
+.rr-dashboard { min-height: 100vh; background: #f4f6f9; color: #14243b; }
+.rr-dashboard-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); min-height: calc(100vh - 72px); }
+.rr-sidebar { padding: 32px 16px; background: #fff; border-right: 1px solid #dfe5ed; }
+.rr-sidebar > .rr-eyebrow { color: #758092; padding-left: 16px; }
+.rr-sidebar .MuiTab-root { align-items: flex-start; text-transform: none; font-weight: 600; min-height: 48px; border-radius: 8px; margin-bottom: 6px; }
+.rr-sidebar .Mui-selected { background: #edf1f7; color: #1c2347; }
+.rr-sidebar .MuiTabs-indicator { background: #b48739; width: 3px; }
+.rr-sidebar-note { margin: 48px 16px 0; border-top: 1px solid #e5e9ef; padding-top: 24px; font-size: 13px; font-weight: 650; }
+.rr-sidebar-note span { display: block; color: #758092; font-size: 11px; font-weight: 400; margin-top: 8px; }
+.rr-dashboard-main { padding: 40px; min-width: 0; }
+.rr-dashboard-heading .rr-eyebrow { color: #758092; margin-bottom: 12px; }
+.rr-dashboard-heading h1 { font-size: 32px; font-weight: 750; color: #14243b; letter-spacing: -.8px; }
+.rr-dashboard-heading > p:last-child { color: #617084; margin: 12px 0 28px; }
+.rr-workspace-panel { background: #fff; border: 1px solid #dfe5ed; border-radius: 14px; padding: 24px; min-height: 280px; overflow-x: auto; }
+.rr-workspace-panel h1 { font-size: 24px; color: #14243b; }
+.rr-workspace-panel .contact-list-container { padding: 0; align-items: stretch; }
+.rr-workspace-panel .contact-list-section { overflow-x: auto; }
+.rr-workspace-panel table { width: 100%; min-width: 580px; }
+.rr-workspace-panel th, .rr-workspace-panel td { padding: 16px 12px; border-bottom: 1px solid #e5e9ef; }
+.rr-workspace-panel th { color: #617084; font-size: 12px; background: #f7f8fa; }
+.rr-workspace-panel .contact-list-container > div[style*="fixed"] { position: static !important; margin-top: 24px; }
+@media (max-width: 900px) { .rr-dashboard-layout { grid-template-columns: 1fr; } .rr-sidebar { padding: 12px 16px; border-right: 0; border-bottom: 1px solid #dfe5ed; min-width: 0; } .rr-sidebar > .rr-eyebrow, .rr-sidebar-note { display: none; } .rr-sidebar .MuiTab-root { align-items: center; margin-bottom: 0; } .rr-sidebar .MuiTabs-indicator { width: auto; height: 3px; } .rr-dashboard-main { padding: 28px 16px; } .rr-workspace-panel { padding: 18px; } }

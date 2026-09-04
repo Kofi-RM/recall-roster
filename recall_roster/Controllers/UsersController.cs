@@ -31,7 +31,7 @@ public async Task<IActionResult> GetUser(int id)
         if (user == null)
             return NotFound();
 
-        return Ok(user);
+        return Ok(new { user.Id, user.Email });
     }
     catch (Exception ex)
     {
@@ -72,7 +72,7 @@ public async Task<IActionResult> DeleteUser(int id)
 
                 _dbContext.Users.Remove(user);
                 await _dbContext.SaveChangesAsync();
-                return StatusCode(0);
+                return NoContent();
                 
             } catch (Exception ex)
             {

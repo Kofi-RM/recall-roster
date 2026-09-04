@@ -1,90 +1,43 @@
 import React, { useState } from 'react';
-import { Typography, Paper, Tabs, Tab, Box, Grid } from '@mui/material';
+import { Tabs, Tab, useMediaQuery } from '@mui/material';
+import { ToolBar } from './Miscelleneous';
+import ManageContacts from './ManageContacts';
+import ManageRoster from './ManageRoster';
+import ManageActiveRecalls from './ManageActiveRecall';
+import ManagePrevRecalls from './ManagePrevRecalls';
+import './css/Dashboard.css';
 
+const sections = [
+  { label: 'Active Recalls', description: 'Coordinate your current recalls and follow your team’s responses.', component: ManageActiveRecalls },
+  { label: 'Recall History', description: 'Revisit previous recalls and their results.', component: ManagePrevRecalls },
+  { label: 'View Rosters', description: 'Organize the teams you need to reach.', component: ManageRoster },
+  { label: 'View Staff', description: 'Keep your staff directory and contact details up to date.', component: ManageContacts },
+];
 
-import { ToolBar } from './Miscelleneous.js';
-import ManageContacts from './ManageContacts.js';
-import ManageRoster from './ManageRoster.js';
-import ManageActiveRecalls from './ManageActiveRecall.js';
-import ManagePrevRecalls from './ManagePrevRecalls.js';
 const LandingPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-
-  const userOptions = ['Active Recalls', 'Recall History', 'Custom Rosters', 'View Staff']; // Add 'Add Contacts' option
-  const userDetails = {
-    0: 'Active Recalls with a Status Button',
-    1: 'Former Recalls sorted by date',
-    2: 'Roster Info and Edit Buttons',
-    3: 'Add new contacts to the system', // Details for 'Add Contacts' option
-  };
-
-  const userTitle = {
-    0: 'List of Active Recalls',
-    1: 'List of Former Recalls',
-    2: 'Manage Roster',
-    3: 'Add Contacts', // Title for 'Add Contacts' option
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
-
-  const renderTabContent = () => {
-    switch (selectedTab) {
-      case 0:
-        return <ManageActiveRecalls/>
-      case 1:
-        return <ManagePrevRecalls/>
-      case 2:
-        return <ManageRoster/>
-        case 3:
-        return <ManageContacts/>// Render content for 'Add Contacts' option
-      default:
-        return <div>No additional content for this tab</div>; // Default message for other tabs
-    }
-  };
-
+  const compact = useMediaQuery('(max-width:900px)');
+  const Content = sections[selectedTab].component;
   return (
-    <div>
-      <ToolBar></ToolBar>
-      <div style={{paddingTop:'20px', marginTop: '-20px', display: 'flex', height: '100vh' }}> {/* Add marginTop: '-20px' to remove the gap */}
-        {/* Left Sidebar */}
-        <Paper elevation={3} style={{display: 'block', position: 'fixed', width: '15%', backgroundColor: '#f0f0f0', height: '100%', overflowY: 'auto' }}>
-          <Typography variant="h6" align="center" style={{ margin: '1rem 0' }}>Navigation</Typography>
-          <Tabs
-            orientation="vertical"
-            variant="scrollable"
-            value={selectedTab}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
-            style={{ marginTop: '20px' }}
-          >
-            {userOptions.map((option, index) => (
-              <Tab sx = {{color:'#1c2347'}}label={option} key={index} />
-            ))}
+    <div className="rr-dashboard">
+      <ToolBar />
+      <div className="rr-dashboard-layout">
+        <aside className="rr-sidebar">
+          <p className="rr-eyebrow">WORKSPACE</p>
+          <Tabs orientation={compact ? 'horizontal' : 'vertical'} variant="scrollable" scrollButtons="auto"
+            value={selectedTab} onChange={(_, value) => setSelectedTab(value)} aria-label="Workspace sections">
+            {sections.map((section, index) => <Tab key={section.label} label={section.label} id={`workspace-tab-${index}`} aria-controls={`workspace-panel-${index}`} />)}
           </Tabs>
-        </Paper>
-
-        {/* Right Content */}
-        <Box style={{marginLeft: '15%', width:'85%', marginTop: '-40px',flexGrow: 1, paddingRight: '25px', paddingLeft: '25px', backgroundColor: '#fff', height: '100vh'  }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              {/* <Typography variant="h4" gutterBottom>{userTitle[selectedTab]}</Typography> */}
-            </Grid>
-            <Grid item xs={12}>
-              {/* <Typography variant="body1">{userDetails[selectedTab]}</Typography> */}
-            </Grid>
-            <Grid item xs={12}>
-              {/* Placeholder for the content related to the selected tab */}
-              {renderTabContent()}
-            </Grid>
-          </Grid>
-          
-        </Box>
+          <div className="rr-sidebar-note">Recall Roster<span>Keep your team within reach.</span></div>
+        </aside>
+        <main id="main-content" className="rr-dashboard-main">
+          <header className="rr-dashboard-heading"><p className="rr-eyebrow">RECALL MANAGEMENT</p><h1>{sections[selectedTab].label}</h1><p>{sections[selectedTab].description}</p></header>
+          <section className="rr-workspace-panel" role="tabpanel" id={`workspace-panel-${selectedTab}`} aria-labelledby={`workspace-tab-${selectedTab}`} tabIndex={0}>
+            <Content />
+          </section>
+        </main>
       </div>
     </div>
   );
 };
-
 export default LandingPage;

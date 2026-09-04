@@ -50,9 +50,6 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
-    Console.WriteLine("JWT KEY: " + builder.Configuration["Jwt:Key"]);
-Console.WriteLine("JWT ISSUER: " + builder.Configuration["Jwt:Issuer"]);
-Console.WriteLine("JWT AUD: " + builder.Configuration["Jwt:Audience"]);
 });
 
 
@@ -71,7 +68,11 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseDeveloperExceptionPage();
+app.UseExceptionHandler(handler => handler.Run(async context =>
+{
+    context.Response.StatusCode = 500;
+    await context.Response.WriteAsJsonAsync(new { message = "The request could not be completed. Please try again." });
+}));
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {

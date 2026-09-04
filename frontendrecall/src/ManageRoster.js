@@ -59,6 +59,7 @@ const navigate = useNavigate();
                     size="large"
                     variant="contained"
                     style={{ backgroundColor: 'red', color: 'white' }}
+                    sx= {{ml:2}}
                     onClick={() => handleRemove(roster.rosterId)}
                   >
                     Remove

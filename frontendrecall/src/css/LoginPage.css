@@ -1,22 +1,10 @@
-.ToolBar {
-    margin-bottom: 20px;
-}
-
-.MuiTypography-root.logoName {
-    
-     font-family: "Orbitron", sans-serif; 
-      font-optical-sizing: auto;
-     font-weight: bold;
-      font-style:italic;
-    }
-.MuiTypography-root.login {
-  font-family: "Roboto", sans-serif; 
-  font-optical-sizing: auto;
- 
-  font-style:italic;
-
-}
-    
-.background {
-  background-color: #1c2347;
-  }
+.rr-login-page { background: #f4f6f9; }
+.rr-login-main { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 72px; width: min(100%, 1100px); margin: auto; padding: 70px 32px; }
+.rr-login-intro .rr-eyebrow { color: #8a621c; }
+.rr-login-intro h1 { font-size: clamp(36px, 4vw, 56px); font-weight: 750; color: #14243b; letter-spacing: -1.8px; margin-bottom: 20px; }
+.rr-login-intro > p:last-child { color: #617084; line-height: 1.8; font-size: 17px; max-width: 410px; }
+.rr-login-card.MuiPaper-root { padding: 36px; border-radius: 16px; border: 1px solid #dfe5ed; box-shadow: 0 16px 50px #14243b08; }
+.rr-login-card h2 { color: #14243b; font-size: 26px; font-weight: 700; }
+.rr-login-card > p { color: #617084; font-size: 14px; }
+.rr-login-help { margin: 24px 0 0; color: #617084; line-height: 1.6; font-size: 12px; text-align: center; }
+@media (max-width: 760px) { .rr-login-main { grid-template-columns: 1fr; gap: 24px; padding: 40px 20px; max-width: 500px; } .rr-login-card.MuiPaper-root { padding: 24px; } }

@@ -1,250 +1,93 @@
-
-import React, { useState, useEffect } from 'react';
-import { Typography, Button, Container, TextField, Select, MenuItem, Snackbar, Alert } from '@mui/material';
-import { ToolBar } from '../Miscelleneous.js';
-import '../css/Landing.css';
-import { useNavigate } from 'react-router-dom';
-import useRoster from '../hooks/UseRoster.js';
-import axios from 'axios';
-import { NavyButton } from '../components/Buttons.js';
-import api from '../api/api.js';
-
-
+import React, { useRef, useState } from 'react';
+import { Alert, Button, Container, TextField, MenuItem, Stack, Typography } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { ToolBar } from '../Miscelleneous';
+import useRoster from '../hooks/UseRoster';
+import api from '../api/api';
 
 const StartRecall = () => {
-    const [selectedRoster, setSelectedRoster] = useState('');
-    const [message, setMessage] = useState('');
-    const { rosters, loading, error } = useRoster();
-    const [isSubmitting, setIsSubmitting] = useState(false);
- 
-    const [alertOpen, setAlertOpen] = useState(false);
-    const navigate = useNavigate();
+  const { rosters, loading, error } = useRoster();
+  const [selectedRoster, setSelectedRoster] = useState('');
+  const [message, setMessage] = useState('');
+  const [duration, setDuration] = useState({ days: 0, hours: 0, minutes: 30 });
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState('');
+  const [createdId, setCreatedId] = useState(null);
+  const submitting = useRef(false);
+  const navigate = useNavigate();
 
-    const [days, setDays] = useState(0);
-const [hours, setHours] = useState(0);
-const [minutes, setMinutes] = useState(30);
-  
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
-
-    const now = new Date();
-
-     const addRecall  = async () => {
-        const endTime = new Date();
-
-endTime.setDate(endTime.getDate() + days);
-endTime.setHours(endTime.getHours() + hours);
-endTime.setMinutes(endTime.getMinutes() + minutes);
-
-        let employeesMax = 0;
-        let flightChiefMax = 0;
-        let elementChiefMax = 0;
-        let squadronDirectorMax = 0;
-        const data = {
-            rosterId: selectedRoster,
-            message: message,
-            timeStarted: now.toISOString(),
-            timeEnded: endTime.toISOString(),
-            active: 1,
-            Employees: 0,
-            FlightChief: 0,
-            ElementChief: 0,
-            SquadronDirector: 0,
-            
-            EmployeesMax: 0,
-            FlightChiefMax: 0,
-            ElementChiefMax: 0,
-            SquadronDirectorMax: 0,
-            TotalMax: 0
-
-
-        };
-        
-        const contactsArray = [];
-        var recallId;
-        const rosterContacts = await fetchRosterContacts(selectedRoster);
-
-        console.log("roster contacts" + rosterContacts);
-        for (const rc of rosterContacts)
-            {
-                const id = rc.contactId;
-                const response = await api.get(`http://localhost:5000/api/contact/${id}`);
-                 console.log(response);
-                const contact = response.data;
-                console.log("contact" + contact)
-                const rank = contact.rank;
-                contactsArray.push(contact);
-                console.log("contacts array" + contactsArray)
-                console.log(rank + "rank")
-                switch (rank) {
-                case 'Employee':
-                    employeesMax++;
-                    break;
-                case 'Flight Chief':
-                    flightChiefMax++;
-                    break;
-                case 'Element Chief':
-                    elementChiefMax++;
-                    break;
-                case 'Squadron Director':
-                    squadronDirectorMax++;
-                    break;
-                default:
-                    break;
-            }
-     };
-    
-     data.EmployeesMax = employeesMax;
-     console.log("employee max" + employeesMax);
-data.FlightChiefMax = flightChiefMax;
-data.ElementChiefMax = elementChiefMax;
-data.SquadronDirectorMax = squadronDirectorMax;
-data.TotalMax = employeesMax + flightChiefMax + elementChiefMax + squadronDirectorMax;
-
-        console.log(data);
-        console.log(contactsArray);
-      
-
-        api.post('http://localhost:5000/api/Recall', data)
-        .then(response => {
-            console.log('Recall data posted successfully:', response.data);
-            recallId = response.data.recallId;
-           
-               contactsArray.forEach(contact => {
-                api.post(`http://localhost:5000/api/Message/SendMessage/${contact.contactId}/${recallId}`, {
-                    message: message
-                })
-                .catch(error => {
-                    console.error(`Error sending message to contact ${contact.contactId}:`, error);
-                });
-            })
-            // Handle response as needed
-        })
-        .catch(error => {
-            console.error('Error posting recall data:', error);
-            // Handle error as needed
-        });
-
-       
-
+  const submit = async (event) => {
+    event.preventDefault();
+    if (submitting.current || createdId) return;
+    const { days, hours, minutes } = duration;
+    const values = [days, hours, minutes];
+    const totalMinutes = days * 1440 + hours * 60 + minutes;
+    if (!selectedRoster || !message.trim() || values.some(v => !Number.isInteger(v) || v < 0) ||
+        days > 365 || hours > 23 || minutes > 59 || totalMinutes <= 0) {
+      setFailure('Choose a roster, enter a message, and set a valid duration (up to 365 days).');
+      return;
     }
-
-    const fetchRosterContacts = async (selectedRoster) => {
+    submitting.current = true;
+    setPending(true);
+    setFailure('');
+    let recallId;
+    try {
+      const result = await api.post('/Recall', {
+        rosterId: Number(selectedRoster), message: message.trim(),
+        timeEnded: new Date(Date.now() + totalMinutes * 60000).toISOString()
+      });
+      recallId = result.data.recallId;
+      setCreatedId(recallId);
+      const snapshot = await api.get(`/Recall/${recallId}/recipients`);
+      let failed = 0;
+      // Bounded sequential sends avoid launching an unbounded set of provider requests.
+      for (const recipient of snapshot.data.recipients) {
         try {
-            const response = await api.get(`http://localhost:5000/api/rostercontact/${selectedRoster}`);
-            const rosterContacts = response.data;
-            return  rosterContacts ;
-        } catch (error) {
-            console.error('Error fetching roster contacts:', error);
-            return { rosterContacts: [] };
-        }
-    };
-    const handleSubmit  = async () => {
-        // // Logic to submit the message
-        
-        addRecall();
-        setAlertOpen(true);
-        setTimeout(() => {
-            navigate("/landing");
-        }, 2000); 
-   
-    };
+          await api.post(`/Message/SendMessage/${recipient.contactId}/${recallId}`, { message: message.trim() });
+        } catch { failed += 1; }
+      }
+      if (failed) {
+        setFailure(`Recall #${recallId} was created, but ${failed} message submission(s) failed or could not be confirmed. Contact your coordinator; do not create another recall to retry.`);
+      } else {
+        navigate(`/recallStats/${recallId}`, { state: { submitted: true } });
+      }
+    } catch (err) {
+      setFailure(recallId
+        ? `Recall #${recallId} was created, but recipient retrieval or message submission failed. Check its progress before taking further action.`
+        : err.response?.data?.message || 'Recall creation could not be confirmed. Check Active Recalls before trying again.');
+    } finally {
+      submitting.current = false;
+      setPending(false);
+    }
+  };
 
-    return (
-        <div className="recallBackground">
-            <ToolBar />
-            {/* Display a Snackbar for the alert */}
-            <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert} anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}>
-                <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%', fontSize: '1.2rem' }}>
-                    Recall initatied!
-                </Alert>
-            </Snackbar>
-            <Container style={{ padding: '25px', borderRadius: 16 }}>
-                <Typography variant="h4" align="center" gutterBottom className="logoName">
-                   Initiate Recall
-                </Typography>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-                    <Typography className="login" variant="h4" align="center" gutterBottom margin='12px' padding-right='30px'>Roster</Typography>
-                    {rosters.length > 0 && (
-  <Select 
-    value={selectedRoster}
-    onChange={(e) => setSelectedRoster(e.target.value)}
-    variant="outlined"
-    sx={{ minWidth: 200 }}
-  >
-    <MenuItem value="">Select Roster</MenuItem>
-    {rosters.map(roster => (
-      <MenuItem key={roster.rosterId} value={roster.rosterId}>{roster.name}</MenuItem>
-    ))}
-  </Select>
-)}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-                    <Typography className="login" variant="h4" align="center" gutterBottom margin='12px' padding-right='30px'>Message</Typography>
-                    <TextField 
-                        label="Type your message here"
-                        variant="outlined"
-                        multiline
-                        rows={6}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        sx={{ minWidth: 400 }}
-                    />
-                </div>
-
-                <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "20px",
-    gap: "15px",
-  }}
->
-  <Typography className="login" variant="h4">
-    Ends In
-  </Typography>
-
-  <TextField
-    label="Days"
-    type="number"
-    value={days}
-    onChange={(e) => setDays(Number(e.target.value))}
-    inputProps={{ min: 0 }}
-    sx={{ width: 100 }}
-  />
-
-  <TextField
-    label="Hours"
-    type="number"
-    value={hours}
-    onChange={(e) => setHours(Number(e.target.value))}
-    inputProps={{ min: 0, max: 23 }}
-    sx={{ width: 100 }}
-  />
-
-  <TextField
-    label="Minutes"
-    type="number"
-    value={minutes}
-    onChange={(e) => setMinutes(Number(e.target.value))}
-    inputProps={{ min: 0, max: 59 }}
-    sx={{ width: 120 }}
-  />
-</div>
-                <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <NavyButton size="large" variant="contained" color="primary" onClick={handleSubmit}>
-                        Start Recall
-                    </NavyButton>
-                    <NavyButton variant="contained" onClick={() => navigate(-1)} style={{ position: 'sticky', bottom: '20px', left: '20px' }}>Go Back</NavyButton>
-                </div>
-            </Container>
-        </div>
-    );
+  return <div>
+    <ToolBar />
+    <Container component="main" id="main-content" maxWidth="sm" sx={{ py: 5 }}>
+      <Typography variant="h4" component="h1" gutterBottom>Initiate recall</Typography>
+      <Typography color="text.secondary" sx={{ mb: 3 }}>Recipients and their contact details are saved when this recall begins.</Typography>
+      {loading && <Alert severity="info">Loading rosters…</Alert>}
+      {error && <Alert severity="error">Rosters could not be loaded. Please refresh and try again.</Alert>}
+      {failure && <Alert severity="error" sx={{ mb: 2 }}>{failure}</Alert>}
+      {createdId && !pending && <Button component={Link} to={`/recallStats/${createdId}`} sx={{ mb: 2 }}>View recall #{createdId}</Button>}
+      <Stack component="form" spacing={3} onSubmit={submit}>
+        <TextField select label="Roster" value={selectedRoster} onChange={e => setSelectedRoster(e.target.value)} required disabled={pending || !!createdId || loading}>
+          {rosters.map(r => <MenuItem key={r.rosterId} value={r.rosterId}>{r.name}</MenuItem>)}
+        </TextField>
+        <TextField label="Message" multiline rows={5} value={message} onChange={e => setMessage(e.target.value)} required inputProps={{ maxLength: 1600 }} disabled={pending || !!createdId} />
+        <Typography component="h2" variant="h6">Response deadline</Typography>
+        <Stack direction="row" spacing={2}>
+          {['days', 'hours', 'minutes'].map(key => <TextField key={key} label={key[0].toUpperCase() + key.slice(1)} type="number"
+            value={duration[key]} onChange={e => setDuration({ ...duration, [key]: Number(e.target.value) })}
+            inputProps={{ min: 0, max: key === 'days' ? 365 : key === 'hours' ? 23 : 59, step: 1 }}
+            disabled={pending || !!createdId} required />)}
+        </Stack>
+        <Button type="submit" variant="contained" disabled={pending || !!createdId || loading || !!error || !rosters.length}>
+          {pending ? 'Creating recall and submitting messages…' : 'Start recall'}
+        </Button>
+        <Button onClick={() => navigate('/landing')} disabled={pending}>Back to dashboard</Button>
+      </Stack>
+    </Container>
+  </div>;
 };
-
 export default StartRecall;

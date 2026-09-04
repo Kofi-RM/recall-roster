@@ -1,81 +1,46 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
 using recall_roster.Models;
 
-    public class RosterContactService : IRosterContactService
+public class RosterContactService : IRosterContactService
+{
+    private readonly AppDbContext _context;
+    public RosterContactService(AppDbContext context) => _context = context;
+    public List<RosterContact> GetAllRosterContacts(int rosterId) =>
+        _context.RosterContacts.AsNoTracking().Where(rc => rc.rosterId == rosterId).ToList();
+    public RosterContact? GetRosterContact(int rosterId, int contactId) =>
+        _context.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contactId);
+    public void AddRosterContact(RosterContact contact) =>
+        UpdateRosterContacts(contact.rosterId, new[] { contact.contactId }, Array.Empty<int>());
+    public void RemoveRosterContact(RosterContact contact) =>
+        UpdateRosterContacts(contact.rosterId, Array.Empty<int>(), new[] { contact.contactId });
+
+    public void UpdateRosterContacts(int rosterId, int[] contactsToAdd, int[] contactsToRemove)
     {
-        private readonly AppDbContext _context;
-
-        public RosterContactService(AppDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
-
-        // Method to retrieve all roster contacts
-        public List<RosterContact> GetAllRosterContacts(int rosterId)
-        {
-
-
-            return _context.RosterContacts.Where(rc => rc.rosterId == rosterId).ToList();
-        }
-
-
-        // Method to retrieve roster contacts by roster ID
-        public RosterContact? GetRosterContact(int rosterId, int contactId)
-        {
-            return _context.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contactId);
-        }
-
-        // Method to add roster contact
-        public void AddRosterContact(RosterContact rosterContact)
-        {
-            _context.RosterContacts.Add(rosterContact);
-            _context.SaveChanges();
-        }
-
-        // Method to remove roster contact
-        public void RemoveRosterContact(RosterContact rosterContact)
-        {
-            _context.RosterContacts.Remove(rosterContact);
-            _context.SaveChanges();
-        }
-
-        public void UpdateRosterContacts(int rosterId, int[] contactsToAdd, int[] contactsToRemove)
-        {
-            // Add new roster contacts
-            foreach (var contact in contactsToAdd)
-            {
-                var rosterContactToAdd = new RosterContact
-                {
-                    rosterId = rosterId,
-                    contactId = contact, // Assuming Contact class has an Id property
-                };
-                _context.RosterContacts.Add(rosterContactToAdd);
-            }
-
-            // Remove existing roster contacts
-            foreach (var contact in contactsToRemove)
-            {
-                var rosterContactToRemove = _context.RosterContacts.FirstOrDefault(rc => rc.rosterId == rosterId && rc.contactId == contact);
-                if (rosterContactToRemove != null)
-                {
-                    _context.RosterContacts.Remove(rosterContactToRemove);
-                }
-            }
-
-            // Save changes to the database
-            _context.SaveChanges();
-        }
-        // Add other methods for CRUD operations as needed...
+        var added = (contactsToAdd ?? Array.Empty<int>()).Distinct().ToArray();
+        var removed = (contactsToRemove ?? Array.Empty<int>()).Distinct().ToArray();
+        if (added.Intersect(removed).Any() || added.Concat(removed).Any(id => id <= 0))
+            throw new ArgumentException("Contact IDs must be positive and cannot be both added and removed.");
+        using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
+        if (!_context.Rosters.Any(r => r.rosterId == rosterId))
+            throw new ArgumentException("Roster not found.");
+        if (_context.Contacts.Count(c => added.Contains(c.contactId) && c.Active == 1) != added.Length)
+            throw new ArgumentException("Only existing active contacts can be added.");
+        var existing = _context.RosterContacts.Where(rc => rc.rosterId == rosterId).ToList();
+        foreach (var id in added.Except(existing.Select(rc => rc.contactId)))
+            _context.RosterContacts.Add(new RosterContact { rosterId = rosterId, contactId = id });
+        _context.RosterContacts.RemoveRange(existing.Where(rc => removed.Contains(rc.contactId)));
+        _context.SaveChanges();
+        transaction.Commit();
     }
+}
 
-    public interface IRosterContactService
-    {
-        List<RosterContact> GetAllRosterContacts(int rosterId);
-        RosterContact? GetRosterContact(int rosterId, int contactId);
-        void AddRosterContact(RosterContact rosterContact);
-        void RemoveRosterContact(RosterContact rosterContact);
-        void UpdateRosterContacts(int rosterId, int[] contactsToAdd ,int[] contactsToRemove);
-
-
-
-    }
+public interface IRosterContactService
+{
+    List<RosterContact> GetAllRosterContacts(int rosterId);
+    RosterContact? GetRosterContact(int rosterId, int contactId);
+    void AddRosterContact(RosterContact rosterContact);
+    void RemoveRosterContact(RosterContact rosterContact);
+    void UpdateRosterContacts(int rosterId, int[] contactsToAdd, int[] contactsToRemove);
+}

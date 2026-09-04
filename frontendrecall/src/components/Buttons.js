@@ -1,22 +1,28 @@
-import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/material';
+import { Button} from '@mui/material';
 
-import { Link,  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import styled from 'styled-components';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { NavyTheme } from '../css/ButtonTheme';
 
-export const NavyButton = ({children, className, onClick, width, height}) => {
+
+export const NavyButton = ({children, className, onClick, sx, ...props}) => {
   return (
-<ThemeProvider theme = {NavyTheme}>
-  {/* <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}> */}
-          <Button sx={{width: width, height: height}} size="large" variant="contained" color="custom" onClick={ onClick}>
+
+ <>
+          <Button  size="large" variant="contained" sx={{
+        backgroundColor: "custom.main",
+        color: "custom.contrastText",
+        "&:hover": {
+          backgroundColor: "custom.dark",
+        }, ...sx,
+      }} 
+      onClick={ onClick} {...props}>
             {children}
           </Button>
-    
-        </ThemeProvider>
+  </>  
+       
 )}
 // Styled DbButton component
 const StyledDbButton = styled.button`

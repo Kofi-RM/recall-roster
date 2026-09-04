@@ -3,7 +3,7 @@ import logo from './logo.svg';
 
 import React, { useState, useEffect,  createContext, useContext, Component } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { Button, Typography, AppBar, Toolbar, Container, TextField } from '@mui/material';
+import { Button, Typography, AppBar, Toolbar, Container, TextField, ThemeProvider } from '@mui/material';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginPage from './LoginPage.js';
 import LandingPage from './Landing.js';
@@ -18,11 +18,13 @@ import EditRoster from './nav/EditRoster.js';
 import StartRecall from './nav/StartRecall.js';
 import CreateRoster from './nav/CreateRoster.js';
 import Home from './nav/Home.js';
+import { NavyTheme } from './css/ButtonTheme.js';
 
 function App() {
   
   return (
     <AuthProvider>
+      <ThemeProvider theme = {NavyTheme}>
     <Router>
         <Routes>
            {/* PUBLIC */}
@@ -125,6 +127,7 @@ function App() {
           {/* Add more routes as needed */}
         </Routes>
       </Router>
+      </ThemeProvider>
       </AuthProvider>
   );
   }

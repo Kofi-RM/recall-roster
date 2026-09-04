@@ -1,137 +1,77 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Twilio.TwiML;
+using recall_roster.Services;
 using Twilio.AspNet.Core;
-using System;
-using Microsoft.EntityFrameworkCore.Internal;
+using Twilio.Security;
+using Twilio.TwiML;
 
-namespace recall_roster.Controllers{
+namespace recall_roster.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class MessageController : TwilioController
 {
-    private readonly IContactService _contactService; 
-    private readonly IMessageService _messageService;
-
-    private readonly IResponseService _responseService;
-
-    public MessageController(IContactService contactService, IMessageService messageService, IResponseService responseService) {
-        _contactService = contactService;
-        _messageService = messageService;
-        _responseService = responseService;
-    }
-    private int[] ExtractIds(string message) {
-    // Split the message by space, comma, or any other separator
-    try
+    private readonly IMessageService _messages;
+    private readonly IResponseService _responses;
+    private readonly IConfiguration _configuration;
+    public MessageController(IMessageService messages, IResponseService responses, IConfiguration configuration)
     {
-        // Split the message by space, comma, or any other separator
-        var parts = message.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-        Console.WriteLine(string.Join(", ", parts));  // Print parts array to ensure message is split correctly
-
-        if (parts.Length < 2)
-        {
-            Console.WriteLine("Message does not contain enough numbers.");
-            return null; // Early return or handle invalid input
-        }
-
-        // Try to parse two numbers from the message
-        int.TryParse(parts[0], out int firstNumber);
-        int.TryParse(parts[1], out int secondNumber);
-
-
-
-        return new[] { firstNumber, secondNumber };
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Exception occurred: " + ex.Message);
-        return null; // Handle exceptions gracefully
-    }
+        _messages = messages;
+        _responses = responses;
+        _configuration = configuration;
     }
 
-  
-    
-
+    [AllowAnonymous]
     [HttpPost("ReceiveMessage")]
-    public TwiMLResult ReceiveSms([FromForm] string From, [FromForm] string Body)
+    public async Task<IActionResult> ReceiveSms()
     {
-
-    
-        Console.WriteLine($"Received message from {From}: {Body}");
-        
-        if (string.IsNullOrWhiteSpace(Body))
-        {
-            Console.WriteLine("Received empty or null message body.");
-            return new TwiMLResult(new MessagingResponse().Message("Your response has not been counted. Please include your contact and recall ID."));
-        }
-
-        var num = ExtractIds(Body); // extract numbers from message body
-
-        if (num == null || num.Length < 2)
-        {
-            Console.WriteLine("Failed to parse valid numbers from the message.");
-            return new TwiMLResult(new MessagingResponse().Message("Failed to parse your message. Please correct your info to be counted in this recall."));
-        } // return error message if parsing fails
-
-      
-        var sender = From; 
-        sender = sender.Length > 10 ? sender.Substring(sender.Length - 10) : sender; // only use the digits of the phone number aka ignore country code
-        var contact = _contactService.GetContactByNumber(sender);
-       Console.WriteLine("from " + From);
-       if (contact == null)
-{
-    Console.WriteLine("No contact found for phone number: " + From); // return error if no contact found
-    return new TwiMLResult(new MessagingResponse().Message("No contact found for phone number: " + From));
-}
-
-        if (contact.contactId == num[0]) // if contact ID matches
-        {
-            Console.WriteLine("Right before add response");
-            
-            _responseService.AddResponse(sender, Body, num[1]); // add response
-
-        } else {
-            Console.WriteLine("Contact ID does not match the sender's contact ID.");
-            return new TwiMLResult(new MessagingResponse().Message("Contact ID does not match the sender's contact ID. Please correct your info to be counted in this recall."));
-        }
-    
-    
-    
-
-        // Respond back to Twilio. In this case, no message is sent back to the user.
-        var response = new MessagingResponse().Message("Your response has been noted. Thank you.");
-        return TwiML(response);
-    }
-
-    [HttpPost("SendMessage/{contactId}/{recallId}")]
-    public ActionResult SendMessage(int contactId, int recallId)
-    {
-        
+        var token = _configuration["Twilio:AuthToken"];
+        var signature = Request.Headers["X-Twilio-Signature"].ToString();
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(signature) || !Request.HasFormContentType)
+            return StatusCode(StatusCodes.Status403Forbidden);
+        var form = await Request.ReadFormAsync();
+        // For a reverse proxy/ngrok, configure the exact public webhook URL (including query).
+        // Do not trust client-supplied forwarded headers to reconstruct a signed URL.
+        var url = _configuration["Twilio:WebhookUrl"] ?? Request.GetDisplayUrl();
+        var parameters = form.ToDictionary(item => item.Key, item => item.Value.ToString());
+        if (!new RequestValidator(token).Validate(url, parameters, signature))
+            return StatusCode(StatusCodes.Status403Forbidden);
+        var from = form["From"].ToString();
+        var body = form["Body"].ToString();
+        if (!TryReadIds(body, out var contactId, out var recallId))
+            return TwiML(new MessagingResponse().Message("Reply with your contact ID followed by your recall ID."));
         try
         {
-
-            _messageService.SendMessageByID(contactId, recallId);
-            return Ok("Message sent successfully.");
+            _responses.AddResponse(from, body, recallId, contactId);
+            return TwiML(new MessagingResponse().Message("Your response has been noted. Thank you."));
         }
-        catch (Exception ex)
+        catch (ArgumentException)
         {
-            return BadRequest($"Failed to send message: {ex}");
+            return TwiML(new MessagingResponse().Message("Your response could not be matched to this recall. Check the IDs or contact your recall coordinator."));
         }
     }
 
-    [HttpPost("SendMessage")]
-    public ActionResult Send() 
+    public static bool TryReadIds(string body, out int contactId, out int recallId)
+    {
+        contactId = recallId = 0;
+        var parts = body.Split(new[] { ' ', ',', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 2 && int.TryParse(parts[0], out contactId) && contactId > 0
+            && int.TryParse(parts[1], out recallId) && recallId > 0;
+    }
+
+    public class SendMessageRequest { public string Message { get; set; } = ""; }
+
+    [Authorize]
+    [HttpPost("SendMessage/{contactId}/{recallId}")]
+    public IActionResult SendMessage(int contactId, int recallId, [FromBody] SendMessageRequest request)
+    {
+        try
         {
-    
-        try 
-        {
-         _messageService.SendMessage("4707862142", "We go");
-        return Ok("Message sent successfully.");
+            _messages.SendMessageByID(contactId, recallId, request.Message);
+            return Ok(new { message = "Message submitted to the SMS provider." });
         }
-        catch (Exception ex)
-        {
-            return BadRequest($"Failed to send message: {ex}");
-        }
-}
-}
+        catch (ArgumentException error) { return BadRequest(new { message = error.Message }); }
+        // Provider failures are handled by the generic exception handler, never exposed with secrets.
+    }
 }

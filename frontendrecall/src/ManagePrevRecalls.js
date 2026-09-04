@@ -35,7 +35,7 @@ const ManagePrevRecalls = () => {
               <li key={recall.recallId} style={{ color: 'black !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h2 style={{ color: 'black' }} className="list">{recall.message}</h2>
-                  <p>{recall.timeStarted}</p>
+                  <p>{new Date(recall.timeStarted + "Z").toLocaleString()}</p>
                 </div>
                 <div>
                   <Link to={`/recallStats/${recall.recallId}`}>

@@ -1,4 +1,6 @@
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using recall_roster.Data;
+using recall_roster.Services;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -6,52 +8,40 @@ using Twilio.Types;
 public interface IMessageService
 {
     void SendMessageByID(int contactId, int recallId, string body);
-    void SendMessage(string name, string content);
+    void SendMessage(string recipient, string body);
 }
 
 public class MessageService : IMessageService
 {
-    private readonly IContactService _contactService;
+    private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
-
-    public MessageService(IContactService contactService, IConfiguration configuration)
+    public MessageService(AppDbContext context, IConfiguration configuration)
     {
-        _contactService = contactService;
+        _context = context;
         _configuration = configuration;
     }
 
     public void SendMessageByID(int contactId, int recallId, string body)
     {
-         var accountSid = _configuration["Twilio:AccountSid"];
-    var authToken = _configuration["Twilio:AuthToken"];
-
-    Console.WriteLine($"SID: {accountSid}");
-    Console.WriteLine($"TOKEN LENGTH: {authToken}");
-        var contact = _contactService.GetContactById(contactId);
-        if (contact != null)
-        {
-            Console.WriteLine($"Sending message to {contact.FirstName} {contact.LastName}");
-            SendMessage(contact.PhoneNumber, "A recall has been initiated. Please respond with your contact ID and corresponding recall ID to confirm you received the message. \n Your contact ID is: " + contactId +". \nYour recall ID is: " + recallId + ".\n" + body);
-        }
-        else
-        {
-            Console.WriteLine("Contact not found.");
-        }
+        var recipient = _context.RecallRecipients.AsNoTracking().Include(r => r.Recall)
+            .SingleOrDefault(r => r.recallId == recallId && r.contactId == contactId);
+        if (recipient == null || recipient.Recall.active != 1)
+            throw new ArgumentException("The contact must belong to an active recall.");
+        // Always send the saved recall message and snapshotted destination, not arbitrary client content.
+        SendMessage(recipient.PhoneNumber, "A recall has been initiated.\n\nMessage: " + recipient.Recall.message
+            + "\n\nReply with your contact ID followed by your recall ID to acknowledge.\nYour contact ID is: "
+            + contactId + ".\nYour recall ID is: " + recallId + ".");
     }
 
     public void SendMessage(string recipient, string body)
     {
-        var accountSid = _configuration["Twilio:AccountSid"];
-        var authToken = _configuration["Twilio:AuthToken"];
+        var accountSid = _configuration["Twilio:AccountSid"] ?? throw new InvalidOperationException("SMS configuration is missing.");
+        var authToken = _configuration["Twilio:AuthToken"] ?? throw new InvalidOperationException("SMS configuration is missing.");
+        var from = _configuration["Twilio:FromNumber"] ?? throw new InvalidOperationException("SMS sender configuration is missing.");
         TwilioClient.Init(accountSid, authToken);
-
-        var messageOptions = new CreateMessageOptions(new PhoneNumber($"+1{recipient}"))
+        MessageResource.Create(new CreateMessageOptions(new PhoneNumber(PhoneNumbers.Normalize(recipient)))
         {
-            From = new PhoneNumber("+18336223946"),
-            Body = body
-        };
-
-        var message = MessageResource.Create(messageOptions);
-        Console.WriteLine($"Message SID: {message.Sid}");
+            From = new PhoneNumber(from), Body = body
+        });
     }
 }

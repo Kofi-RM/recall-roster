@@ -46,8 +46,9 @@ namespace recall_roster.Controllers;
             {
                 _rosterContactService.AddRosterContact(roster);
                 _logger.LogInformation("Roster_Contact added successfully");
-               return CreatedAtAction(nameof(GetRosterContact), new { id = roster.rosterId, id2 = roster.contactId }, roster);
+               return CreatedAtAction(nameof(GetRosterContact), new { rosterId = roster.rosterId, contactId = roster.contactId }, roster);
             }
+            catch (ArgumentException ex) { return BadRequest(new { message = ex.Message }); }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding roster");
@@ -82,6 +83,7 @@ public IActionResult UpdateRosterContacts([FromBody] UpdateRosterContacts reques
         _logger.LogInformation("Roster contacts updated successfully");
         return Ok();
     }
+    catch (ArgumentException ex) { return BadRequest(new { message = ex.Message }); }
     catch (Exception ex)
     {
         _logger.LogError(ex, "Error updating roster contacts");

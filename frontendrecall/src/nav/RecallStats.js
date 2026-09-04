@@ -1,194 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Paper, Tabs, Tab, Grid, Button, LinearProgress } from '@mui/material';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Alert, Box, Button, Container, LinearProgress, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { ToolBar } from '../Miscelleneous';
 import api from '../api/api';
-const RecallStats = () => {
-    const navigate = useNavigate();
-    const { recallId } = useParams(); // snag recallId from URL params
-    const [recall, setRecall] = useState({
-        timeStarted: '',
-        timeEnded: '',
-        message: ''
-    });
-    const [responses, setResponses] = useState({});
-    
-    const [contacts, setContacts] = useState([]);
-    const [activeTab, setActiveTab] = useState('all');
-    let rosterId;
 
-    useEffect(() => {
-        console.log(recallId);
-        // Fetch recall details
-        api.get('http://localhost:5000/api/recall/' + recallId)
-        .then(response => {
-            setRecall(response.data)
-            console.log( response.data);
-            const rosterId = response.data.rosterId;
-            console.log("rosterId" + rosterId);
-            console.log("recallId" + recallId);
-            // Fetch contacts associated with the recall
-            api.get('http://localhost:5000/api/rostercontact/' + rosterId)
-                .then(rc => {
-                   return Promise.all(rc.data.map(rc => api.get(`http://localhost:5000/api/contact/${rc.contactId}`)))
-                    .then(contactResponses => {
-                        const contactsData = contactResponses.map(response => response.data);
-                        setContacts(contactsData);
-                        // maps each response to an array of contacts
-                    })
-                })
-                .catch(error => {
-                    console.error('Error fetching roster contact data:', error);
-                });
-        })
-        .catch(error => {
-            console.error('Error fetching recall data:', error);
-        });
-        
-    }, [recallId]);
+// SQL datetime2 responses from older endpoints lack an offset; this app stores them in UTC.
+export const asUtcDate = value => value ? new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? value : value + 'Z') : null;
+const displayDate = value => {
+  const date = asUtcDate(value);
+  return date && !Number.isNaN(date.getTime()) ? date.toLocaleString() : 'N/A';
+};
+const RecallStats = () => {
+  const { recallId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [recall, setRecall] = useState(null);
+  const [contacts, setContacts] = useState([]);
+  const [hasSnapshot, setHasSnapshot] = useState(false);
+  const [rank, setRank] = useState('All');
+  const [error, setError] = useState('');
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchResponses = async () => {
+    let cancelled = false;
+    let timer;
+    setLoaded(false);
+    setRecall(null);
+    setContacts([]);
+    setError('');
+    const refresh = async () => {
       try {
-        const updatedContacts = await Promise.all(
-          contacts.map(async contact => {
-            if (contact.responded !== undefined) return contact; // Already has response info
-            try {
-             const response = await api.get(`http://localhost:5000/api/Response/${recallId}/${contact.contactId}`);
-             console.log(response)
-             return { ...contact, responded: true, responseTime: response.data.responseTime };
-            } catch (error) {
-              console.error(`Error fetching response for ${contact.contactId}:`, error.message);
-              return { ...contact, responded: false };
-            }
-          })
-        );
-        setContacts(updatedContacts);
-      } catch (error) {
-        console.error("Error fetching responses:", error.message);
+        const [details, snapshot] = await Promise.all([
+          api.get(`/Recall/${recallId}`), api.get(`/Recall/${recallId}/recipients`)
+        ]);
+        if (cancelled) return;
+        setRecall(details.data);
+        setHasSnapshot(snapshot.data.hasRecipientSnapshot);
+        setContacts(snapshot.data.recipients);
+        setLoaded(true);
+        setError('');
+      } catch {
+        if (!cancelled) setError('Recall data could not be refreshed. Previously loaded results may be out of date; a connection error does not mean someone has not responded.');
+      } finally {
+        if (!cancelled) timer = setTimeout(refresh, 5000);
       }
     };
+    refresh();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [recallId]);
 
-    if (contacts.length > 0) {
-      fetchResponses();
-    }
-  }, [recallId, contacts.length, contacts]);
-    // Filter contacts based on role
-    const filteredContacts = contacts.filter(contact => {
-        if (activeTab === 'all') return true;
-        return contact.rank === activeTab;
-    });
+  const filtered = contacts.filter(c => rank === 'All' || c.rank === rank);
+  const acknowledged = filtered.filter(c => c.responded).length;
+  const progress = filtered.length ? acknowledged / filtered.length * 100 : 0;
+  const roles = ['All', ...new Set(contacts.map(c => c.rank))];
 
-    const calculateProgress = (rank) => {
-        if (rank === 'all') {
-            const totalContacts = contacts.length;
-            const respondedContacts = contacts.filter(contact => contact.responded).length;
-            if (totalContacts === 0) return 0; // to prevent division by zero
-            return (respondedContacts / totalContacts) * 100;
-        } else {
-            const totalContacts = contacts.filter(contact => contact.rank === rank).length;
-            const respondedContacts = filteredContacts.filter(contact => contact.rank === rank && contact.responded).length;
-            if (totalContacts === 0) return 0; // to prevent division by zero
-            return (respondedContacts / totalContacts) * 100;
-        }
-    };
-
-    const formatDateTime = (value) => {
-        if (!value) return 'N/A';
-        const date = new Date(value);
-        return isNaN(date.getTime()) ? value : date.toLocaleString();
-    };
-
-    const calculateLateness = (responseTime, deadline) => {
-        if (!responseTime || !deadline) return null;
-        const responseDate = new Date(responseTime);
-        const deadlineDate = new Date(deadline);
-        const diffMs = responseDate - deadlineDate;
-        if (isNaN(diffMs) || diffMs <= 0) return null;
-
-        const minutes = Math.floor(diffMs / 60000);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-
-        if (days > 0) {
-            const remHours = hours % 24;
-            return `${days}d ${remHours}h late`;
-        } else if (hours > 0) {
-            const remMinutes = minutes % 60;
-            return `${hours}h ${remMinutes}m late`;
-        } else {
-            return `${minutes}m late`;
-        }
-    };
-
-    return (
-        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px', border: '1px solid #e0e0e0' }}>
-            <Paper style={{ padding: '16px', marginBottom: '20px' }}>
-                <Typography variant="h4" gutterBottom>Recall Details</Typography>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                        <Typography variant="overline" color="textSecondary">Time Started</Typography>
-                        <Typography variant="h6">{formatDateTime(recall.timeStarted)}</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Typography variant="overline" color="textSecondary">Time Ended</Typography>
-                        <Typography variant="h6">{formatDateTime(recall.timeEnded)}</Typography>
-                    </Grid>
-                </Grid>
-            </Paper>
-
-            {/* Tabs for different roles */}
-            <Tabs value={activeTab} onChange={(event, newValue) => setActiveTab(newValue)} aria-label="roles">
-                <Tab label="All" value="all" />
-                <Tab label="Employees" value="Employee" />
-                <Tab label="Element Chiefs" value="Element Chief" />
-                <Tab label="Flight Chiefs" value="Flight Chief" />
-                <Tab label="Squadron Directors" value="Squadron Director" />
-            </Tabs>
-
-            <Typography variant="body1">
-    Current Progress: {calculateProgress(activeTab)}%
-</Typography>
-            <LinearProgress 
-    variant="determinate" 
-    value={calculateProgress(activeTab)} 
-    style={{ margin: '20px 0', height: '10px' }} // Adjusted margin and height
-/>
-            {filteredContacts.length === 0 ? (
-    <Typography variant="body1">You have no contacts of this rank</Typography>
-) : (
-    filteredContacts.map((contact, index) => (
-        <div
-            key={`${contact.contactId}-${index}`}
-            style={{
-                backgroundColor: 'white',
-                padding: '10px',
-                margin: '10px 0'
-            }}
-        >
-            <Grid container spacing={2} alignItems="center">
-                <Grid item xs={6}>
-                    <Typography variant="body1">Name:{contact.firstName + " " + contact.lastName}</Typography>
-                    <Typography variant="body2">Rank: {contact.rank}</Typography>
-                </Grid>
-                <Grid item xs={3}>
-                    {/* Show response status */}
-                    <Typography variant="body1">{contact.responded ? 'Responded' : 'Not Responded'}</Typography>
-                </Grid>
-                <Grid item xs={3} style={{ textAlign: 'right' }}>
-                    <Typography variant="body2">{contact.responseTime > recall.timeEnded ? "After deadline" : "Responded within timeframe"}</Typography>
-                <Typography color ="error" variant="body2">{calculateLateness(contact.responseTime, recall.timeEnded) ? `${calculateLateness(contact.responseTime, recall.timeEnded)}` : ""}</Typography>
-                </Grid>
-            </Grid>
-        </div>
-    ))
-)}
-
-            <Button variant="contained" onClick={() => navigate(-1)} fullWidth style={{ marginTop: '20px' }}>
-                Go Back
-            </Button>
-        </div>
-    );
+  return <div>
+    <ToolBar />
+    <Container component="main" id="main-content" maxWidth="md" sx={{ py: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>Recall progress</Typography>
+      {location.state?.submitted && <Alert severity="success" sx={{ mb: 2 }}>Recall created and all messages submitted to the SMS provider. Submission is not confirmation of delivery.</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {!loaded && !error && <Typography role="status">Loading recall…</Typography>}
+      {loaded && <>
+        <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" component="h2" sx={{ overflowWrap: 'anywhere' }}>{recall.message}</Typography>
+          <Typography sx={{ mt: 2 }}>Started: {displayDate(recall.timeStarted)}</Typography>
+          <Typography>Deadline: {displayDate(recall.timeEnded)}</Typography>
+        </Paper>
+        {!hasSnapshot && <Alert severity="warning" sx={{ mb: 3 }}>Legacy recall: the original recipient list was not saved. Only recorded acknowledgments are shown; completion percentage and historical names/ranks are unavailable.</Alert>}
+        <Tabs value={roles.includes(rank) ? rank : 'All'} onChange={(_, value) => setRank(value)} variant="scrollable" scrollButtons="auto" aria-label="Recipient rank">
+          {roles.map(role => <Tab key={role} label={role} value={role} />)}
+        </Tabs>
+        {hasSnapshot && <Box sx={{ my: 3 }}>
+          <Typography>{acknowledged} of {filtered.length} acknowledged ({Math.round(progress)}%)</Typography>
+          <LinearProgress variant="determinate" value={progress} aria-label="Acknowledgment progress" sx={{ mt: 1, height: 8, borderRadius: 4 }} />
+        </Box>}
+        {!filtered.length && <Typography sx={{ my: 3 }}>No recipients or acknowledgments to display.</Typography>}
+        {filtered.map(contact => {
+          const responseTime = asUtcDate(contact.responseTime);
+          const deadline = asUtcDate(recall.timeEnded);
+          const lateMinutes = responseTime && deadline ? Math.max(0, Math.ceil((responseTime - deadline) / 60000)) : 0;
+          return <Paper variant="outlined" key={contact.contactId} sx={{ my: 2, p: 2 }}>
+            <Typography fontWeight={700}>{contact.firstName} {contact.lastName}</Typography>
+            <Typography color="text.secondary">{contact.rank}</Typography>
+            <Typography>{contact.responded ? 'Acknowledged · ' + displayDate(contact.responseTime) : 'Awaiting acknowledgment'}</Typography>
+            {contact.responded && <Typography color={lateMinutes ? 'error' : 'success.main'}>{lateMinutes ? `${lateMinutes} minute(s) after deadline` : 'Responded within timeframe'}</Typography>}
+          </Paper>;
+        })}
+      </>}
+      <Button onClick={() => navigate('/landing')} sx={{ mt: 2 }}>Back to dashboard</Button>
+    </Container>
+  </div>;
 };
-
 export default RecallStats;

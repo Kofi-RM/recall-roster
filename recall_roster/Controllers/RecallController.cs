@@ -1,57 +1,44 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using recall_roster.DTOs;
 using recall_roster.Models;
 
-namespace recall_roster.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RecallController : ControllerBase
-    {
-        private readonly ILogger<RecallController> _logger;
-        private readonly IRecallResultsService _recallResultsService;
+namespace recall_roster.Controllers;
 
-        public RecallController(ILogger<RecallController> logger, IRecallResultsService recallResultsService)
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class RecallController : ControllerBase
+{
+    private readonly IRecallResultsService _service;
+    public RecallController(IRecallResultsService service) => _service = service;
+
+    [HttpGet]
+    public ActionResult<IEnumerable<Recall>> GetRecalls() => Ok(_service.GetAllRecalls());
+
+    [HttpGet("{id}")]
+    public ActionResult<Recall> GetRecall(int id)
+    {
+        var recall = _service.GetRecall(id);
+        return recall == null ? NotFound() : Ok(recall);
+    }
+
+    [HttpGet("{id}/recipients")]
+    public IActionResult GetRecipients(int id)
+    {
+        var recall = _service.GetRecall(id);
+        if (recall == null) return NotFound();
+        return Ok(new { hasRecipientSnapshot = recall.HasRecipientSnapshot, recipients = _service.GetRecipients(id) });
+    }
+
+    [HttpPost]
+    public ActionResult<Recall> AddRecall(CreateRecallRequest request)
+    {
+        try
         {
-            _logger = logger;
-            _recallResultsService = recallResultsService ?? throw new ArgumentNullException(nameof(recallResultsService));
+            var recall = _service.AddRecall(request);
+            return CreatedAtAction(nameof(GetRecall), new { id = recall.recallId }, recall);
         }
-        [Authorize]
-        [HttpGet]
-        public ActionResult<IEnumerable<Recall>> GetRecalls()
-        {
-            _logger.LogInformation("Executing GetRecalls action...");
-            var recalls = _recallResultsService.GetAllRecalls();
-            return Ok(recalls);
-        }
-        [Authorize]
-        [HttpGet("{id}")]
-        public ActionResult<Recall> GetRecall(int id)
-        {
-            _logger.LogInformation("Executing GetRecall action...");
-            var recall = _recallResultsService.GetRecall(id);
-            if (recall == null)
-            {
-                return NotFound();
-            }
-            return Ok(recall);
-        }
-        [Authorize]
-        [HttpPost]
-        public ActionResult<Recall> AddRecall(Recall recall)
-        {
-            _logger.LogInformation("Executing AddRecall action...");
-            try
-            {
-                _recallResultsService.AddRecall(recall);
-                _logger.LogInformation("Recall added successfully");
-                return CreatedAtAction(nameof(GetRecall), new { id = recall.recallId }, recall);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding recall");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+        catch (ArgumentException error) { return BadRequest(new { message = error.Message }); }
     }
 }

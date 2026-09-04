@@ -1,100 +1,61 @@
-import { Box, TextField, Button, Checkbox, FormControlLabel, Grid, Paper, Typography } from '@mui/material';
-
-import './css/LoginPage.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Alert, Button, CircularProgress, Paper, TextField } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import React, { useState} from 'react';
-import { ToolBar, Footer } from './Miscelleneous.js';
-import { useAuth } from './Auth.js'
-import { NavyButton } from './components/Buttons.js';
-
+import React, { useState, useRef } from 'react';
+import { ToolBar, Footer } from './Miscelleneous';
+import { useAuth } from './Auth';
+import './css/LoginPage.css';
 
 const LoginPage = () => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  // set email and password 
-  const { login, logout } = useAuth();
-  // load login varaibles from Global instances
-
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const submitting = useRef(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-console.log("tryna login");
-
-    const loginData = {
-      Email: email,
-      Password: password
-    };
-    console.log(loginData);
-
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
-    email,
-    password
-  });
-
-  login(res.data.token);
-  console.log("before nav")
- setTimeout(() => {
-  navigate("/landing");
-}, 0);
-  console.log("after nav")
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
+    setPending(true);
+    setError('');
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', { email: email.trim(), password });
+      login(response.data.token);
+      navigate('/landing', { replace: true });
+    } catch (failure) {
+      setError(failure.response?.status === 401 || failure.response?.status === 400
+        ? 'The email or password is incorrect. Please try again.'
+        : 'Unable to sign in right now. Please try again shortly.');
+    } finally {
+      submitting.current = false;
+      setPending(false);
+    }
   };
 
- 
-
   return (
-    <div className="background">
-      <ToolBar ></ToolBar>
-
-      <Grid container justifyContent="center" alignItems="center" height="100vh">
-      <Grid item>
-        <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: '100%' }}>
-          <Typography variant="h5" gutterBottom align="center">
-            Officer Login
-          </Typography>
-       
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <TextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <FormControlLabel
-              control={<Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
-              label="Remember me"
-            />
-            <NavyButton onClick = {handleLogin} width= {'20%'} type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-              Login
-            </NavyButton>
-         
-          <Box mt={2} textAlign="center">
-            <Link to="/forgot-password">Forgot Password?</Link>
-          </Box>
+    <div className="rr-page rr-login-page">
+      <ToolBar />
+      <main id="main-content" className="rr-login-main">
+        <div className="rr-login-intro"><p className="rr-eyebrow">YOUR TEAM, WITHIN REACH</p><h1>Welcome back.</h1><p>Sign in to manage rosters, coordinate recalls, and follow your team’s responses.</p></div>
+        <Paper component="section" elevation={0} className="rr-login-card">
+          <h2>Officer login</h2>
+          <p>Enter your account details to continue.</p>
+          <form onSubmit={handleLogin}>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            <TextField label="Email" type="email" autoComplete="username" fullWidth margin="normal" value={email} onChange={(event) => setEmail(event.target.value)} required disabled={pending} />
+            <TextField label="Password" type="password" autoComplete="current-password" fullWidth margin="normal" value={password} onChange={(event) => setPassword(event.target.value)} required disabled={pending} />
+            <Button type="submit" variant="contained" fullWidth disabled={pending} sx={{ mt: 3, py: 1.5, bgcolor: '#1c2347' }}>
+              {pending ? <><CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />Signing in…</> : 'Sign in'}
+            </Button>
+            <p className="rr-login-help">Need access or help with your password? Contact your administrator.</p>
+          </form>
         </Paper>
-      </Grid>
-    </Grid>
-  ;
-  <Footer></Footer>
+      </main>
+      <Footer />
     </div>
-
   );
 };
-
 export default LoginPage;
