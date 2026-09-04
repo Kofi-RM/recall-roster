@@ -1,5 +1,5 @@
 import { Alert, Button, CircularProgress, Paper, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React, { useState, useRef } from 'react';
 import { ToolBar, Footer } from './Miscelleneous';
@@ -14,6 +14,7 @@ const LoginPage = () => {
   const submitting = useRef(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -24,7 +25,9 @@ const LoginPage = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', { email: email.trim(), password });
       login(response.data.token);
-      navigate('/landing', { replace: true });
+      const from = location.state?.from;
+      const destination = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !from.startsWith('/login') ? from : '/landing';
+      navigate(destination, { replace: true });
     } catch (failure) {
       setError(failure.response?.status === 401 || failure.response?.status === 400
         ? 'The email or password is incorrect. Please try again.'

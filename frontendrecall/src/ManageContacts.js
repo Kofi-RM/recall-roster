@@ -1,163 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { Tabs, Tab, Button } from '@mui/material';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react';
+import { Alert, Button, Stack, Tabs, Tab, TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
-import useContacts from './hooks/UseContacts.js'; // Adjust the path as needed
-import { NavyButton } from './components/Buttons.js';
+import useContacts from './hooks/UseContacts';
+import api from './api/api';
 import './css/ItemRows.css';
 
-const EditableRow = ({ item, onSave }) => {
-  const [editMode, setEditMode] = useState(false);
-  const [editedItem, setEditedItem] = useState(item);
+export const staffRanks = ['Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
 
-  useEffect(() => {
-    setEditedItem(item);
-  }, [item]);
-
-  const handleToggleEditMode = () => {
-    setEditMode(!editMode);
+export const EditableRow = ({ item, onSave }) => {
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(item);
+  const [draft, setDraft] = useState(item);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const submitting = useRef(false);
+  useEffect(() => { setSaved(item); }, [item]);
+  const edit = () => { setDraft(saved); setError(''); setEditing(true); };
+  const cancel = () => { setDraft(saved); setError(''); setEditing(false); };
+  const save = async () => {
+    if (submitting.current) return;
+    if (!draft.firstName.trim() || !draft.lastName.trim() || !draft.phoneNumber.trim() || !staffRanks.includes(draft.rank)) {
+      setError('Enter a first name, last name, phone number, and staff rank.');
+      return;
+    }
+    submitting.current = true;
+    setPending(true);
+    setError('');
+    try {
+      const result = await onSave({ ...draft, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), phoneNumber: draft.phoneNumber.trim() });
+      setSaved(result || draft);
+      setEditing(false);
+    } catch (failure) {
+      setError(failure.response?.data?.message || 'Changes could not be saved. Your edits are still here; try again.');
+    } finally { submitting.current = false; setPending(false); }
   };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedItem((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    onSave(editedItem);
-    setEditMode(false); // Exit edit mode after saving
-  };
-
-  return (
+  const input = (field, label) => <TextField size="small" label={label} value={draft[field] || ''} disabled={pending}
+    onChange={event => setDraft({ ...draft, [field]: event.target.value })} sx={{ my: 0.5 }} />;
+  return <>
     <tr>
-      {editMode ? (
-        <>
-          <td>
-  <input
-    type="text"
-    name="firstName"
-    value={editedItem.firstName}
-    onChange={handleChange}
-  />
-  <input
-    type="text"
-    name="lastName"
-    value={editedItem.lastName}
-    onChange={handleChange}
-    style={{ marginLeft: "6px" }}
-  />
-</td>
-          <td>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={editedItem.phoneNumber}
-              onChange={handleChange}
-            />
-          </td>
-          <td>
-            <select name="rank" value={editedItem.rank} onChange={handleChange}>
-              <option value="">Select Option</option>
-              <option value="Employee">Employee</option>
-              <option value="Element Chief">Element Chief</option>
-              <option value="Flight Chief">Flight Chief</option>
-              <option value="Squadron Director">Squadron Director</option>
-            </select>
-          </td>
-          <td>
-            <NavyButton onClick={handleSave}>Save</NavyButton>
-            <NavyButton onClick={handleToggleEditMode}>Cancel</NavyButton>
-          </td>
-        </>
-      ) : (
-        <>
-          <td>{`${editedItem.firstName} ${editedItem.lastName}`}</td>
-          <td>{editedItem.phoneNumber}</td>
-          <td>{editedItem.rank}</td>
-          <td>
-            <NavyButton onClick={handleToggleEditMode}>Edit</NavyButton>
-          </td>
-        </>
-      )}
+      {editing ? <>
+        <td>{input('firstName', 'First name')}{input('lastName', 'Last name')}</td>
+        <td>{input('phoneNumber', 'Phone number')}</td>
+        <td><select aria-label="Staff rank" value={draft.rank} disabled={pending} onChange={event => setDraft({ ...draft, rank: event.target.value })}>
+          {staffRanks.map(rank => <option key={rank}>{rank}</option>)}
+        </select></td>
+        <td><Button onClick={save} disabled={pending}>{pending ? 'Saving…' : 'Save'}</Button><Button onClick={cancel} disabled={pending}>Cancel</Button></td>
+      </> : <>
+        <td>{saved.firstName} {saved.lastName}</td><td>{saved.phoneNumber}</td><td>{saved.rank}</td>
+        <td><Button onClick={edit} aria-label={`Edit ${saved.firstName} ${saved.lastName}`}>Edit</Button></td>
+      </>}
     </tr>
-  );
+    {error && <tr><td colSpan={4}><Alert severity="error">{error}</Alert></td></tr>}
+  </>;
 };
 
 const ManageContacts = () => {
   const { contacts, loading, error } = useContacts();
-  const [tabValue, setTabValue] = useState(0); // State to track the active tab index
-
-  const handleSaveItem = (updatedItem) => {
-    console.log("Saving item:", updatedItem);
-  
-    axios
-      .put(`http://localhost:5000/api/contact/${updatedItem.contactId}`, updatedItem)
-      .then((response) => {
-        console.log("Contact updated successfully:", response.data);
-        // Optionally update your state here instead of reloading
-        // e.g., refetch contacts or update local list
-      })
-      .catch((error) => {
-        console.error("Error updating contact:", error);
-      });
+  const [updates, setUpdates] = useState({});
+  const [rank, setRank] = useState('All');
+  const [search, setSearch] = useState('');
+  const [success, setSuccess] = useState('');
+  const query = search.trim().toLowerCase();
+  const filtered = contacts.map(contact => updates[contact.contactId] || contact).filter(contact =>
+    (rank === 'All' || contact.rank === rank) &&
+    `${contact.firstName} ${contact.lastName} ${contact.phoneNumber}`.toLowerCase().includes(query));
+  const save = async contact => {
+    setSuccess('');
+    const response = await api.put(`/contact/${contact.contactId}`, contact);
+    const saved = response.data && typeof response.data === 'object' ? response.data : contact;
+    setUpdates(previous => ({ ...previous, [contact.contactId]: saved }));
+    setSuccess('Contact updated.');
+    return saved;
   };
-
-  // Define roles for each tab
-  const ranks = ['All', 'Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
-
-  // Filter contacts based on the selected tab value (role)
-  const filteredContacts = contacts.filter((contact) => {
-    const rank = ranks[tabValue];
-    return rank === 'All' || contact.rank === rank;
-  });
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  return (
-    <div>
-      <div className="contact-list-container">
-        <h1>Contact List</h1>
-        <Tabs value={tabValue} onChange={(event, newValue) => setTabValue(newValue)}>
-          {ranks.map((rank, index) => (
-            <Tab key={index} label={rank} />
-          ))}
-        </Tabs>
-        <div className="contact-list-section">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Rank</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredContacts.map((item) => (
-                <EditableRow key={item.id} item={item} onSave={handleSaveItem} />
-              ))}
-            </tbody>
-          </table>
-          <div className="contact-list-buttons">
-            <Link to="/insertContact">
-              <NavyButton size="large" variant="contained" color="primary">
-                Add a Contact
-              </NavyButton>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  if (loading) return <p role="status">Loading staff…</p>;
+  if (error) return <Alert severity="error">Staff could not be loaded. Please refresh and try again.</Alert>;
+  return <section>
+    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+      <h2>Staff directory</h2><Button component={Link} to="/insertContact">Add a contact</Button>
+    </Stack>
+    {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+    <TextField label="Search name or phone" value={search} onChange={event => setSearch(event.target.value)} fullWidth size="small" />
+    <Tabs value={rank} onChange={(_, value) => setRank(value)} variant="scrollable" scrollButtons="auto" aria-label="Staff rank filter">
+      {['All', ...staffRanks].map(value => <Tab key={value} value={value} label={value} />)}
+    </Tabs>
+    <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', minWidth: 580 }}>
+      <thead><tr><th scope="col">Name</th><th scope="col">Phone</th><th scope="col">Rank</th><th scope="col">Action</th></tr></thead>
+      <tbody>{filtered.map(contact => <EditableRow key={contact.contactId} item={contact} onSave={save} />)}</tbody>
+    </table></div>
+    {!filtered.length && <p style={{ marginTop: 20 }}>{contacts.length ? 'No staff match these filters.' : 'No staff yet. Add a contact to get started.'}</p>}
+  </section>;
 };
-
 export default ManageContacts;

@@ -1,82 +1,61 @@
-import React from 'react';
-import { Button } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Stack, TextField, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import useRoster from './hooks/UseRoster'; // Adjust the path as needed
-import { NavyButton } from './components/Buttons';
-import { useNavigate } from 'react-router-dom';
-import { ToolBar } from './Miscelleneous';
-import './css/ItemRows.css'
+import useRoster from './hooks/UseRoster';
+import api from './api/api';
 
-
-export const RemoveContact = ({ children }) => (
-  <span className="button">{children}</span>
-);
-
+export const RemoveContact = ({ children }) => <span className="button">{children}</span>;
 const ManageRoster = () => {
   const { rosters, loading, error } = useRoster();
-const navigate = useNavigate();
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  const handleRemove = async (id) => {
+  const [removed, setRemoved] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState('');
+  const [success, setSuccess] = useState('');
+  const [search, setSearch] = useState('');
+  const submitting = useRef(false);
+  const visible = rosters.filter(roster => !removed.includes(roster.rosterId) &&
+    `${roster.name} ${roster.description || ''}`.toLowerCase().includes(search.trim().toLowerCase()));
+  const remove = async () => {
+    if (!selected || submitting.current) return;
+    submitting.current = true;
+    setPending(true);
+    setFailure('');
     try {
-      const response = await fetch(`http://localhost:5000/api/roster/remove/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      console.log('Contact removed:', await response.json());
-    } catch (error) {
-      console.error('There was a problem removing the roster:', error);
-    }
+      try { await api.delete(`/roster/remove/${selected.rosterId}`); }
+      catch (err) { if (err.response?.status !== 404) throw err; }
+      setRemoved(previous => [...previous, selected.rosterId]);
+      setSuccess(`“${selected.name}” was removed. Saved recall snapshots are unchanged.`);
+      setSelected(null);
+    } catch {
+      setFailure('The roster could not be removed. Please try again.');
+    } finally { submitting.current = false; setPending(false); }
   };
-
-  const handleEdit = (id) => {
-    navigate("/editRoster/" +id)
-  }
-  return (
-    <div>
-    
-      <div className="contact-list-container">
-        <div className="contact-list-section">
-          <h1>Roster List</h1>
-          <hr />
-          <ul className="contact-list">
-            {rosters.map((roster) => (
-              <li key={roster.rosterId} style={{ color: 'black' }}>
-                <h2 className="list" style={{ color: 'black' }}>{roster.name}</h2>
-             
-                  
-                    <NavyButton size="large" variant="contained" color="primary" onClick={() => handleEdit(roster.rosterId)}>Edit</NavyButton>
-                  
-                  <Button
-                    size="large"
-                    variant="contained"
-                    style={{ backgroundColor: 'red', color: 'white' }}
-                    sx= {{ml:2}}
-                    onClick={() => handleRemove(roster.rosterId)}
-                  >
-                    Remove
-                  </Button>
-                  <hr></hr>
-              </li>
-            ))}
-            
-          </ul>
-    
-        </div>
-        <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
-          <Link to={'/CreateRoster'}> <NavyButton size="large" variant="contained" color="primary">Make a New Roster</NavyButton></Link>
-         </div>
-      </div>
-    </div>
-  );
+  if (loading) return <p role="status">Loading rosters…</p>;
+  if (error) return <Alert severity="error">Rosters could not be loaded. Please refresh and try again.</Alert>;
+  return <section>
+    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+      <Typography variant="h5" component="h2">Your rosters</Typography>
+      <Button component={Link} to="/createRoster" variant="contained">Create roster</Button>
+    </Stack>
+    {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+    <TextField label="Search rosters" value={search} onChange={event => setSearch(event.target.value)} fullWidth size="small" sx={{ mb: 2 }} />
+    {visible.map(roster => <Paper variant="outlined" key={roster.rosterId} sx={{ p: 2, mb: 2 }}>
+      <Typography component="h3" variant="h6">{roster.name}</Typography>
+      <Typography color="text.secondary" sx={{ mb: 1 }}>{roster.description}</Typography>
+      <Button component={Link} to={`/editRoster/${roster.rosterId}`}>Edit</Button>
+      <Button color="error" onClick={() => { setSelected(roster); setFailure(''); setSuccess(''); }}>Remove</Button>
+    </Paper>)}
+    {!visible.length && <p>{search ? 'No rosters match your search.' : 'No rosters yet. Create one to organize your team.'}</p>}
+    <Dialog open={!!selected} onClose={() => { if (!pending) setSelected(null); }} aria-labelledby="remove-roster-title">
+      <DialogTitle id="remove-roster-title">Remove {selected?.name}?</DialogTitle>
+      <DialogContent>
+        <DialogContentText>This removes the roster and its memberships, not the staff contacts or saved recall snapshots. This cannot be undone here.</DialogContentText>
+        {failure && <Alert severity="error" sx={{ mt: 2 }}>{failure}</Alert>}
+      </DialogContent>
+      <DialogActions><Button onClick={() => setSelected(null)} disabled={pending}>Cancel</Button>
+        <Button color="error" onClick={remove} disabled={pending}>{pending ? 'Removing…' : 'Remove roster'}</Button></DialogActions>
+    </Dialog>
+  </section>;
 };
-
 export default ManageRoster;

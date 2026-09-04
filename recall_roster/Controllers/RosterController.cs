@@ -80,9 +80,12 @@ namespace recall_roster.Controllers;
         
         }
 
-        [HttpPut("{id}")] 
+        [Authorize]
+        [HttpPut("{id}")]
  
- public ActionResult<Contact> UpdateContact(Roster roster){
+ public ActionResult<Roster> UpdateContact(int id, Roster roster){
+
+ if (id != roster.rosterId) return BadRequest(new { message = "The route and roster IDs must match." });
 
  try
             {

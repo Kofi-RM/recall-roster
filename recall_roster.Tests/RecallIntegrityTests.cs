@@ -209,6 +209,46 @@ public class RecallIntegrityTests : IDisposable
         Assert.NotNull(typeof(MessageController).GetMethod("SendMessage")!.GetCustomAttribute<AuthorizeAttribute>());
     }
 
+    [Fact]
+    public void Contact_edit_rejects_mismatched_ids_without_changing_either_contact()
+    {
+        var controller = new ContactController(
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<ContactController>.Instance,
+            new ContactService(_db), _db);
+        var input = new Contact { contactId=2, FirstName="Changed", LastName="Name", PhoneNumber="2025550100", Rank="Employee" };
+        Assert.IsType<BadRequestObjectResult>(controller.UpdateContact(1, input).Result);
+        Assert.Equal("First", _db.Contacts.Find(1)!.FirstName);
+        Assert.Equal("Other", _db.Contacts.Find(2)!.FirstName);
+    }
+
+    [Fact]
+    public void Contact_edit_preserves_activation_and_validates_before_saving()
+    {
+        var controller = new ContactController(
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<ContactController>.Instance,
+            new ContactService(_db), _db);
+        var input = new Contact { contactId=1, FirstName=" Updated ", LastName=" Person ", PhoneNumber="2025550100", Rank="Flight Chief", Active=0 };
+        Assert.IsType<OkObjectResult>(controller.UpdateContact(1, input).Result);
+        Assert.Equal(1, _db.Contacts.Find(1)!.Active);
+        Assert.Equal("Updated", _db.Contacts.Find(1)!.FirstName);
+        input.FirstName="Should not persist";
+        input.PhoneNumber="invalid";
+        Assert.IsType<BadRequestObjectResult>(controller.UpdateContact(1, input).Result);
+        Assert.Equal("Updated", _db.Contacts.Find(1)!.FirstName);
+    }
+
+    [Fact]
+    public void Roster_update_requires_auth_and_matching_route_id()
+    {
+        Assert.NotNull(typeof(RosterController).GetMethod("UpdateContact")!.GetCustomAttribute<AuthorizeAttribute>());
+        var controller = new RosterController(
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<RosterController>.Instance,
+            new RosterRepositoryService(_db));
+        Assert.IsType<BadRequestObjectResult>(controller.UpdateContact(1,
+            new Roster { rosterId=2, name="Wrong roster", description="" }).Result);
+        Assert.Equal("Team", _db.Rosters.Find(1)!.name);
+    }
+
     private class NoMessages : IMessageService
     {
         public void SendMessage(string recipient, string body) => throw new InvalidOperationException("Tests must not send SMS.");

@@ -98,20 +98,28 @@ public ActionResult<Contact> RemoveContact(int id)
 [Authorize]
  [HttpPut("{id}")] 
  
-public void UpdateContact(Contact contact)
+public ActionResult<Contact> UpdateContact(int id, Contact contact)
 {
-    var existingContact = _dbContext.Contacts.Find(contact.contactId);
+    if (id != contact.contactId) return BadRequest(new { message = "The route and contact IDs must match." });
+    var existingContact = _dbContext.Contacts.Find(id);
     if (existingContact == null)
-        throw new ArgumentException("Contact not found.");
+        return NotFound();
+    if (string.IsNullOrWhiteSpace(contact.FirstName) || string.IsNullOrWhiteSpace(contact.LastName) ||
+        !new[] { "Employee", "Element Chief", "Flight Chief", "Squadron Director" }.Contains(contact.Rank))
+        return BadRequest(new { message = "First name, last name, and a supported staff rank are required." });
+    var phone = contact.PhoneNumber?.Trim() ?? "";
+    try { recall_roster.Services.PhoneNumbers.Normalize(phone); }
+    catch (ArgumentException) { return BadRequest(new { message = "Enter a valid phone number." }); }
 
     // Update all editable fields
-    existingContact.FirstName = contact.FirstName;
-    existingContact.LastName = contact.LastName;
-    existingContact.PhoneNumber = contact.PhoneNumber;
-    existingContact.Rank = contact.Rank;   // <-- Make sure this line exists
-    existingContact.Active = contact.Active;
+    existingContact.FirstName = contact.FirstName.Trim();
+    existingContact.LastName = contact.LastName.Trim();
+    existingContact.PhoneNumber = phone;
+    existingContact.Rank = contact.Rank;
+    // Activation changes belong to the separate removal workflow, not an ordinary edit.
 
     _dbContext.SaveChanges();
+    return Ok(existingContact);
 }
 }
 
