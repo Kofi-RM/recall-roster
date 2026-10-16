@@ -33,6 +33,44 @@ public class RecallIntegrityTests : IDisposable
         _db.RosterContacts.Add(new RosterContact { rosterId = 1, contactId = 1 });
         _db.SaveChanges();
     }
+    [Fact]
+    public void Multiple_rosters_snapshot_unique_contacts_and_preserve_selection()
+    {
+        _db.Rosters.Add(new Roster { rosterId = 2, UnitId = 1, name = "Backup", description = "" });
+        _db.RosterContacts.AddRange(new RosterContact { rosterId = 2, contactId = 1 }, new RosterContact { rosterId = 2, contactId = 2 });
+        _db.SaveChanges();
+        var recall = new RecallResultsService(_db).AddRecall(new CreateRecallRequest
+        { rosterIds = new[] { 1, 2, 2 }, message = "Report", timeEnded = DateTimeOffset.UtcNow.AddHours(1) });
+        Assert.Equal(2, recall.TotalMax);
+        Assert.Equal(1, recall.EmployeesMax);
+        Assert.Equal(1, recall.FlightChiefMax);
+        _db.ChangeTracker.Clear();
+        Assert.Equal(new[] { 1, 2 }, _db.Recalls.Single().rosterIds);
+        Assert.Equal(2, _db.RecallRecipients.Count());
+    }
+
+    [Theory]
+    [InlineData(new int[] { })]
+    [InlineData(new[] { 1, 999 })]
+    [InlineData(new[] { 0 })]
+    public void Invalid_roster_selection_creates_nothing(int[] ids)
+    {
+        Assert.Throws<ArgumentException>(() => new RecallResultsService(_db).AddRecall(new CreateRecallRequest
+        { rosterIds = ids, message = "Report", timeEnded = DateTimeOffset.UtcNow.AddHours(1) }));
+        Assert.Empty(_db.Recalls);
+    }
+
+    [Fact]
+    public void Cross_unit_selection_is_rejected()
+    {
+        _db.Units.Add(new Unit { Id = 2, Name = "Other unit" });
+        _db.Rosters.Add(new Roster { rosterId = 2, UnitId = 2, name = "Other", description = "" });
+        _db.SaveChanges();
+        Assert.Throws<ArgumentException>(() => new RecallResultsService(_db).AddRecall(new CreateRecallRequest
+        { rosterIds = new[] { 1, 2 }, message = "Report", timeEnded = DateTimeOffset.UtcNow.AddHours(1) }));
+        Assert.Empty(_db.Recalls);
+    }
+
     private Recall CreateRecall() => new RecallResultsService(_db).AddRecall(new CreateRecallRequest
     {
         rosterId = 1, message = "Report in", timeEnded = DateTimeOffset.UtcNow.AddHours(1)

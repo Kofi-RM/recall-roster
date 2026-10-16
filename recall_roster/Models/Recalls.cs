@@ -8,6 +8,8 @@ public class Recall
     public int recallId { get; set; }
     public int UnitId { get; set; }
     public int rosterId { get; set; }
+    [JsonIgnore] public string? RosterIdsJson { get; set; }
+    [NotMapped] public int[] rosterIds => RosterIdsJson == null ? new[] { rosterId } : System.Text.Json.JsonSerializer.Deserialize<int[]>(RosterIdsJson)!;
     public int? CreatedByUserId { get; set; }
     public string message { get; set; } = "";
     public DateTime timeStarted { get; set; }

@@ -21,19 +21,28 @@ public class RecallResultsService : IRecallResultsService
             throw new ArgumentException("A message and a future deadline are required.");
 
         using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
-        var roster = _context.Rosters.SingleOrDefault(r => r.rosterId == request.rosterId);
-        if (roster == null)
-            throw new ArgumentException("Roster not found.");
-
-        var contacts = _context.RosterContacts.Where(rc => rc.rosterId == request.rosterId && rc.Contact!.Active == 1)
-            .Select(rc => rc.Contact!).AsNoTracking().ToList();
+        var rosterIds = (request.rosterIds ?? new[] { request.rosterId }).Distinct().OrderBy(id => id).ToArray();
+        if (rosterIds.Length == 0 || rosterIds.Any(id => id <= 0))
+            throw new ArgumentException("Choose at least one valid roster.");
+        var rosters = _context.Rosters.Where(r => rosterIds.Contains(r.rosterId)).ToList();
+        if (rosters.Count != rosterIds.Length)
+            throw new ArgumentException("One or more rosters were not found.");
+        if (rosters.Any(r => !_context.Access.CanInitiate(r.UnitId)))
+            throw new UnauthorizedAccessException("Recall initiation permission is required for every roster.");
+        if (rosters.Select(r => r.UnitId).Distinct().Count() != 1)
+            throw new ArgumentException("Select rosters from the same unit for one recall.");
+        var roster = rosters[0];
+        var contactIds = _context.RosterContacts.Where(rc => rosterIds.Contains(rc.rosterId)).Select(rc => rc.contactId);
+        var contacts = _context.Contacts.Where(c => contactIds.Contains(c.contactId) && c.Active == 1 && c.UnitId == roster.UnitId)
+            .AsNoTracking().ToList();
         if (contacts.Count == 0) throw new ArgumentException("The roster has no active recipients.");
         if (contacts.Any(c => !StaffRanks.IsSupported(c.Rank)))
             throw new ArgumentException("Every recipient must have a supported staff rank before starting a recall.");
 
         var recall = new Recall
         {
-            rosterId = request.rosterId,
+            rosterId = rosterIds[0],
+            RosterIdsJson = System.Text.Json.JsonSerializer.Serialize(rosterIds),
             UnitId = roster.UnitId,
             CreatedByUserId = _context.Access.UserId,
             message = request.message.Trim(),

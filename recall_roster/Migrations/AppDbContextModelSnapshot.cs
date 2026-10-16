@@ -142,6 +142,8 @@ namespace recall_roster.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RosterIdsJson").HasColumnType("nvarchar(max)");
+
                     b.Property<int>("rosterId")
                         .HasColumnType("int");
 
