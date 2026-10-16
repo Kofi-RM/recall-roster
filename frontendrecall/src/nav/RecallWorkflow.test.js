@@ -8,7 +8,7 @@ import api from '../api/api';
 jest.mock('../UnitAccess', () => ({ useUnitAccess: () => ({ units: [{ id: 1, canInitiateRecalls: true }], canInitiate: () => true, unitName: () => 'Team unit' }) }));
 jest.mock('../api/api', () => ({ get: jest.fn(), post: jest.fn() }));
 jest.mock('../Miscelleneous', () => ({ ToolBar: () => null }));
-jest.mock('../hooks/UseRoster', () => () => ({ rosters: [{ rosterId: 1, name: 'Team', unitId: 1 }], loading: false, error: null }));
+jest.mock('../hooks/UseRoster', () => () => ({ rosters: [{ rosterId: 1, name: 'Team', unitId: 1 }, { rosterId: 2, name: 'Backup', unitId: 1 }, { rosterId: 3, name: 'Other unit', unitId: 2 }], loading: false, error: null }));
 beforeEach(() => jest.clearAllMocks());
 const details = { message: 'Report in', timeStarted: '2026-09-04T12:00:00', timeEnded: '2026-09-04T13:00:00' };
 const renderStats = () => render(<MemoryRouter initialEntries={['/recallStats/7']}><Routes><Route path="/recallStats/:recallId" element={<RecallStats />} /></Routes></MemoryRouter>);
@@ -43,8 +43,8 @@ test('legacy recalls explain the missing snapshot and do not show a percentage',
 
 const fillRecall = async () => {
   render(<MemoryRouter><StartRecall /></MemoryRouter>);
-  fireEvent.mouseDown(screen.getByLabelText(/roster/i));
-  fireEvent.click(await screen.findByRole('option', { name: /Team/ }));
+  fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+  fireEvent.click(await screen.findByRole('option', { name: /^Team/ }));
   fireEvent.change(screen.getByLabelText(/message/i), { target: { value: 'Report in' } });
   fireEvent.click(screen.getByRole('button', { name: 'Start recall' }));
 };
@@ -65,4 +65,17 @@ test('partial SMS failure preserves the created recall and prevents duplicate cr
   await waitFor(() => expect(screen.getByRole('button', { name: 'Start recall' })).toBeDisabled());
   expect(screen.getByRole('link', { name: 'View recall #7' })).toHaveAttribute('href', '/recallStats/7');
   expect(api.post).toHaveBeenNthCalledWith(2, '/Message/SendMessage/1/7', { message: 'Report in' });
+});
+
+test('submits multiple roster IDs in one recall and disables other units', async () => {
+  api.post.mockRejectedValueOnce(new Error('Unavailable'));
+  render(<MemoryRouter><StartRecall /></MemoryRouter>);
+  fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+  fireEvent.click(await screen.findByRole('option', { name: /^Team/ }));
+  fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+  expect(await screen.findByRole('option', { name: /Other unit/ })).toHaveAttribute('aria-disabled', 'true');
+  fireEvent.click(screen.getByRole('option', { name: /Backup/ }));
+  fireEvent.change(screen.getByLabelText(/message/i), { target: { value: 'Report in' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Start recall' }));
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/Recall', expect.objectContaining({ rosterIds: [1, 2] })));
 });

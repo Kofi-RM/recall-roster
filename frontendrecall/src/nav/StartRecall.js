@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Alert, Button, Container, TextField, MenuItem, Stack, Typography } from '@mui/material';
+import { Alert, Autocomplete, Button, Container, TextField, Stack, Typography } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToolBar } from '../Miscelleneous';
 import useRoster from '../hooks/UseRoster';
@@ -10,7 +10,7 @@ const StartRecall = () => {
   const access = useUnitAccess();
   const { rosters: allRosters, loading, error } = useRoster();
   const rosters = allRosters.filter(roster => access.canInitiate(roster.unitId));
-  const [selectedRoster, setSelectedRoster] = useState('');
+  const [selectedRosters, setSelectedRosters] = useState([]);
   const [message, setMessage] = useState('');
   const [duration, setDuration] = useState({ days: 0, hours: 0, minutes: 30 });
   const [pending, setPending] = useState(false);
@@ -25,9 +25,9 @@ const StartRecall = () => {
     const { days, hours, minutes } = duration;
     const values = [days, hours, minutes];
     const totalMinutes = days * 1440 + hours * 60 + minutes;
-    if (!selectedRoster || !message.trim() || values.some(v => !Number.isInteger(v) || v < 0) ||
+    if (!selectedRosters.length || !message.trim() || values.some(v => !Number.isInteger(v) || v < 0) ||
         days > 365 || hours > 23 || minutes > 59 || totalMinutes <= 0) {
-      setFailure('Choose a roster, enter a message, and set a valid duration (up to 365 days).');
+      setFailure('Choose at least one roster, enter a message, and set a valid duration (up to 365 days).');
       return;
     }
     submitting.current = true;
@@ -36,7 +36,7 @@ const StartRecall = () => {
     let recallId;
     try {
       const result = await api.post('/Recall', {
-        rosterId: Number(selectedRoster), message: message.trim(),
+        rosterIds: selectedRosters.map(r => r.rosterId), message: message.trim(),
         timeEnded: new Date(Date.now() + totalMinutes * 60000).toISOString()
       });
       recallId = result.data.recallId;
@@ -75,9 +75,13 @@ const StartRecall = () => {
       {failure && <Alert severity="error" sx={{ mb: 2 }}>{failure}</Alert>}
       {createdId && !pending && <Button component={Link} to={`/recallStats/${createdId}`} sx={{ mb: 2 }}>View recall #{createdId}</Button>}
       <Stack component="form" spacing={3} onSubmit={submit}>
-        <TextField select label="Roster" value={selectedRoster} onChange={e => setSelectedRoster(e.target.value)} required disabled={pending || !!createdId || loading}>
-          {rosters.map(r => <MenuItem key={r.rosterId} value={r.rosterId}>{r.name} · {access.unitName(r.unitId)}</MenuItem>)}
-        </TextField>
+        <Autocomplete multiple options={rosters} value={selectedRosters}
+          onChange={(_, value) => setSelectedRosters(value)}
+          isOptionEqualToValue={(a, b) => a.rosterId === b.rosterId}
+          getOptionLabel={r => `${r.name} · ${access.unitName(r.unitId)}`}
+          getOptionDisabled={r => selectedRosters.length > 0 && r.unitId !== selectedRosters[0].unitId}
+          disabled={pending || !!createdId || loading}
+          renderInput={params => <TextField {...params} label="Rosters" helperText="Choose rosters from the same unit. Shared contacts receive one message." />} />
         <TextField label="Message" multiline rows={5} value={message} onChange={e => setMessage(e.target.value)} required inputProps={{ maxLength: 1600 }} disabled={pending || !!createdId} />
         <Typography component="h2" variant="h6">Response deadline</Typography>
         <Stack direction="row" spacing={2}>
