@@ -1,0 +1,26 @@
+FROM node:22-bookworm-slim AS frontend
+WORKDIR /src
+COPY frontendrecall/package*.json ./
+RUN npm ci
+COPY frontendrecall/ ./
+ENV REACT_APP_DEMO_ONLY=true
+ENV REACT_APP_API_URL=/api
+RUN npm run build
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS backend
+WORKDIR /src
+COPY recall_roster/recall_roster.csproj recall_roster/
+RUN dotnet restore recall_roster/recall_roster.csproj
+COPY recall_roster/ recall_roster/
+RUN dotnet publish recall_roster/recall_roster.csproj -c Release -o /app --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+COPY --from=backend /app ./
+COPY --from=frontend /src/build ./wwwroot
+ENV ASPNETCORE_URLS=http://+:8080
+ENV Demo__Only=true
+ENV Demo__Enabled=true
+ENV Demo__StorePath=/data/demo-ledger.json
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "recall_roster.dll"]

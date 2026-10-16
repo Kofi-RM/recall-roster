@@ -21,19 +21,21 @@ public class RecallResultsService : IRecallResultsService
             throw new ArgumentException("A message and a future deadline are required.");
 
         using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
-        if (!_context.Rosters.Any(r => r.rosterId == request.rosterId))
+        var roster = _context.Rosters.SingleOrDefault(r => r.rosterId == request.rosterId);
+        if (roster == null)
             throw new ArgumentException("Roster not found.");
 
         var contacts = _context.RosterContacts.Where(rc => rc.rosterId == request.rosterId && rc.Contact!.Active == 1)
             .Select(rc => rc.Contact!).AsNoTracking().ToList();
         if (contacts.Count == 0) throw new ArgumentException("The roster has no active recipients.");
-        var ranks = new[] { "Employee", "Element Chief", "Flight Chief", "Squadron Director" };
-        if (contacts.Any(c => !ranks.Contains(c.Rank)))
+        if (contacts.Any(c => !StaffRanks.IsSupported(c.Rank)))
             throw new ArgumentException("Every recipient must have a supported staff rank before starting a recall.");
 
         var recall = new Recall
         {
             rosterId = request.rosterId,
+            UnitId = roster.UnitId,
+            CreatedByUserId = _context.Access.UserId,
             message = request.message.Trim(),
             timeStarted = now,
             timeEnded = request.timeEnded.UtcDateTime,

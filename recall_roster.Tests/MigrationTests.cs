@@ -15,6 +15,13 @@ public class MigrationTests
         new TSql160Parser(true).Parse(new StringReader(script), out var errors);
         Assert.True(errors.Count == 0, string.Join(Environment.NewLine,
             errors.Select(e => $"Line {e.Line}: {e.Message}")));
+        Assert.Contains("Legacy / unassigned unit", script);
+        Assert.Contains("UPDATE Contacts SET UnitId = 1", script);
+        Assert.Contains("UPDATE Rosters SET UnitId = 1", script);
+        Assert.Contains("UPDATE Recalls SET UnitId = 1", script);
+        Assert.Contains("[IsEnabled] bit NOT NULL DEFAULT CAST(1 AS bit)", script);
+        Assert.Contains("[IsSystemAdministrator] bit NOT NULL DEFAULT CAST(0 AS bit)", script);
+        Assert.True(script.IndexOf("UPDATE Contacts SET UnitId = 1", StringComparison.Ordinal) < script.IndexOf("FK_Contacts_Units_UnitId", StringComparison.Ordinal));
         Assert.Contains("LegacyTotal", script);
         Assert.Contains("IsDuplicate", script);
         Assert.DoesNotContain("DROP TABLE [Logins]", script);

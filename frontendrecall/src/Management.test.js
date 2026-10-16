@@ -7,6 +7,7 @@ import { EditableRow } from './ManageContacts';
 import ManageRoster from './ManageRoster';
 import api from './api/api';
 
+jest.mock('./UnitAccess', () => ({ useUnitAccess: () => ({ units: [{ id: 1, canManageRosters: true }], canManage: () => true, unitName: () => 'Team unit' }) }));
 jest.mock('./api/api', () => ({ put: jest.fn(), delete: jest.fn() }));
 jest.mock('./hooks/UseRoster', () => () => ({ rosters: [{ rosterId: 1, name: 'Team', description: 'Test team' }], loading: false, error: null }));
 const contact = { contactId: 1, firstName: 'First', lastName: 'Person', phoneNumber: '2025550100', rank: 'Employee', active: 1 };

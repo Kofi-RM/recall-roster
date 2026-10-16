@@ -2,89 +2,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
-using recall_roster.Models;
+namespace recall_roster.Controllers;
 
-namespace recall_roster.Controllers
+[Authorize, ApiController, Route("api/User")]
+public sealed class UserController(AppDbContext db) : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers() => Ok(await db.Users.AsNoTracking()
+        .Select(u => new { u.Id, u.Email, u.IsSystemAdministrator, u.IsEnabled }).ToListAsync());
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetUser(int id)
     {
-        private readonly AppDbContext _dbContext;
-         private readonly ILogger<UserController> _logger;
-
-        public UserController(ILogger<UserController> logger, AppDbContext dbContext)
-        {
-            _dbContext = dbContext;
-             _logger = logger;
-        }
-
-// Get one user
-[Authorize]
-[HttpGet("{id}")]
-public async Task<IActionResult> GetUser(int id)
-{
-    try
-    {
-        var user = await _dbContext.Users.FindAsync(id);
-
-        if (user == null)
-            return NotFound();
-
-        return Ok(new { user.Id, user.Email });
+        var user = await db.Users.AsNoTracking().Where(u => u.Id == id)
+            .Select(u => new { u.Id, u.Email, u.IsSystemAdministrator, u.IsEnabled }).SingleOrDefaultAsync();
+        return user == null ? NotFound() : Ok(user);
     }
-    catch (Exception ex)
-    {
-        return StatusCode(500, ex.Message);
-    }
+    // Disable accounts through /api/access/users/{id}; deleting an account would erase attribution.
 }
-// get all users
-[Authorize]
-   [HttpGet]
-public async Task<IActionResult> GetAllUsers()
-{
-    try
-    {
-        var users = await _dbContext.Users
-            .Select(u => new
-            {
-                u.Id,
-                u.Email
-            })
-            .ToListAsync();
-
-        return Ok(users);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "An error occurred while retrieving users.");
-        return StatusCode(500, "An error occurred while processing your request.");
-    }
-}
-[Authorize]
-[HttpDelete("{id}")]
-public async Task<IActionResult> DeleteUser(int id)
-        {
-            try
-            {
-                var user = await _dbContext.Users.FindAsync(id);
-                if (user == null) return NotFound();
-
-                _dbContext.Users.Remove(user);
-                await _dbContext.SaveChangesAsync();
-                return NoContent();
-                
-            } catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-
-//
-    
-}
-
-
-    }
-

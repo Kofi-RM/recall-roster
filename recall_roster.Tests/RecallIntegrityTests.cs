@@ -23,10 +23,13 @@ public class RecallIntegrityTests : IDisposable
         _connection.Open();
         _db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options,
             new ConfigurationBuilder().Build());
+        _db.Access.IsSystem = true;
         _db.Database.EnsureCreated();
-        _db.Contacts.Add(new Contact { contactId = 1, FirstName = "First", LastName = "Person", PhoneNumber = "2025550100", Rank = "Employee", Active = 1 });
-        _db.Contacts.Add(new Contact { contactId = 2, FirstName = "Other", LastName = "Person", PhoneNumber = "2025550101", Rank = "Flight Chief", Active = 1 });
-        _db.Rosters.Add(new Roster { rosterId = 1, name = "Team", description = "" });
+        _db.Units.Add(new Unit { Id = 1, Name = "Test unit" });
+        _db.SaveChanges();
+        _db.Contacts.Add(new Contact { contactId = 1, UnitId = 1, FirstName = "First", LastName = "Person", PhoneNumber = "2025550100", Rank = "Employee", Active = 1 });
+        _db.Contacts.Add(new Contact { contactId = 2, UnitId = 1, FirstName = "Other", LastName = "Person", PhoneNumber = "2025550101", Rank = "Flight Chief", Active = 1 });
+        _db.Rosters.Add(new Roster { rosterId = 1, UnitId = 1, name = "Team", description = "" });
         _db.RosterContacts.Add(new RosterContact { rosterId = 1, contactId = 1 });
         _db.SaveChanges();
     }
@@ -214,7 +217,7 @@ public class RecallIntegrityTests : IDisposable
     {
         var controller = new ContactController(
             Microsoft.Extensions.Logging.Abstractions.NullLogger<ContactController>.Instance,
-            new ContactService(_db), _db);
+            new ContactService(_db));
         var input = new Contact { contactId=2, FirstName="Changed", LastName="Name", PhoneNumber="2025550100", Rank="Employee" };
         Assert.IsType<BadRequestObjectResult>(controller.UpdateContact(1, input).Result);
         Assert.Equal("First", _db.Contacts.Find(1)!.FirstName);
@@ -226,7 +229,7 @@ public class RecallIntegrityTests : IDisposable
     {
         var controller = new ContactController(
             Microsoft.Extensions.Logging.Abstractions.NullLogger<ContactController>.Instance,
-            new ContactService(_db), _db);
+            new ContactService(_db));
         var input = new Contact { contactId=1, FirstName=" Updated ", LastName=" Person ", PhoneNumber="2025550100", Rank="Flight Chief", Active=0 };
         Assert.IsType<OkObjectResult>(controller.UpdateContact(1, input).Result);
         Assert.Equal(1, _db.Contacts.Find(1)!.Active);
@@ -249,9 +252,64 @@ public class RecallIntegrityTests : IDisposable
         Assert.Equal("Team", _db.Rosters.Find(1)!.name);
     }
 
+    [Fact]
+    public void Contact_service_rejects_invalid_edit_without_mutating_tracked_entity()
+    {
+        var service = new ContactService(_db);
+        var input = new Contact { contactId = 1, FirstName = "Changed", LastName = "Name", PhoneNumber = "invalid", Rank = "Flight Chief", Active = 0 };
+        Assert.Throws<ArgumentException>(() => service.UpdateContact(input));
+        Assert.Equal("First", _db.Contacts.Find(1)!.FirstName);
+        // A later save must not accidentally persist any part of the rejected edit.
+        _db.SaveChanges();
+        _db.ChangeTracker.Clear();
+        Assert.Equal("First", _db.Contacts.Find(1)!.FirstName);
+        input.PhoneNumber = "2025550100";
+        service.UpdateContact(input);
+        Assert.Equal("Flight Chief", _db.Contacts.Find(1)!.Rank);
+        Assert.Equal(1, _db.Contacts.Find(1)!.Active);
+    }
+
+    [Fact]
+    public void Contact_creation_returns_database_identity_and_rejects_invalid_details()
+    {
+        var service = new ContactService(_db);
+        var invalid = new ContactCreateDto { UnitId = 1, FirstName = "New", LastName = "Person", PhoneNumber = "invalid", Rank = "Employee" };
+        Assert.Throws<ArgumentException>(() => service.AddContact(invalid));
+        Assert.Equal(2, _db.Contacts.Count());
+        invalid.PhoneNumber = "2025550102";
+        var added = service.AddContact(invalid);
+        Assert.True(added.contactId > 2);
+        Assert.Equal(1, added.Active);
+        Assert.NotNull(_db.Contacts.Find(added.contactId));
+    }
+
+    [Fact]
+    public void Recall_messages_use_saved_details_and_an_injected_transport()
+    {
+        var recall = CreateRecall();
+        _db.Contacts.Find(1)!.PhoneNumber = "2025550199";
+        _db.SaveChanges();
+        var sender = new RecordingSmsSender();
+        var service = new MessageService(_db, sender);
+        service.SendMessageByID(1, recall.recallId, "Untrusted browser message");
+        Assert.Equal("+12025550100", sender.Phone);
+        Assert.Contains("Report in", sender.Body);
+        Assert.DoesNotContain("Untrusted browser message", sender.Body);
+        Assert.Throws<ArgumentException>(() => service.SendMessageByID(2, recall.recallId, "test"));
+        Assert.Equal(1, sender.Count);
+    }
+
+    private sealed class RecordingSmsSender : ISmsSender
+    {
+        public string Phone { get; private set; } = "";
+        public string Body { get; private set; } = "";
+        public int Count { get; private set; }
+        public void Send(string recipient, string body) { Phone = recipient; Body = body; Count++; }
+        public Task SendAsync(string recipient, string body) { Send(recipient, body); return Task.CompletedTask; }
+    }
+
     private class NoMessages : IMessageService
     {
-        public void SendMessage(string recipient, string body) => throw new InvalidOperationException("Tests must not send SMS.");
         public void SendMessageByID(int contactId, int recallId, string body) => throw new InvalidOperationException("Tests must not send SMS.");
     }
     public void Dispose() { _db.Dispose(); _connection.Dispose(); }

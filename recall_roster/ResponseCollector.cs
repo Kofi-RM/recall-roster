@@ -16,7 +16,7 @@ public static class ResponseCollector
         timer.Enabled = true; // Start the timer
     }
 
-    private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+    private static void OnTimedEvent(object? source, ElapsedEventArgs e)
     {
         DisplayResults();
         timer.Stop(); // Stop the timer after processing

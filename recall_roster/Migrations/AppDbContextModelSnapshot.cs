@@ -22,6 +22,35 @@ namespace recall_roster.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("recall_roster.Models.AccessAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ActorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccessAudits");
+                });
+
             modelBuilder.Entity("recall_roster.Models.Contact", b =>
                 {
                     b.Property<int>("contactId")
@@ -50,7 +79,12 @@ namespace recall_roster.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
                     b.HasKey("contactId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("Contacts");
                 });
@@ -62,6 +96,9 @@ namespace recall_roster.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("recallId"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ElementChief")
                         .HasColumnType("int");
@@ -98,6 +135,9 @@ namespace recall_roster.Migrations
                     b.Property<int>("TotalMax")
                         .HasColumnType("int");
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
                     b.Property<string>("message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -112,6 +152,10 @@ namespace recall_roster.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("recallId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("Recalls");
                 });
@@ -188,6 +232,9 @@ namespace recall_roster.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("rosterId"));
 
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
                     b.Property<string>("description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -197,6 +244,8 @@ namespace recall_roster.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("rosterId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("Rosters");
                 });
@@ -216,6 +265,53 @@ namespace recall_roster.Migrations
                     b.ToTable("RosterContact", (string)null);
                 });
 
+            modelBuilder.Entity("recall_roster.Models.Unit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<int?>("ParentUnitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentUnitId");
+
+                    b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("recall_roster.Models.UnitMembership", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CanInitiateRecalls")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanManageRosters")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IncludeDescendants")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "UnitId");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("UnitMemberships");
+                });
+
             modelBuilder.Entity("recall_roster.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -229,9 +325,18 @@ namespace recall_roster.Migrations
                         .HasMaxLength(320)
                         .HasColumnType("nvarchar(320)");
 
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystemAdministrator")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TokenVersion")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -239,6 +344,29 @@ namespace recall_roster.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("recall_roster.Models.Contact", b =>
+                {
+                    b.HasOne("recall_roster.Models.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("recall_roster.Models.Recall", b =>
+                {
+                    b.HasOne("recall_roster.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("recall_roster.Models.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("recall_roster.Models.RecallRecipient", b =>
@@ -271,6 +399,15 @@ namespace recall_roster.Migrations
                     b.Navigation("Recall");
                 });
 
+            modelBuilder.Entity("recall_roster.Models.Roster", b =>
+                {
+                    b.HasOne("recall_roster.Models.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("recall_roster.Models.RosterContact", b =>
                 {
                     b.HasOne("recall_roster.Models.Contact", "Contact")
@@ -288,6 +425,29 @@ namespace recall_roster.Migrations
                     b.Navigation("Contact");
 
                     b.Navigation("Roster");
+                });
+
+            modelBuilder.Entity("recall_roster.Models.Unit", b =>
+                {
+                    b.HasOne("recall_roster.Models.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("ParentUnitId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("recall_roster.Models.UnitMembership", b =>
+                {
+                    b.HasOne("recall_roster.Models.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("recall_roster.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("recall_roster.Models.Contact", b =>

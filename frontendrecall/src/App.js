@@ -1,9 +1,9 @@
-import logo from './logo.svg';
 
 
-import React, { useState, useEffect,  createContext, useContext, Component } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { Button, Typography, AppBar, Toolbar, Container, TextField, ThemeProvider } from '@mui/material';
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginPage from './LoginPage.js';
 import LandingPage from './Landing.js';
@@ -19,17 +19,23 @@ import StartRecall from './nav/StartRecall.js';
 import CreateRoster from './nav/CreateRoster.js';
 import Home from './nav/Home.js';
 import { NavyTheme } from './css/ButtonTheme.js';
+import Demo from './Demo';
+import { UnitAccessProvider } from './UnitAccess';
+import AccessManagement from './AccessManagement';
 
 function App() {
+  if (process.env.REACT_APP_DEMO_ONLY === 'true') return <ThemeProvider theme={NavyTheme}><Demo /></ThemeProvider>;
   
   return (
-    <AuthProvider>
+    <AuthProvider><UnitAccessProvider>
       <ThemeProvider theme = {NavyTheme}>
     <Router>
         <Routes>
-           {/* PUBLIC */}
+           <Route path="/access" element={<ProtectedRoute><AccessManagement /></ProtectedRoute>} />
+          {/* PUBLIC */}
   <Route path="/" element={<Home />} />
   <Route path="/login" element={<LoginPage />} />
+  <Route path="/demo" element={<Demo />} />
 
   {/* PROTECTED */}
   <Route
@@ -128,7 +134,7 @@ function App() {
         </Routes>
       </Router>
       </ThemeProvider>
-      </AuthProvider>
+      </UnitAccessProvider></AuthProvider>
   );
   }
 

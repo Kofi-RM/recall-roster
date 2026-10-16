@@ -3,9 +3,11 @@ import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText,
 import { Link } from 'react-router-dom';
 import useRoster from './hooks/UseRoster';
 import api from './api/api';
+import { useUnitAccess } from './UnitAccess';
 
 export const RemoveContact = ({ children }) => <span className="button">{children}</span>;
 const ManageRoster = () => {
+  const access = useUnitAccess();
   const { rosters, loading, error } = useRoster();
   const [removed, setRemoved] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -36,15 +38,15 @@ const ManageRoster = () => {
   return <section>
     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
       <Typography variant="h5" component="h2">Your rosters</Typography>
-      <Button component={Link} to="/createRoster" variant="contained">Create roster</Button>
+      {access.units.some(unit => unit.canManageRosters) && <Button component={Link} to="/createRoster" variant="contained">Create roster</Button>}
     </Stack>
     {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
     <TextField label="Search rosters" value={search} onChange={event => setSearch(event.target.value)} fullWidth size="small" sx={{ mb: 2 }} />
     {visible.map(roster => <Paper variant="outlined" key={roster.rosterId} sx={{ p: 2, mb: 2 }}>
       <Typography component="h3" variant="h6">{roster.name}</Typography>
-      <Typography color="text.secondary" sx={{ mb: 1 }}>{roster.description}</Typography>
-      <Button component={Link} to={`/editRoster/${roster.rosterId}`}>Edit</Button>
-      <Button color="error" onClick={() => { setSelected(roster); setFailure(''); setSuccess(''); }}>Remove</Button>
+      <Typography color="text.secondary" sx={{ mb: 1 }}>{access.unitName(roster.unitId)} · {roster.description}</Typography>
+      <Button component={Link} to={`/editRoster/${roster.rosterId}`}>{access.canManage(roster.unitId) ? 'Edit' : 'View members'}</Button>
+      {access.canManage(roster.unitId) && <Button color="error" onClick={() => { setSelected(roster); setFailure(''); setSuccess(''); }}>Remove</Button>}
     </Paper>)}
     {!visible.length && <p>{search ? 'No rosters match your search.' : 'No rosters yet. Create one to organize your team.'}</p>}
     <Dialog open={!!selected} onClose={() => { if (!pending) setSelected(null); }} aria-labelledby="remove-roster-title">

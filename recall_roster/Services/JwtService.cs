@@ -19,12 +19,13 @@ namespace recall_roster.Services
 
         public string GenerateToken(User user)
         {
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT signing configuration is missing."));
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("token_version", user.TokenVersion.ToString(System.Globalization.CultureInfo.InvariantCulture))
             };
 
             var token = new JwtSecurityToken(

@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Alert, Button } from '@mui/material';
+import { useUnitAccess } from './UnitAccess';
 import { Tabs, Tab, useMediaQuery } from '@mui/material';
 import { ToolBar } from './Miscelleneous';
 import ManageContacts from './ManageContacts';
@@ -15,6 +18,7 @@ const sections = [
 ];
 
 const LandingPage = () => {
+  const access = useUnitAccess();
   const [selectedTab, setSelectedTab] = useState(0);
   const compact = useMediaQuery('(max-width:900px)');
   const Content = sections[selectedTab].component;
@@ -32,6 +36,9 @@ const LandingPage = () => {
         </aside>
         <main id="main-content" className="rr-dashboard-main">
           <header className="rr-dashboard-heading"><p className="rr-eyebrow">RECALL MANAGEMENT</p><h1>{sections[selectedTab].label}</h1><p>{sections[selectedTab].description}</p></header>
+          {access.error && <Alert severity="error">{access.error}<Button onClick={access.refresh}>Refresh access</Button></Alert>}
+          {!access.loading && !access.error && !access.units.length && <Alert severity="info">No units assigned. Ask an administrator to grant unit access.</Alert>}
+          {access.isAdministrator && <Button component={Link} to="/access">Manage units and access</Button>}
           <section className="rr-workspace-panel" role="tabpanel" id={`workspace-panel-${selectedTab}`} aria-labelledby={`workspace-tab-${selectedTab}`} tabIndex={0}>
             <Content />
           </section>

@@ -8,12 +8,15 @@ public class User
 
 
 public int Id { get; set; }
+    public bool IsSystemAdministrator { get; set; }
+    public int TokenVersion { get; set; }
+    public bool IsEnabled { get; set; } = true;
 
     [Required]
     [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
-    public string Email { get; set; }
+    public string Email { get; set; } = "";
 
     [Required]
-    public string Password { get; set; }
+    public string Password { get; set; } = "";
 }
 }

@@ -90,7 +90,7 @@ namespace recall_roster.Controllers;
  try
             {
                 _rosterRepository.UpdateRoster(roster);
-                return Ok(roster);
+                return Ok(_rosterRepository.GetRoster(id));
             }
             catch (ArgumentException ex)
             {

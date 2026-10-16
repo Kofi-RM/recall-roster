@@ -4,9 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ToolBar } from '../Miscelleneous';
 import useRoster from '../hooks/UseRoster';
 import api from '../api/api';
+import { useUnitAccess } from '../UnitAccess';
 
 const StartRecall = () => {
-  const { rosters, loading, error } = useRoster();
+  const access = useUnitAccess();
+  const { rosters: allRosters, loading, error } = useRoster();
+  const rosters = allRosters.filter(roster => access.canInitiate(roster.unitId));
   const [selectedRoster, setSelectedRoster] = useState('');
   const [message, setMessage] = useState('');
   const [duration, setDuration] = useState({ days: 0, hours: 0, minutes: 30 });
@@ -66,13 +69,14 @@ const StartRecall = () => {
     <Container component="main" id="main-content" maxWidth="sm" sx={{ py: 5 }}>
       <Typography variant="h4" component="h1" gutterBottom>Initiate recall</Typography>
       <Typography color="text.secondary" sx={{ mb: 3 }}>Recipients and their contact details are saved when this recall begins.</Typography>
+      {!access.loading && !access.units.some(unit => unit.canInitiateRecalls) && <Alert severity="info">You need recall initiation permission for a unit.</Alert>}
       {loading && <Alert severity="info">Loading rosters…</Alert>}
       {error && <Alert severity="error">Rosters could not be loaded. Please refresh and try again.</Alert>}
       {failure && <Alert severity="error" sx={{ mb: 2 }}>{failure}</Alert>}
       {createdId && !pending && <Button component={Link} to={`/recallStats/${createdId}`} sx={{ mb: 2 }}>View recall #{createdId}</Button>}
       <Stack component="form" spacing={3} onSubmit={submit}>
         <TextField select label="Roster" value={selectedRoster} onChange={e => setSelectedRoster(e.target.value)} required disabled={pending || !!createdId || loading}>
-          {rosters.map(r => <MenuItem key={r.rosterId} value={r.rosterId}>{r.name}</MenuItem>)}
+          {rosters.map(r => <MenuItem key={r.rosterId} value={r.rosterId}>{r.name} · {access.unitName(r.unitId)}</MenuItem>)}
         </TextField>
         <TextField label="Message" multiline rows={5} value={message} onChange={e => setMessage(e.target.value)} required inputProps={{ maxLength: 1600 }} disabled={pending || !!createdId} />
         <Typography component="h2" variant="h6">Response deadline</Typography>

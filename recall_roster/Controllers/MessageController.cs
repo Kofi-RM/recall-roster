@@ -15,8 +15,10 @@ public class MessageController : TwilioController
     private readonly IMessageService _messages;
     private readonly IResponseService _responses;
     private readonly IConfiguration _configuration;
-    public MessageController(IMessageService messages, IResponseService responses, IConfiguration configuration)
+    private readonly recall_roster.Data.AppDbContext? _db;
+    public MessageController(IMessageService messages, IResponseService responses, IConfiguration configuration, recall_roster.Data.AppDbContext? db = null)
     {
+        _db = db;
         _messages = messages;
         _responses = responses;
         _configuration = configuration;
@@ -37,6 +39,8 @@ public class MessageController : TwilioController
         var parameters = form.ToDictionary(item => item.Key, item => item.Value.ToString());
         if (!new RequestValidator(token).Validate(url, parameters, signature))
             return StatusCode(StatusCodes.Status403Forbidden);
+        // Only a signature-verified provider request gets the internal response-writing scope.
+        if (_db != null) _db.Access.IsSystem = true;
         var from = form["From"].ToString();
         var body = form["Body"].ToString();
         if (!TryReadIds(body, out var contactId, out var recallId))

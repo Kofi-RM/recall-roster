@@ -1,0 +1,12 @@
+**/node_modules
+**/build
+**/bin
+**/obj
+.git
+.vs
+**/.env*
+**/appsettings*.json
+**/App_Data
+**/demo-ledger*
+**/*.user
+**/*.sql

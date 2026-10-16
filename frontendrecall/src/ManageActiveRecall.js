@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Button } from '@mui/material';
-import { ToolBar } from './Miscelleneous.js';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import useActiveRecalls from './hooks/UseActiveRecalls.js';
+import { useUnitAccess } from './UnitAccess';
 import { NavyButton } from './components/Buttons.js';
 
 const ManageActiveRecalls = () => {
+const access = useUnitAccess();
+const mayInitiate = access.units.some(unit => unit.canInitiateRecalls);
 const [ recallsActive, loading, error] = useActiveRecalls();
 const recallActive = recallsActive.filter(recall => recall.active === 1);
 const navigate = useNavigate();
@@ -27,7 +27,7 @@ const StartRecall = () => {
     return (<>
     <div><br></br><br></br><h1>There are currently have no Active Recalls.</h1></div>
     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-      <NavyButton onClick={StartRecall}>Start Recall</NavyButton>
+      {mayInitiate && <NavyButton onClick={StartRecall}>Start Recall</NavyButton>}
     </div>
     </>
   )}
@@ -42,7 +42,7 @@ const StartRecall = () => {
             {recallActive.map(recall => (
               <li key={recall.recallId} style={{ color: 'black !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h2 style={{ color: 'black' }} className="list">{recall.message}</h2>
+                  <h2 style={{ color: 'black' }} className="list">{recall.message}</h2><p>{access.unitName(recall.unitId)}</p>
                   <p>{new Date(recall.timeStarted + "Z").toLocaleString()}</p>
                 </div>
                 <div>
@@ -55,7 +55,7 @@ const StartRecall = () => {
           </ul>
         </div>
         <div  style={{ position: 'fixed', bottom: '20px', left: '250px' }}>
-          <Link to={'/StartRecall'}> <NavyButton size="large" variant="contained" color="primary">Start a Recall</NavyButton></Link>
+          {mayInitiate && <Link to={'/StartRecall'}> <NavyButton size="large" variant="contained" color="primary">Start a Recall</NavyButton></Link>}
          </div>
       </div>
     </div>

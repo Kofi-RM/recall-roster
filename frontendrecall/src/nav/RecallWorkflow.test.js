@@ -5,9 +5,10 @@ import RecallStats, { asUtcDate } from './RecallStats';
 import StartRecall from './StartRecall';
 import api from '../api/api';
 
+jest.mock('../UnitAccess', () => ({ useUnitAccess: () => ({ units: [{ id: 1, canInitiateRecalls: true }], canInitiate: () => true, unitName: () => 'Team unit' }) }));
 jest.mock('../api/api', () => ({ get: jest.fn(), post: jest.fn() }));
 jest.mock('../Miscelleneous', () => ({ ToolBar: () => null }));
-jest.mock('../hooks/UseRoster', () => () => ({ rosters: [{ rosterId: 1, name: 'Team' }], loading: false, error: null }));
+jest.mock('../hooks/UseRoster', () => () => ({ rosters: [{ rosterId: 1, name: 'Team', unitId: 1 }], loading: false, error: null }));
 beforeEach(() => jest.clearAllMocks());
 const details = { message: 'Report in', timeStarted: '2026-09-04T12:00:00', timeEnded: '2026-09-04T13:00:00' };
 const renderStats = () => render(<MemoryRouter initialEntries={['/recallStats/7']}><Routes><Route path="/recallStats/:recallId" element={<RecallStats />} /></Routes></MemoryRouter>);
@@ -43,7 +44,7 @@ test('legacy recalls explain the missing snapshot and do not show a percentage',
 const fillRecall = async () => {
   render(<MemoryRouter><StartRecall /></MemoryRouter>);
   fireEvent.mouseDown(screen.getByLabelText(/roster/i));
-  fireEvent.click(await screen.findByRole('option', { name: 'Team' }));
+  fireEvent.click(await screen.findByRole('option', { name: /Team/ }));
   fireEvent.change(screen.getByLabelText(/message/i), { target: { value: 'Report in' } });
   fireEvent.click(screen.getByRole('button', { name: 'Start recall' }));
 };

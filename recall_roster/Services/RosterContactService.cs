@@ -23,9 +23,10 @@ public class RosterContactService : IRosterContactService
         if (added.Intersect(removed).Any() || added.Concat(removed).Any(id => id <= 0))
             throw new ArgumentException("Contact IDs must be positive and cannot be both added and removed.");
         using var transaction = _context.Database.BeginTransaction(IsolationLevel.Serializable);
-        if (!_context.Rosters.Any(r => r.rosterId == rosterId))
+        var roster = _context.Rosters.SingleOrDefault(r => r.rosterId == rosterId);
+        if (roster == null)
             throw new ArgumentException("Roster not found.");
-        if (_context.Contacts.Count(c => added.Contains(c.contactId) && c.Active == 1) != added.Length)
+        if (_context.Contacts.Count(c => added.Contains(c.contactId) && c.Active == 1 && c.UnitId == roster.UnitId) != added.Length)
             throw new ArgumentException("Only existing active contacts can be added.");
         var existing = _context.RosterContacts.Where(rc => rc.rosterId == rosterId).ToList();
         foreach (var id in added.Except(existing.Select(rc => rc.contactId)))

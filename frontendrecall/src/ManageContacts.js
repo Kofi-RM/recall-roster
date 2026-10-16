@@ -3,11 +3,12 @@ import { Alert, Button, Stack, Tabs, Tab, TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
 import useContacts from './hooks/UseContacts';
 import api from './api/api';
+import { useUnitAccess } from './UnitAccess';
 import './css/ItemRows.css';
 
 export const staffRanks = ['Employee', 'Element Chief', 'Flight Chief', 'Squadron Director'];
 
-export const EditableRow = ({ item, onSave }) => {
+export const EditableRow = ({ item, onSave, canEdit = true }) => {
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(item);
   const [draft, setDraft] = useState(item);
@@ -47,7 +48,7 @@ export const EditableRow = ({ item, onSave }) => {
         <td><Button onClick={save} disabled={pending}>{pending ? 'Saving…' : 'Save'}</Button><Button onClick={cancel} disabled={pending}>Cancel</Button></td>
       </> : <>
         <td>{saved.firstName} {saved.lastName}</td><td>{saved.phoneNumber}</td><td>{saved.rank}</td>
-        <td><Button onClick={edit} aria-label={`Edit ${saved.firstName} ${saved.lastName}`}>Edit</Button></td>
+        <td>{canEdit ? <Button onClick={edit} aria-label={`Edit ${saved.firstName} ${saved.lastName}`}>Edit</Button> : 'Read only'}</td>
       </>}
     </tr>
     {error && <tr><td colSpan={4}><Alert severity="error">{error}</Alert></td></tr>}
@@ -55,6 +56,7 @@ export const EditableRow = ({ item, onSave }) => {
 };
 
 const ManageContacts = () => {
+  const access = useUnitAccess();
   const { contacts, loading, error } = useContacts();
   const [updates, setUpdates] = useState({});
   const [rank, setRank] = useState('All');
@@ -76,7 +78,7 @@ const ManageContacts = () => {
   if (error) return <Alert severity="error">Staff could not be loaded. Please refresh and try again.</Alert>;
   return <section>
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-      <h2>Staff directory</h2><Button component={Link} to="/insertContact">Add a contact</Button>
+      <h2>Staff directory</h2>{access.units.some(unit => unit.canManageRosters) && <Button component={Link} to="/insertContact">Add a contact</Button>}
     </Stack>
     {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
     <TextField label="Search name or phone" value={search} onChange={event => setSearch(event.target.value)} fullWidth size="small" />
@@ -85,7 +87,7 @@ const ManageContacts = () => {
     </Tabs>
     <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', minWidth: 580 }}>
       <thead><tr><th scope="col">Name</th><th scope="col">Phone</th><th scope="col">Rank</th><th scope="col">Action</th></tr></thead>
-      <tbody>{filtered.map(contact => <EditableRow key={contact.contactId} item={contact} onSave={save} />)}</tbody>
+      <tbody>{filtered.map(contact => <EditableRow key={contact.contactId} item={contact} onSave={save} canEdit={access.canManage(contact.unitId)} />)}</tbody>
     </table></div>
     {!filtered.length && <p style={{ marginTop: 20 }}>{contacts.length ? 'No staff match these filters.' : 'No staff yet. Add a contact to get started.'}</p>}
   </section>;

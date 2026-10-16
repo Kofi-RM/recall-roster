@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Container, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import {ToolBar, MyImage} from '../Miscelleneous.js'
+import {ToolBar} from '../Miscelleneous.js'
 import api from '../api/api.js';
+import { Alert } from '@mui/material';
+import { useUnitAccess } from '../UnitAccess';
 
 const EditContact = () => {
+    const access = useUnitAccess();
     const navigate = useNavigate();
     const { contactId } = useParams();
     const [contact, setContact] = useState({
@@ -17,7 +19,7 @@ const EditContact = () => {
     const [initialContact, setInitialContact] = useState(null);
     useEffect(() => {
         // Fetch contact data from the API
-        api.get('http://localhost:5000/api/contact/' + contactId) // Assuming endpoint to fetch contact details
+        api.get('/contact/' + contactId) // Assuming endpoint to fetch contact details
             .then(response => {
                 // Set the state with retrieved contact data
                 setContact(response.data);
@@ -26,7 +28,7 @@ const EditContact = () => {
             .catch(error => {
                 console.error('Error fetching contact data:', error);
             });
-    }, []);
+    }, [contactId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,7 +40,7 @@ const EditContact = () => {
 
     const handleSubmit = () => {
         // Logic to submit updated contact data
-        api.put(`http://localhost:5000/api/contact/${contactId}`, contact)
+        api.put(`/contact/${contactId}`, contact)
         .then(response => {
             console.log('Contact updated successfully:', response.data);
             navigate("/Landing");
@@ -52,6 +54,7 @@ const EditContact = () => {
         });
     };
 
+    if (initialContact && !access.canManage(initialContact.unitId)) return <><ToolBar /><Alert severity="info">Staff management permission is required for this unit.</Alert></>;
     return (
         <div>
         <ToolBar></ToolBar>

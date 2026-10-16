@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using recall_roster.Data;
 using recall_roster.Models;
@@ -20,6 +21,7 @@ public class AuthController : ControllerBase
         _jwtService = jwtService;
     }
 
+    [Authorize]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -42,6 +44,7 @@ public class AuthController : ControllerBase
             };
 
             _dbContext.Users.Add(user);
+            _dbContext.AccessAudits.Add(new AccessAudit { ActorUserId = _dbContext.Access.UserId, Action = "Create account", Details = "Email=" + email });
             try { await _dbContext.SaveChangesAsync(); }
             catch (DbUpdateException)
             {
@@ -59,6 +62,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -71,7 +75,7 @@ public class AuthController : ControllerBase
             var user = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null)
+            if (user == null || !user.IsEnabled)
                 return Unauthorized("Invalid email or password.");
 
             bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);

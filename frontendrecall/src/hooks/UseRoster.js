@@ -10,7 +10,7 @@ const useRoster = () => {
     const fetchRosters = async () => {
       try {
         setLoading(true);
-        const response = await api.get('http://localhost:5000/api/roster');
+        const response = await api.get('/roster');
         setRosters(response.data);
         setLoading(false);
       } catch (error) {

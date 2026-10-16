@@ -1,14 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Button } from '@mui/material';
-import { ToolBar } from './Miscelleneous.js';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import useActiveRecalls from './hooks/UseActiveRecalls.js';
 import { NavyButton } from './components/Buttons.js';
 
-const RemoveRecall = ({ children }) => {
-  return <span className="button">{children}</span>;
-};
 
 const ManagePrevRecalls = () => {
     const [ recallsActive, loading, error] = useActiveRecalls();

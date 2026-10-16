@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Box, Button, Container, LinearProgress, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { ToolBar } from '../Miscelleneous';
 import api from '../api/api';
+import { useUnitAccess } from '../UnitAccess';
 
 // SQL datetime2 responses from older endpoints lack an offset; this app stores them in UTC.
 export const asUtcDate = value => value ? new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? value : value + 'Z') : null;
@@ -11,6 +12,7 @@ const displayDate = value => {
   return date && !Number.isNaN(date.getTime()) ? date.toLocaleString() : 'N/A';
 };
 const RecallStats = () => {
+  const access = useUnitAccess();
   const { recallId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,6 +66,8 @@ const RecallStats = () => {
       {loaded && <>
         <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" component="h2" sx={{ overflowWrap: 'anywhere' }}>{recall.message}</Typography>
+          <Typography>Unit: {access.unitName(recall.unitId)}</Typography>
+          <Typography>Initiated by: {recall.createdByUserId ? `Account #${recall.createdByUserId}` : 'Not recorded for this historical recall'}</Typography>
           <Typography sx={{ mt: 2 }}>Started: {displayDate(recall.timeStarted)}</Typography>
           <Typography>Deadline: {displayDate(recall.timeEnded)}</Typography>
         </Paper>

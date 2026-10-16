@@ -1,199 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Button, Container, TextField, Snackbar, Alert } from '@mui/material';
-import { ToolBar } from '../Miscelleneous.js';
+import React, { useState } from 'react';
+import { Alert, Button, Checkbox, Container, FormControlLabel, Stack, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import useContacts from '../hooks/UseContacts.js';
-import { NavyButton } from '../components/Buttons.js';
-import axios from 'axios';
-import api from '../api/api.js';
+import { ToolBar } from '../Miscelleneous';
+import { UnitPicker, useUnitAccess } from '../UnitAccess';
+import useContacts from '../hooks/UseContacts';
+import api from '../api/api';
 
-const CreateRoster = () => {
-    const [rosterName, setRosterName] = useState('');
-    const [description, setDescription] = useState('');
-    const [alertOpen, setAlertOpen] = useState(false);
-    
-    const { contacts, loading, error } = useContacts();
-
-    const [contactsByRank, setContactsByRank] = useState({});
-    const [selectedContacts, setSelectedContacts] = useState([]);
-    const [rosterContacts, setRosterContacts] = useState([]);
-    const navigate = useNavigate();
-
-
-    useEffect(() => {
-        if (contacts && contacts.length > 0) {
-        const groupedContacts = groupContactsByRole(contacts);
-        setContactsByRank(groupedContacts);
-        }
-    }, [contacts]) 
-
-    const handleCloseAlert = () => {
-        setAlertOpen(false);
-    };
-
-    const handleAddRoster = async () => {
-        // Create the roster with name and description
-        const rosterData = {
-            name: rosterName,
-            description: description
-        };
-    
-        try {
-            // Send a POST request to create the roster
-            const rosterResponse = await api.post('http://localhost:5000/api/roster', rosterData);
-    
-            const rosterId = rosterResponse.data.rosterId;
-    
-            // Create roster contact entries
-            const contactsToAdd = rosterContacts;
-    
-    
-           const  contactsToRemove = []; // Always empty due to creating the roster
-            // Send a POST request to create roster contacts
-            api.post('http://localhost:5000/api/RosterContact/updateContacts', {
-            rosterId: rosterId,
-            contactsToAdd: contactsToAdd,
-            contactsToRemove: contactsToRemove
-           
-        }) .then(response => {
-            console.log('Roster contacts updated successfully:', response.data);
-            // Optionally, you can update the local state or perform any other actions upon successful update.
-        })
-        .catch(error => {
-            console.error('Error updating roster contacts:', error);
-            // Optionally, you can handle errors here, such as displaying an error message to the user.
-        });
-    
-            // Display success message
-           // console.log('Roster and roster contacts created successfully');
-            setAlertOpen(true);
-            // Reset form fields
-            setRosterName('');
-            setDescription('');
-            setRosterContacts([]);
-    
-            // Redirect to the previous page
-        } catch (error) {
-            console.error('Error:', error.message);
-            // Handle error (e.g., display error message)
-        }
-    };
-
-
-    const handleCheckboxChange = (contactId) => {
-        const id = Number(contactId);
-    
-        setRosterContacts(prev => 
-            prev.includes(id)
-                ? prev.filter(c => c !== id)  // remove
-                : [...prev, id]               // add
-        );
-    };
-    const groupContactsByRole = (contacts) => {
-        const groupedContacts = {};
-        contacts.forEach(contact => {
-            if (!groupedContacts[contact.rank]) {
-                groupedContacts[contact.rank] = [];
-            }
-             if (Number(contact.active) === 1) {
-                groupedContacts[contact.rank].push(contact);
-             }
-        });
-        // Sort contacts alphabetically within each rank
-        for (const rank in groupedContacts) {
-            groupedContacts[rank].sort((a, b) => a.lastName.localeCompare(b.lastName));
-        }
-        return groupedContacts;
-    };
-
-   
-
-    return (
-        <div>
-            <ToolBar />
-            {/* Display a Snackbar for the alert */}
-            <Snackbar
-                open={alertOpen}
-                autoHideDuration={6000}
-                onClose={handleCloseAlert}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >
-                <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%', fontSize: '1.2rem' }}>
-                    Roster added successfully!
-                </Alert>
-            </Snackbar>
-            <Container style={{ padding: '25px', borderRadius: 16 }}>
-    <Typography variant="h4" align="center" gutterBottom className="logoName">
-        Please enter the Roster Details
-    </Typography>
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <TextField
-            label="Roster Name"
-            variant="outlined"
-            value={rosterName}
-            onChange={e => setRosterName(e.target.value)}
-            sx={{ textAlign: 'center' }}
-            InputProps={{ style: { borderColor: 'white' } }}
-        />
-    </div>
-    <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <TextField
-            label="Description"
-            variant="outlined"
-            multiline
-            rows={4}
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            sx={{ textAlign: 'center' }}
-            InputProps={{ style: { borderColor: 'white' } }}
-        />
-    </div>
-
-    {/* Right Panel for Listing Contacts */}
-    <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-        <Typography variant="h5" align="center" gutterBottom color="primary">
-            Contacts
-        </Typography>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-            {Object.entries(contactsByRank).map(([rank, contacts]) => (
-                <div key={rank} style={{ marginTop: '20px', flexBasis: '30%' }}>
-                    <Typography variant="h6" gutterBottom color="primary">
-                        {rank}
-                    </Typography>
-                    <ul>
-                        {contacts.map(contact => (
-                            <li key={contact.contactId} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                                <Typography variant="body1" style={{ marginRight: '10px' }}>
-                                    {contact.firstName} {contact.lastName}
-                                </Typography>
-                                <input type="checkbox"
-    value={contact.contactId}
-    aria-label={`Select contact ${contact.name}`}
-    onChange={(e) => handleCheckboxChange(e.target.value)}
-    checked={rosterContacts.includes(Number(contact.contactId))}
-/>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
-        </div>
-    </div>
-
-    <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <NavyButton size="large" variant="contained" color="primary" onClick={handleAddRoster}>
-            Submit
-        </NavyButton>
-        <NavyButton variant="contained" onClick={() => navigate(-1)} style={{ marginLeft: '20px' }}>
-            Go Back
-        </NavyButton>
-    </div>
-</Container>
-        </div>
-    );
-};
-
-export default CreateRoster;
+export default function CreateRoster() {
+  const access = useUnitAccess();
+  const navigate = useNavigate();
+  const { contacts, loading, error } = useContacts();
+  const [draft, setDraft] = useState({ unitId: '', name: '', description: '' });
+  const [selected, setSelected] = useState([]);
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState('');
+  const [createdId, setCreatedId] = useState(null);
+  const submit = async event => {
+    event.preventDefault();
+    if (pending || createdId || !access.canManage(draft.unitId)) return;
+    setPending(true); setFailure('');
+    let id;
+    try {
+      const response = await api.post('/roster', draft);
+      id = response.data.rosterId; setCreatedId(id);
+      await api.post('/RosterContact/updateContacts', { rosterId: id, contactsToAdd: selected, contactsToRemove: [] });
+      navigate('/landing');
+    } catch (failure) { setFailure(id ? `Roster #${id} was created, but membership could not be confirmed. Open it to check members before trying again.` : failure.response?.data?.message || 'Creation could not be confirmed. Check rosters before retrying.'); }
+    finally { setPending(false); }
+  };
+  return <><ToolBar /><Container maxWidth="sm" sx={{ py: 4 }}>
+    <Typography variant="h4" component="h1">Create roster</Typography>
+    {(failure || error) && <Alert severity="error">{failure || 'Staff could not be loaded.'}</Alert>}
+    <Stack component="form" onSubmit={submit} spacing={2} sx={{ mt: 3 }}>
+      <UnitPicker value={draft.unitId} disabled={pending || !!createdId} onChange={unitId => { setDraft({ ...draft, unitId }); setSelected([]); }} />
+      <TextField label="Roster name" required value={draft.name} disabled={pending || !!createdId} onChange={event => setDraft({ ...draft, name: event.target.value })} />
+      <TextField label="Description" multiline value={draft.description} disabled={pending || !!createdId} onChange={event => setDraft({ ...draft, description: event.target.value })} />
+      <Typography>Members must belong to the roster’s unit.</Typography>
+      {contacts.filter(contact => contact.unitId === Number(draft.unitId)).map(contact => <FormControlLabel key={contact.contactId} label={`${contact.firstName} ${contact.lastName}`} control={<Checkbox checked={selected.includes(contact.contactId)} disabled={pending || !!createdId} onChange={() => setSelected(ids => ids.includes(contact.contactId) ? ids.filter(id => id !== contact.contactId) : [...ids, contact.contactId])} />} />)}
+      <Button type="submit" variant="contained" disabled={pending || loading || !!error || !!createdId || !access.canManage(draft.unitId)}>{pending ? 'Creating…' : 'Create roster'}</Button>
+      {createdId && <Button onClick={() => navigate(`/editRoster/${createdId}`)}>Check saved roster</Button>}
+      <Button onClick={() => navigate('/landing')}>Back to dashboard</Button>
+    </Stack>
+  </Container></>;
+}

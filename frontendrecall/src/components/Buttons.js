@@ -1,6 +1,5 @@
 import { Button} from '@mui/material';
 
-import { useNavigate } from 'react-router-dom';
 
 import React from 'react';
 
@@ -48,11 +47,7 @@ const StyledDbButton = styled.button`
 
 export const DbButton = ({ children, className, onClick }) => {
 
-    const navigate = useNavigate();
-    const dbList = () => {
-  
-      navigate("/manageRoster")
-    }
+
     return (
       <StyledDbButton onClick={onClick}>{children}</StyledDbButton>
     //<span className = "button" style= {{color: "white"}} onClick={dbList}>{children}</span>
